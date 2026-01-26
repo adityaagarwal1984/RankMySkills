@@ -35,9 +35,20 @@ const Home = () => {
         <div className="flex items-start space-x-6">
           <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center">
             {user?.profile_photo ? (
-              <img src={user.profile_photo} alt="" className="w-24 h-24 rounded-full object-cover" />
+              <img 
+                src={user.profile_photo.startsWith('http') ? user.profile_photo : `http://localhost:5000${user.profile_photo}`} 
+                alt="Profile" 
+                className="w-24 h-24 rounded-full object-cover"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'flex';
+                }}
+              />
             ) : (
               <span className="text-4xl">👤</span>
+            )}
+            {user?.profile_photo && (
+              <span className="text-4xl" style={{ display: 'none' }}>👤</span>
             )}
           </div>
           

@@ -44,12 +44,19 @@ const DashboardLayout = () => {
 
         <div className="absolute bottom-0 w-64 p-4 border-t">
           <div className="flex items-center space-x-3 mb-3">
-            <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
               {user?.profile_photo ? (
-                <img src={user.profile_photo} alt="" className="w-10 h-10 rounded-full" />
-              ) : (
-                <span className="text-lg">👤</span>
-              )}
+                <img 
+                  src={user.profile_photo.startsWith('http') ? user.profile_photo : `http://localhost:5000${user.profile_photo}`} 
+                  alt="Profile" 
+                  className="w-10 h-10 rounded-full object-cover"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'inline';
+                  }}
+                />
+              ) : null}
+              <span className={`text-lg ${user?.profile_photo ? 'hidden' : ''}`}>👤</span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>

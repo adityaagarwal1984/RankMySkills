@@ -1,9 +1,38 @@
 const express = require('express');
+const multer = require('multer');
+const path = require('path');
 const User = require('../models/User');
 const College = require('../models/College');
 const { authenticate, authorize } = require('../middleware/auth');
 
 const router = express.Router();
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/profile-photos/');
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'profile-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed (jpeg, jpg, png, gif)'));
+    }
+  }
+});
 
 // Get student profile
 router.get('/profile', authenticate, authorize('student'), async (req, res) => {
@@ -34,6 +63,30 @@ router.get('/profile', authenticate, authorize('student'), async (req, res) => {
   } catch (error) {
     console.error('Get profile error:', error);
     res.status(500).json({ error: 'Failed to fetch profile' });
+  }
+});
+
+// Upload profile photo
+router.post('/upload-photo', authenticate, authorize('student'), upload.single('photo'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+    
+    const photoUrl = `/uploads/profile-photos/${req.file.filename}`;
+    
+    // Update user's profile photo
+    await User.findByIdAndUpdate(req.userId, {
+      profile_photo: photoUrl
+    });
+    
+    res.json({
+      message: 'Photo uploaded successfully',
+      photoUrl
+    });
+  } catch (error) {
+    console.error('Upload photo error:', error);
+    res.status(500).json({ error: error.message || 'Failed to upload photo' });
   }
 });
 
