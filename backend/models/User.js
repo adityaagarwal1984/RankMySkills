@@ -87,6 +87,16 @@ const userSchema = new mongoose.Schema({
     default: function() { return this.role !== 'college_admin'; }
   },
   
+  // Password reset fields
+  resetPasswordToken: {
+    type: String,
+    default: null
+  },
+  resetPasswordExpires: {
+    type: Date,
+    default: null
+  },
+  
   created_at: {
     type: Date,
     default: Date.now
