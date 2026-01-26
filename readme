@@ -1,0 +1,51 @@
+# TalentTrack - Student Skill Tracking Platform
+
+🎉 **BUILD COMPLETE!**
+
+## Quick Links
+- 📖 [Complete Documentation](README.md)
+- 🚀 [Quick Start Guide](QUICKSTART.md)
+- 📡 [API Documentation](API_DOCUMENTATION.md)
+- 🎓 [Student Dashboard Guide](STUDENT_DASHBOARD.md)
+- ✅ [Build Summary](BUILD_COMPLETE.md)
+
+## What is TalentTrack?
+
+A full-stack student skill tracking and ranking platform with:
+- ✅ **THREE separate dashboards** (Student, College, Admin)
+- ✅ **ONE shared backend** (Node.js + Express + MongoDB)
+- ✅ **Left sidebar navigation** with 5 pages
+- ✅ **4 ranking cards** on home page
+- ✅ **4 coding platform cards** in portfolio
+- ✅ **Global and college leaderboards**
+- ✅ **Engineer score calculation**
+
+## Get Started in 5 Minutes
+
+```bash
+# 1. Start Backend
+cd backend
+npm install
+# Create .env file (see .env.example)
+npm run dev
+
+# 2. Start Student Dashboard (new terminal)
+cd student-dashboard
+npm install
+npm start
+```
+
+Open http://localhost:3000 and register!
+
+## Project Structure
+
+```
+TalentTrack/
+├── backend/              # Express.js API
+├── student-dashboard/    # React app (main)
+├── college-dashboard/    # React app (college admin)
+├── admin-dashboard/      # React app (super admin)
+└── docs/                 # Documentation files
+```
+
+See [BUILD_COMPLETE.md](BUILD_COMPLETE.md) for full details!
