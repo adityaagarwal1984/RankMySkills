@@ -5,17 +5,17 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
-        <nav className="bg-white shadow-md">
+        <nav className="bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg">
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex justify-between items-center">
               <div>
-                <h1 className="text-2xl font-bold text-purple-600">TalentTrack</h1>
-                <p className="text-sm text-gray-600">College Dashboard</p>
+                <h1 className="text-2xl font-bold">RankMySkills</h1>
+                <p className="text-sm text-purple-100">College Dashboard</p>
               </div>
               <div className="flex space-x-6">
-                <Link to="/" className="text-gray-700 hover:text-purple-600">Overview</Link>
-                <Link to="/students" className="text-gray-700 hover:text-purple-600">Students</Link>
-                <Link to="/assessments" className="text-gray-700 hover:text-purple-600">Assessments</Link>
+                <Link to="/" className="hover:text-purple-200">Overview</Link>
+                <Link to="/students" className="hover:text-purple-200">Students</Link>
+                <Link to="/assessments" className="hover:text-purple-200">Assessments</Link>
               </div>
             </div>
           </div>

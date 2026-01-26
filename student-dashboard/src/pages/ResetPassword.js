@@ -48,7 +48,8 @@ const ResetPassword = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
       <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center mb-2 text-gray-800">Reset Password</h1>
+        <h1 className="text-3xl font-bold text-center mb-2 text-gray-800">RankMySkills</h1>
+        <h2 className="text-xl font-semibold text-center mb-2 text-gray-700">Reset Password</h2>
         <p className="text-center text-gray-600 mb-6">
           Enter your new password
         </p>

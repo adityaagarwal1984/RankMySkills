@@ -18,7 +18,7 @@ const DashboardLayout = () => {
       {/* Left Sidebar */}
       <aside className="w-64 bg-white shadow-lg fixed h-full">
         <div className="p-6 border-b">
-          <h1 className="text-2xl font-bold text-primary">TalentTrack</h1>
+          <h1 className="text-2xl font-bold text-primary">RankMySkills</h1>
           <p className="text-sm text-gray-600 mt-1">Student Dashboard</p>
         </div>
 

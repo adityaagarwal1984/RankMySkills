@@ -9,7 +9,7 @@ function App() {
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex justify-between items-center">
               <div>
-                <h1 className="text-2xl font-bold">TalentTrack Admin</h1>
+                <h1 className="text-2xl font-bold">RankMySkills Admin</h1>
                 <p className="text-sm text-red-100">System Administrator</p>
               </div>
               <div className="flex space-x-6">
