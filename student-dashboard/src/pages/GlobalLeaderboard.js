@@ -63,11 +63,20 @@ const GlobalLeaderboard = () => {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-800 mb-2">Global Leaderboard</h1>
-      <p className="text-gray-600 mb-6">Compare yourself with students across the platform</p>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 flex items-center space-x-2">
+          <i className='bx bx-world text-blue-600'></i>
+          <span>Global Leaderboard</span>
+        </h1>
+        <p className="text-gray-600 mt-1">Compare yourself with students across the platform</p>
+      </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-6">
+        <div className="flex items-center space-x-2 mb-4">
+          <i className='bx bx-filter text-lg text-gray-700'></i>
+          <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Filters</h3>
+        </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -164,7 +173,7 @@ const GlobalLeaderboard = () => {
                               className="w-10 h-10 rounded-full object-cover" 
                             />
                           ) : (
-                            <span>👤</span>
+                            <i className='bx bx-user text-xl text-gray-500'></i>
                           )}
                         </div>
                         <div>

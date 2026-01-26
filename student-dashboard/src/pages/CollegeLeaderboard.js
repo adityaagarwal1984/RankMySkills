@@ -68,12 +68,24 @@ const CollegeLeaderboard = () => {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-800 mb-2">College Leaderboard</h1>
-      <p className="text-gray-600 mb-1">{user?.college?.name}</p>
-      <p className="text-sm text-gray-500 mb-6">Compare yourself with students in your college</p>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 flex items-center space-x-2">
+          <i className='bx bx-buildings text-blue-600'></i>
+          <span>College Leaderboard</span>
+        </h1>
+        <div className="flex items-center space-x-2 text-gray-600 mt-1">
+          <i className='bx bxs-school text-sm'></i>
+          <p>{user?.college?.name}</p>
+        </div>
+        <p className="text-sm text-gray-500 mt-1">Compare yourself with students in your college</p>
+      </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-6">
+        <div className="flex items-center space-x-2 mb-4">
+          <i className='bx bx-filter text-lg text-gray-700'></i>
+          <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Filters</h3>
+        </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -170,7 +182,7 @@ const CollegeLeaderboard = () => {
                               className="w-10 h-10 rounded-full object-cover" 
                             />
                           ) : (
-                            <span>👤</span>
+                            <i className='bx bx-user text-xl text-gray-500'></i>
                           )}
                         </div>
                         <div>

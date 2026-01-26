@@ -112,8 +112,13 @@ const EditProfile = () => {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-800 mb-2">Edit Profile</h1>
-      <p className="text-gray-600 mb-8">Update your personal information and platform usernames</p>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 flex items-center space-x-2">
+          <i className='bx bx-edit text-blue-600'></i>
+          <span>Edit Profile</span>
+        </h1>
+        <p className="text-gray-600 mt-1">Update your personal information and platform usernames</p>
+      </div>
 
       {success && (
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
@@ -273,8 +278,9 @@ const EditProfile = () => {
           
           <div className="space-y-4">
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                💻 LeetCode Username
+              <label className="block text-gray-700 font-medium mb-2 flex items-center space-x-2">
+                <i className='bx bx-code-alt text-lg text-yellow-600'></i>
+                <span>LeetCode Username</span>
               </label>
               <input
                 type="text"
@@ -287,8 +293,9 @@ const EditProfile = () => {
             </div>
 
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                🏆 Codeforces Handle
+              <label className="block text-gray-700 font-medium mb-2 flex items-center space-x-2">
+                <i className='bx bx-trophy text-lg text-blue-600'></i>
+                <span>Codeforces Handle</span>
               </label>
               <input
                 type="text"
@@ -301,8 +308,9 @@ const EditProfile = () => {
             </div>
 
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                🍳 CodeChef Username
+              <label className="block text-gray-700 font-medium mb-2 flex items-center space-x-2">
+                <i className='bx bx-dish text-lg text-amber-700'></i>
+                <span>CodeChef Username</span>
               </label>
               <input
                 type="text"
@@ -315,8 +323,9 @@ const EditProfile = () => {
             </div>
 
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                📚 GeeksForGeeks Username
+              <label className="block text-gray-700 font-medium mb-2 flex items-center space-x-2">
+                <i className='bx bx-book-open text-lg text-green-600'></i>
+                <span>GeeksForGeeks Username</span>
               </label>
               <input
                 type="text"

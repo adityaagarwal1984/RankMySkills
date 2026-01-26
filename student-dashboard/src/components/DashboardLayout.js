@@ -6,11 +6,11 @@ const DashboardLayout = () => {
   const { user, logout } = useAuth();
 
   const navItems = [
-    { path: '/', label: 'Home', icon: '🏠' },
-    { path: '/portfolio', label: 'Portfolio', icon: '📁' },
-    { path: '/global-leaderboard', label: 'Global Leaderboard', icon: '🌍' },
-    { path: '/college-leaderboard', label: 'College Leaderboard', icon: '🏫' },
-    { path: '/edit-profile', label: 'Edit Profile', icon: '✏️' },
+    { path: '/', label: 'Home', icon: 'bx-home' },
+    { path: '/portfolio', label: 'Portfolio', icon: 'bx-folder' },
+    { path: '/global-leaderboard', label: 'Global Leaderboard', icon: 'bx-world' },
+    { path: '/college-leaderboard', label: 'College Leaderboard', icon: 'bx-buildings' },
+    { path: '/edit-profile', label: 'Edit Profile', icon: 'bx-edit-alt' },
   ];
 
   return (
@@ -29,14 +29,14 @@ const DashboardLayout = () => {
               to={item.path}
               end={item.path === '/'}
               className={({ isActive }) =>
-                `flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 transition-colors ${
+                `flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 transition-all ${
                   isActive
-                    ? 'bg-primary text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
+                    : 'text-gray-700 hover:bg-gray-100 hover:shadow-sm'
                 }`
               }
             >
-              <span className="text-xl">{item.icon}</span>
+              <i className={`bx ${item.icon} text-xl`}></i>
               <span className="font-medium">{item.label}</span>
             </NavLink>
           ))}
@@ -56,7 +56,7 @@ const DashboardLayout = () => {
                   }}
                 />
               ) : null}
-              <span className={`text-lg ${user?.profile_photo ? 'hidden' : ''}`}>👤</span>
+              <i className={`bx bx-user text-2xl text-gray-500 ${user?.profile_photo ? 'hidden' : ''}`}></i>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
