@@ -290,4 +290,15 @@ router.post('/reset-password/:token', async (req, res) => {
   }
 });
 
+// Get all colleges (public endpoint for registration)
+router.get('/colleges', async (req, res) => {
+  try {
+    const colleges = await College.find().sort('name_display').select('college_id name_display');
+    res.json({ colleges });
+  } catch (error) {
+    console.error('Get colleges error:', error);
+    res.status(500).json({ error: 'Failed to fetch colleges' });
+  }
+});
+
 module.exports = router;

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -11,13 +12,35 @@ const Register = () => {
     graduation_year: new Date().getFullYear() + 2,
     course: '',
   });
+  const [colleges, setColleges] = useState([]);
+  const [showNewCollegeInput, setShowNewCollegeInput] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // Fetch colleges list
+    const fetchColleges = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/auth/colleges');
+        setColleges(response.data.colleges || []);
+      } catch (err) {
+        console.error('Failed to fetch colleges:', err);
+      }
+    };
+    fetchColleges();
+  }, []);
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    if (name === 'college_name' && value === '__add_new__') {
+      setShowNewCollegeInput(true);
+      setFormData({ ...formData, college_name: '' });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -87,14 +110,47 @@ const Register = () => {
 
           <div>
             <label className="block text-gray-700 font-medium mb-2">College Name</label>
-            <input
-              type="text"
-              name="college_name"
-              value={formData.college_name}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
+            {!showNewCollegeInput ? (
+              <select
+                name="college_name"
+                value={formData.college_name}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              >
+                <option value="">-- Select Your College --</option>
+                {colleges.map((college) => (
+                  <option key={college.college_id} value={college.name_display}>
+                    {college.name_display}
+                  </option>
+                ))}
+                <option value="__add_new__" className="text-blue-600 font-semibold">
+                  + Add New College
+                </option>
+              </select>
+            ) : (
+              <div>
+                <input
+                  type="text"
+                  name="college_name"
+                  value={formData.college_name}
+                  onChange={handleChange}
+                  placeholder="e.g., GL BAJAJ INSTITUTE OF TECHNOLOGY AND MANAGEMENT, GREATER NOIDA"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-red-500"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowNewCollegeInput(false);
+                    setFormData({ ...formData, college_name: '' });
+                  }}
+                  className="text-sm text-blue-500 hover:underline mt-1"
+                >
+                  ← Back to college list
+                </button>
+              </div>
+            )}
           </div>
 
           <div>
