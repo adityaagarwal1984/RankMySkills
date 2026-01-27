@@ -1,8 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import api from '../api/api';
 
 const Portfolio = () => {
-  const { user } = useAuth();
+  const { user, fetchProfile } = useAuth();
+  const [syncing, setSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState(null);
+  const [syncError, setSyncError] = useState(null);
+
+  const handleSyncPlatforms = async () => {
+    setSyncing(true);
+    setSyncMessage(null);
+    setSyncError(null);
+
+    try {
+      const response = await api.post('/student/sync-platforms');
+      
+      setSyncMessage({
+        text: response.data.message,
+        score: response.data.global_engineer_score,
+        results: response.data.results
+      });
+      
+      // Refresh user data to show updated scores
+      await fetchProfile();
+    } catch (error) {
+      setSyncError(error.response?.data?.error || 'Failed to sync platform data');
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const platforms = [
     {
@@ -11,6 +38,7 @@ const Portfolio = () => {
       color: 'yellow',
       username: user?.platforms?.leetcode,
       rating: user?.ratings?.leetcode,
+      maxRating: user?.max_ratings?.leetcode,
       problems: user?.problems_solved?.leetcode,
       url: user?.platforms?.leetcode ? `https://leetcode.com/${user.platforms.leetcode}` : null
     },
@@ -20,6 +48,7 @@ const Portfolio = () => {
       color: 'blue',
       username: user?.platforms?.codeforces,
       rating: user?.ratings?.codeforces,
+      maxRating: user?.max_ratings?.codeforces,
       problems: user?.problems_solved?.codeforces,
       url: user?.platforms?.codeforces ? `https://codeforces.com/profile/${user.platforms.codeforces}` : null
     },
@@ -29,6 +58,7 @@ const Portfolio = () => {
       color: 'brown',
       username: user?.platforms?.codechef,
       rating: user?.ratings?.codechef,
+      maxRating: user?.max_ratings?.codechef,
       problems: user?.problems_solved?.codechef,
       url: user?.platforms?.codechef ? `https://www.codechef.com/users/${user.platforms.codechef}` : null
     },
@@ -38,7 +68,11 @@ const Portfolio = () => {
       color: 'green',
       username: user?.platforms?.gfg,
       rating: null,
+      maxRating: null,
       problems: user?.problems_solved?.gfg,
+      codingScore: user?.gfg_coding_score,
+      instituteRank: user?.gfg_institute_rank,
+      instituteName: user?.gfg_institute_name,
       url: user?.platforms?.gfg ? `https://auth.geeksforgeeks.org/user/${user.platforms.gfg}` : null
     }
   ];
@@ -66,11 +100,80 @@ const Portfolio = () => {
   return (
     <div className="max-w-6xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 flex items-center space-x-2">
-          <i className='bx bx-briefcase text-blue-600'></i>
-          <span>Portfolio</span>
-        </h1>
-        <p className="text-gray-600 mt-1">Your coding platform performance and achievements</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center space-x-2">
+              <i className='bx bx-briefcase text-blue-600'></i>
+              <span>Portfolio</span>
+            </h1>
+            <p className="text-gray-600 mt-1">Your coding platform performance and achievements</p>
+          </div>
+          <button
+            onClick={handleSyncPlatforms}
+            disabled={syncing}
+            className={`flex items-center space-x-2 px-5 py-2.5 rounded-lg font-medium transition-all ${
+              syncing 
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg'
+            }`}
+          >
+            <i className={`bx ${syncing ? 'bx-loader-alt bx-spin' : 'bx-refresh'} text-xl`}></i>
+            <span>{syncing ? 'Syncing...' : 'Sync Data'}</span>
+          </button>
+        </div>
+
+        {/* Sync Messages */}
+        {syncMessage && (
+          <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
+            <div className="flex items-start space-x-3">
+              <i className='bx bx-check-circle text-2xl text-green-600'></i>
+              <div className="flex-1">
+                <p className="font-semibold text-green-800">{syncMessage.text}</p>
+                <p className="text-sm text-green-700 mt-1">
+                  New Global Engineer Score: <span className="font-bold">{syncMessage.score}</span>
+                </p>
+                {syncMessage.results && (
+                  <div className="mt-2 space-y-1">
+                    {Object.entries(syncMessage.results).map(([platform, result]) => (
+                      <div key={platform} className="text-sm">
+                        <span className="font-medium capitalize">{platform}:</span>{' '}
+                        {result.success ? (
+                          platform === 'gfg' ? (
+                            <span className="text-green-700">
+                              ✓ Coding Score: {result.codingScore || 'N/A'}
+                            </span>
+                          ) : platform === 'codechef' ? (
+                            <span className="text-green-700">
+                              ✓ Rating: {result.rating} (Max: {result.maxRating})
+                            </span>
+                          ) : (
+                            <span className="text-green-700">
+                              ✓ Rating: {result.rating} (Max: {result.maxRating}), Problems: {result.problems}
+                            </span>
+                          )
+                        ) : (
+                          <span className="text-orange-600">✗ {result.error}</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {syncError && (
+          <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-start space-x-3">
+              <i className='bx bx-error-circle text-2xl text-red-600'></i>
+              <div>
+                <p className="font-semibold text-red-800">Sync Failed</p>
+                <p className="text-sm text-red-700 mt-1">{syncError}</p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -122,16 +225,37 @@ const Portfolio = () => {
             {platform.username ? (
               <div className="space-y-3">
                 {platform.rating !== null && platform.rating !== undefined && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-700 font-medium">Current Rating:</span>
-                    <span className="text-2xl font-bold text-gray-800">{platform.rating}</span>
-                  </div>
+                  <>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-700 font-medium">Current Rating:</span>
+                      <span className="text-2xl font-bold text-gray-800">{platform.rating}</span>
+                    </div>
+                    {platform.maxRating !== null && platform.maxRating !== undefined && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-700 font-medium">Max Rating:</span>
+                        <span className="text-xl font-bold text-orange-600">{platform.maxRating}</span>
+                      </div>
+                    )}
+                  </>
                 )}
                 
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-700 font-medium">Problems Solved:</span>
-                  <span className="text-2xl font-bold text-gray-800">{platform.problems || 0}</span>
-                </div>
+                {/* Only show problems for LeetCode and Codeforces */}
+                {(platform.name === 'LeetCode' || platform.name === 'Codeforces') && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-700 font-medium">Problems Solved:</span>
+                    <span className="text-2xl font-bold text-gray-800">{platform.problems || 0}</span>
+                  </div>
+                )}
+
+                {/* GeeksForGeeks specific - Coding Score only */}
+                {platform.name === 'GeeksForGeeks' && platform.codingScore && (
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-700 font-medium">Coding Score:</span>
+                      <span className="text-xl font-bold text-green-600">{platform.codingScore}</span>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="text-center py-4">
@@ -149,11 +273,25 @@ const Portfolio = () => {
       </div>
 
       <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">💡 Tip</h3>
-        <p className="text-gray-700">
-          Connect all your coding platform accounts to get accurate rankings and track your progress.
-          Your Global Engineer Score is calculated based on your LeetCode, Codeforces, and CodeChef ratings.
-        </p>
+        <h3 className="text-lg font-semibold text-gray-800 mb-2">💡 How It Works</h3>
+        <ul className="text-gray-700 space-y-2">
+          <li className="flex items-start space-x-2">
+            <i className='bx bx-check text-blue-600 text-xl'></i>
+            <span>Add your platform usernames in the Edit Profile section</span>
+          </li>
+          <li className="flex items-start space-x-2">
+            <i className='bx bx-check text-blue-600 text-xl'></i>
+            <span>Click "Sync Data" to fetch your latest ratings and problem counts from LeetCode, Codeforces, and CodeChef</span>
+          </li>
+          <li className="flex items-start space-x-2">
+            <i className='bx bx-check text-blue-600 text-xl'></i>
+            <span>Your Global Engineer Score is automatically calculated based on the formula:
+              <br/><code className="text-xs bg-white px-2 py-1 rounded mt-1 inline-block">
+                (0.35×√CF + 0.30×√LC + 0.25×√CC + 0.10×√TotalSolved) × 1000
+              </code>
+            </span>
+          </li>
+        </ul>
       </div>
     </div>
   );

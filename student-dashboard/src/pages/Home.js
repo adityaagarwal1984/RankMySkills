@@ -151,13 +151,13 @@ const Home = () => {
             <h3 className="text-lg font-semibold text-gray-800">College Rank</h3>
           </div>
           <div className="text-4xl font-bold text-purple-600 mb-2">
-            #{rankings?.college?.rank || '-'}
+            {user?.college_engineer_score !== null ? `#${rankings?.college?.rank || '-'}` : 'N/A'}
           </div>
           <p className="text-gray-600 text-sm">
-            Out of {rankings?.college?.total || 0} students
+            Out of {user?.college_engineer_score !== null ? (rankings?.college?.total || 0) : 'N/A'} students
           </p>
           <p className="text-xs text-gray-500 mt-2">
-            Based on {rankings?.college?.score_type}
+            Based on {user?.college_engineer_score !== null ? rankings?.college?.score_type : 'N/A'}
           </p>
         </div>
 
@@ -167,16 +167,16 @@ const Home = () => {
             <div className="p-3 bg-orange-100 rounded-lg">
               <i className='bx bx-badge-check text-2xl text-orange-600'></i>
             </div>
-            <h3 className="text-lg font-semibold text-gray-800">College Rank ({rankings?.college_year?.year})</h3>
+            <h3 className="text-lg font-semibold text-gray-800">College Rank ({user?.college_engineer_score !== null ? rankings?.college_year?.year : 'N/A'})</h3>
           </div>
           <div className="text-4xl font-bold text-orange-600 mb-2">
-            #{rankings?.college_year?.rank || '-'}
+            {user?.college_engineer_score !== null ? `#${rankings?.college_year?.rank || '-'}` : 'N/A'}
           </div>
           <p className="text-gray-600 text-sm">
-            Out of {rankings?.college_year?.total || 0} students
+            Out of {user?.college_engineer_score !== null ? (rankings?.college_year?.total || 0) : 'N/A'} students
           </p>
           <p className="text-xs text-gray-500 mt-2">
-            Based on {rankings?.college_year?.score_type}
+            Based on {user?.college_engineer_score !== null ? rankings?.college_year?.score_type : 'N/A'}
           </p>
         </div>
       </div>

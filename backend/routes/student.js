@@ -4,6 +4,7 @@ const path = require('path');
 const User = require('../models/User');
 const College = require('../models/College');
 const { authenticate, authorize } = require('../middleware/auth');
+const platformService = require('../services/platformService');
 
 const router = express.Router();
 
@@ -55,7 +56,11 @@ router.get('/profile', authenticate, authorize('student'), async (req, res) => {
         course: student.course,
         platforms: student.platforms,
         ratings: student.ratings,
+        max_ratings: student.max_ratings,
         problems_solved: student.problems_solved,
+        gfg_coding_score: student.gfg_coding_score,
+        gfg_institute_rank: student.gfg_institute_rank,
+        gfg_institute_name: student.gfg_institute_name,
         global_engineer_score: student.global_engineer_score,
         college_engineer_score: student.college_engineer_score
       }
@@ -223,6 +228,118 @@ router.post('/update-ratings', authenticate, authorize('student'), async (req, r
   } catch (error) {
     console.error('Update ratings error:', error);
     res.status(500).json({ error: 'Failed to update ratings' });
+  }
+});
+
+// Sync platform data from external sources
+router.post('/sync-platforms', authenticate, authorize('student'), async (req, res) => {
+  try {
+    const student = await User.findById(req.userId);
+    
+    if (!student.platforms || 
+        (!student.platforms.leetcode && !student.platforms.codeforces && 
+         !student.platforms.codechef && !student.platforms.gfg)) {
+      return res.status(400).json({ 
+        error: 'No platform usernames configured. Please add your usernames first.' 
+      });
+    }
+
+    // Fetch data from all configured platforms
+    const platformData = await platformService.fetchAllPlatformData(student.platforms);
+
+    let updatedCount = 0;
+    const results = {};
+
+    // Update LeetCode data
+    if (platformData.leetcode?.success) {
+      student.ratings.leetcode = platformData.leetcode.rating;
+      student.max_ratings.leetcode = platformData.leetcode.maxRating;
+      student.problems_solved.leetcode = platformData.leetcode.problemsSolved;
+      results.leetcode = { 
+        success: true, 
+        rating: platformData.leetcode.rating,
+        maxRating: platformData.leetcode.maxRating,
+        problems: platformData.leetcode.problemsSolved
+      };
+      updatedCount++;
+    } else if (platformData.leetcode) {
+      results.leetcode = { success: false, error: platformData.leetcode.error };
+    }
+
+    // Update Codeforces data
+    if (platformData.codeforces?.success) {
+      student.ratings.codeforces = platformData.codeforces.rating;
+      student.max_ratings.codeforces = platformData.codeforces.maxRating;
+      student.problems_solved.codeforces = platformData.codeforces.problemsSolved;
+      results.codeforces = { 
+        success: true, 
+        rating: platformData.codeforces.rating,
+        maxRating: platformData.codeforces.maxRating,
+        problems: platformData.codeforces.problemsSolved
+      };
+      updatedCount++;
+    } else if (platformData.codeforces) {
+      results.codeforces = { success: false, error: platformData.codeforces.error };
+    }
+
+    // Update CodeChef data
+    if (platformData.codechef?.success) {
+      student.ratings.codechef = platformData.codechef.rating;
+      student.max_ratings.codechef = platformData.codechef.maxRating;
+      student.problems_solved.codechef = platformData.codechef.problemsSolved;
+      results.codechef = { 
+        success: true, 
+        rating: platformData.codechef.rating,
+        maxRating: platformData.codechef.maxRating,
+        problems: platformData.codechef.problemsSolved
+      };
+      updatedCount++;
+    } else if (platformData.codechef) {
+      results.codechef = { success: false, error: platformData.codechef.error };
+    }
+
+    // Update GeeksForGeeks data
+    if (platformData.gfg?.success) {
+      student.problems_solved.gfg = platformData.gfg.problemsSolved;
+      student.gfg_coding_score = platformData.gfg.codingScore;
+      student.gfg_institute_rank = platformData.gfg.instituteRank;
+      student.gfg_institute_name = platformData.gfg.instituteName;
+      results.gfg = { 
+        success: true, 
+        problems: platformData.gfg.problemsSolved,
+        codingScore: platformData.gfg.codingScore,
+        instituteRank: platformData.gfg.instituteRank,
+        instituteName: platformData.gfg.instituteName
+      };
+      updatedCount++;
+    } else if (platformData.gfg) {
+      results.gfg = { success: false, error: platformData.gfg.error };
+    }
+
+    if (updatedCount > 0) {
+      // Recalculate global engineer score
+      student.calculateGlobalEngineerScore();
+      await student.save();
+
+      res.json({
+        message: `Successfully synced ${updatedCount} platform(s)`,
+        global_engineer_score: student.global_engineer_score,
+        ratings: student.ratings,
+        max_coding_score: student.gfg_coding_score,
+        gfg_ratings: student.max_ratings,
+        problems_solved: student.problems_solved,
+        gfg_institute_rank: student.gfg_institute_rank,
+        results
+      });
+    } else {
+      res.status(400).json({
+        error: 'Failed to sync any platforms. Please check your usernames.',
+        results
+      });
+    }
+  } catch (error) {
+    console.error('Sync platforms error:', error);
+    res.status(500).json({ error: 'Failed to sync platform data' });
   }
 });
 
