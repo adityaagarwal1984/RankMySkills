@@ -22,9 +22,13 @@ const EditProfile = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [isModified, setIsModified] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    setIsSaved(false);
+    setIsModified(true);
     if (name.startsWith('platform_')) {
       const platform = name.replace('platform_', '');
       setFormData({
@@ -50,6 +54,8 @@ const EditProfile = () => {
         return;
       }
       
+      setIsSaved(false);
+      setIsModified(true);
       setSelectedFile(file);
       setPhotoPreview(URL.createObjectURL(file));
       setError('');
@@ -99,6 +105,8 @@ const EditProfile = () => {
       await updateProfile(formData);
       await fetchProfile();
       setSuccess('Profile updated successfully!');
+      setIsSaved(true);
+      setIsModified(false);
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to update profile');
     } finally {
@@ -335,10 +343,14 @@ const EditProfile = () => {
           </button>
           <button
             type="submit"
-            disabled={loading}
-            className="px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors disabled:opacity-50"
+            disabled={loading || isSaved}
+            className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+              isSaved 
+                ? 'bg-gray-400 text-white cursor-not-allowed' 
+                : 'bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50'
+            }`}
           >
-            {loading ? 'Saving...' : 'Save Changes'}
+            {loading ? 'Saving...' : isSaved ? 'Saved' : 'Save Changes'}
           </button>
         </div>
       </form>
