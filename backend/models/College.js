@@ -43,9 +43,6 @@ const collegeSchema = new mongoose.Schema({
   }
 });
 
-// CRITICAL: Enforce unique index on name_key
-collegeSchema.index({ name_key: 1 }, { unique: true });
-
 // Helper function to normalize college name
 collegeSchema.statics.normalizeCollegeName = function(name) {
   return name
