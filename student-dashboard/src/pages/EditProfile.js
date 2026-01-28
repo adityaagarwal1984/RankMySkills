@@ -18,7 +18,6 @@ const EditProfile = () => {
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(user?.profile_photo || '');
-  const [uploadMode, setUploadMode] = useState('url'); // 'url' or 'file'
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -34,9 +33,6 @@ const EditProfile = () => {
       });
     } else {
       setFormData({ ...formData, [name]: value });
-      if (name === 'profile_photo') {
-        setPhotoPreview(value);
-      }
     }
   };
 
@@ -200,71 +196,28 @@ const EditProfile = () => {
                 </div>
               )}
               
-              {/* Toggle between URL and File Upload */}
-              <div className="flex space-x-4 mb-3">
-                <button
-                  type="button"
-                  onClick={() => setUploadMode('url')}
-                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
-                    uploadMode === 'url'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
-                >
-                  Use URL
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setUploadMode('file')}
-                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
-                    uploadMode === 'file'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
-                >
-                  Upload File
-                </button>
-              </div>
-              
-              {/* URL Input */}
-              {uploadMode === 'url' && (
-                <div>
-                  <input
-                    type="url"
-                    name="profile_photo"
-                    value={formData.profile_photo}
-                    onChange={handleChange}
-                    placeholder="https://example.com/photo.jpg"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <p className="text-sm text-gray-500 mt-1">Enter a URL to your profile photo</p>
-                </div>
-              )}
-              
               {/* File Upload */}
-              {uploadMode === 'file' && (
-                <div>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                  />
-                  <p className="text-sm text-gray-500 mt-1">
-                    Max file size: 5MB. Allowed formats: JPEG, PNG, GIF
-                  </p>
-                  {selectedFile && (
-                    <button
-                      type="button"
-                      onClick={handlePhotoUpload}
-                      disabled={uploading}
-                      className="mt-3 w-full bg-green-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors disabled:opacity-50"
-                    >
-                      {uploading ? 'Uploading...' : 'Upload Photo'}
-                    </button>
-                  )}
-                </div>
-              )}
+              <div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  Max file size: 5MB. Allowed formats: JPEG, PNG, GIF
+                </p>
+                {selectedFile && (
+                  <button
+                    type="button"
+                    onClick={handlePhotoUpload}
+                    disabled={uploading}
+                    className="mt-3 w-full bg-green-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors disabled:opacity-50"
+                  >
+                    {uploading ? 'Uploading...' : 'Upload Photo'}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
