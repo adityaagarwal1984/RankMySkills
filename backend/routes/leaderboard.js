@@ -51,7 +51,7 @@ router.get('/', authenticate, async (req, res) => {
     
     // Fetch students
     const students = await User.find(filter)
-      .select('name profile_photo college_id graduation_year course global_engineer_score college_engineer_score ratings problems_solved platforms')
+      .select('name profile_photo college_id graduation_year course global_engineer_score college_engineer_score ratings problems_solved platforms platform_verification')
       .sort(sortField)
       .limit(parseInt(limit))
       .skip(skip);
@@ -76,9 +76,9 @@ router.get('/', authenticate, async (req, res) => {
       global_engineer_score: student.global_engineer_score,
       college_engineer_score: student.college_engineer_score,
       ratings: {
-        leetcode: student.platforms?.leetcode ? (student.ratings?.leetcode || 0) : 0,
-        codeforces: student.platforms?.codeforces ? (student.ratings?.codeforces || 0) : 0,
-        codechef: student.platforms?.codechef ? (student.ratings?.codechef || 0) : 0
+        leetcode: (student.platforms?.leetcode && student.platform_verification?.leetcode?.verified) ? (student.ratings?.leetcode || 0) : 0,
+        codeforces: (student.platforms?.codeforces && student.platform_verification?.codeforces?.verified) ? (student.ratings?.codeforces || 0) : 0,
+        codechef: (student.platforms?.codechef && student.platform_verification?.codechef?.verified) ? (student.ratings?.codechef || 0) : 0
       },
       problems_solved: student.problems_solved
     }));

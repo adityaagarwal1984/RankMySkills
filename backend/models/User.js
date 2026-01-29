@@ -51,6 +51,30 @@ const userSchema = new mongoose.Schema({
     gfg: { type: String, default: null }
   },
   
+  // Platform verification
+  platform_verification: {
+    leetcode: {
+      verified: { type: Boolean, default: false },
+      verification_code: { type: String, default: null },
+      verified_at: { type: Date, default: null }
+    },
+    codeforces: {
+      verified: { type: Boolean, default: false },
+      verification_code: { type: String, default: null },
+      verified_at: { type: Date, default: null }
+    },
+    codechef: {
+      verified: { type: Boolean, default: false },
+      verification_code: { type: String, default: null },
+      verified_at: { type: Date, default: null }
+    },
+    gfg: {
+      verified: { type: Boolean, default: false },
+      verification_code: { type: String, default: null },
+      verified_at: { type: Date, default: null }
+    }
+  },
+  
   // Platform ratings (current ratings, updated by system)
   ratings: {
     leetcode: { type: Number, default: 1500 },
@@ -148,17 +172,22 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 //           0.25 * sqrt(clamp((CC - 1200) / 1800, 0, 1)) + 
 //           0.10 * sqrt(clamp(TotalSolved / 2000, 0, 1))) * 1000
 userSchema.methods.calculateGlobalEngineerScore = function() {
-  // Use actual ratings with proper defaults
-  const cf = this.ratings.codeforces || 0;
-  const lc = this.ratings.leetcode || 0;
-  const cc = this.ratings.codechef || 0;
+  // Use actual ratings (only if verified)
+  const lcVerified = this.platform_verification?.leetcode?.verified;
+  const cfVerified = this.platform_verification?.codeforces?.verified;
+  const ccVerified = this.platform_verification?.codechef?.verified;
+  const gfgVerified = this.platform_verification?.gfg?.verified;
+
+  const lc = lcVerified ? (this.ratings.leetcode || 0) : 0;
+  const cf = cfVerified ? (this.ratings.codeforces || 0) : 0;
+  const cc = ccVerified ? (this.ratings.codechef || 0) : 0;
   
-  // Calculate total problems solved across all platforms
+  // Calculate total problems solved across all verified platforms
   // GFG coding score/4 is used as proxy for problems solved (backend only)
-  const totalSolved = (this.problems_solved.leetcode || 0) + 
-                      (this.problems_solved.codeforces || 0) + 
-                      (this.problems_solved.codechef || 0) +
-                      ((this.gfg_coding_score || 0) / 4);
+  const totalSolved = (lcVerified ? (this.problems_solved.leetcode || 0) : 0) + 
+                      (cfVerified ? (this.problems_solved.codeforces || 0) : 0) + 
+                      (ccVerified ? (this.problems_solved.codechef || 0) : 0) +
+                      (gfgVerified ? ((this.gfg_coding_score || 0) / 4) : 0);
   
   // Clamp and normalize each component
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));

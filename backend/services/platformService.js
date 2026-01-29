@@ -425,6 +425,133 @@ class PlatformService {
   }
 
   /**
+   * Verify verification code in LeetCode profile
+   */
+  async verifyLeetCodeProfile(username, verificationCode) {
+    try {
+      const query = `
+        query getUserProfile($username: String!) {
+          matchedUser(username: $username) {
+            profile {
+              aboutMe
+            }
+          }
+        }
+      `;
+
+      const response = await axios.post('https://leetcode.com/graphql', {
+        query,
+        variables: { username }
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Referer': 'https://leetcode.com',
+          'User-Agent': 'Mozilla/5.0'
+        },
+        timeout: 10000
+      });
+
+      const aboutMe = response.data?.data?.matchedUser?.profile?.aboutMe || '';
+      return aboutMe.includes(verificationCode);
+    } catch (error) {
+      console.error('LeetCode verification error:', error.message);
+      return false;
+    }
+  }
+
+  /**
+   * Verify verification code in Codeforces profile
+   */
+  async verifyCodeforcesProfile(username, verificationCode) {
+    try {
+      const response = await axios.get(`https://codeforces.com/api/user.info?handles=${username}`, {
+        timeout: 10000
+      });
+
+      if (response.data?.status === 'OK' && response.data.result?.length > 0) {
+        const user = response.data.result[0];
+        const combinedName = (user.firstName || '') + ' ' + (user.lastName || '');
+        return combinedName.includes(verificationCode);
+      }
+      return false;
+    } catch (error) {
+      console.error('Codeforces verification error:', error.message);
+      return false;
+    }
+  }
+
+  /**
+   * Verify verification code in CodeChef profile (search entire page content)
+   */
+  async verifyCodeChefProfile(username, verificationCode) {
+    try {
+      console.log('Verifying CodeChef profile for:', username, 'Code:', verificationCode);
+      const url = `https://www.codechef.com/users/${username}`;
+      const response = await axios.get(url, {
+        timeout: 15000,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'text/html',
+          'Accept-Language': 'en-US,en;q=0.9'
+        }
+      });
+
+      const html = response.data;
+      // Search for the verification code anywhere in the HTML content
+      const found = html.includes(verificationCode);
+      console.log('CodeChef verification result:', found ? 'Found' : 'Not found');
+      return found;
+    } catch (error) {
+      console.error('CodeChef verification error:', error.message);
+      return false;
+    }
+  }
+
+  /**
+   * Verify verification code in GFG profile (search entire page content)
+   */
+  async verifyGFGProfile(username, verificationCode) {
+    try {
+      console.log('Verifying GFG profile for:', username, 'Code:', verificationCode);
+      
+      const urls = [
+        `https://auth.geeksforgeeks.org/user/${username}`,
+        `https://www.geeksforgeeks.org/user/${username}`
+      ];
+      
+      for (const url of urls) {
+        try {
+          const response = await axios.get(url, {
+            timeout: 15000,
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+              'Accept': 'text/html',
+              'Referer': 'https://www.geeksforgeeks.org/'
+            }
+          });
+
+          const html = response.data;
+          // Search for the verification code anywhere in the HTML content
+          // This creates a robust check regardless of where the user puts the code
+          // or how the page structure changes
+          if (html.includes(verificationCode)) {
+            console.log('GFG verification found in:', url);
+            return true;
+          }
+        } catch (urlError) {
+          console.log('GFG: Failed to fetch from', url);
+        }
+      }
+
+      console.log('GFG: Verification code not found in any source');
+      return false;
+    } catch (error) {
+      console.error('GFG verification error:', error.message);
+      return false;
+    }
+  }
+
+  /**
    * Fetch data from all platforms for a user
    */
   async fetchAllPlatformData(platforms) {

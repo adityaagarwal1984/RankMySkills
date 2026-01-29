@@ -55,6 +55,7 @@ router.get('/profile', authenticate, authorize('student'), async (req, res) => {
         graduation_year: student.graduation_year,
         course: student.course,
         platforms: student.platforms,
+        platform_verification: student.platform_verification,
         ratings: student.ratings,
         max_ratings: student.max_ratings,
         problems_solved: student.problems_solved,
@@ -100,22 +101,67 @@ router.put('/profile', authenticate, authorize('student'), async (req, res) => {
   try {
     const { name, course, graduation_year, platforms, profile_photo } = req.body;
     
-    const updates = {};
-    if (name) updates.name = name;
-    if (course) updates.course = course;
-    if (graduation_year) updates.graduation_year = graduation_year;
-    if (profile_photo) updates.profile_photo = profile_photo;
-    if (platforms) updates.platforms = platforms;
+    const student = await User.findById(req.userId);
+    if (!student) {
+      return res.status(404).json({ error: 'User not found' });
+    }
     
-    const student = await User.findByIdAndUpdate(
-      req.userId,
-      { $set: updates },
-      { new: true }
-    ).select('-password');
+    if (name) student.name = name;
+    if (course) student.course = course;
+    if (graduation_year) student.graduation_year = graduation_year;
+    if (profile_photo) student.profile_photo = profile_photo;
+    
+    if (platforms) {
+      // Check for platform changes to reset verification
+      const validPlatforms = ['leetcode', 'codeforces', 'codechef', 'gfg'];
+      
+      validPlatforms.forEach(platform => {
+        // Only process if the platform is actually in the request body
+        if (platforms[platform] !== undefined) {
+          const oldValue = student.platforms[platform];
+          const newValue = platforms[platform];
+          
+          // If value changed or removed
+          if (newValue !== oldValue) {
+            student.platforms[platform] = newValue;
+            
+            // Reset verification if username changed/removed
+            // We use direct assignment to ensure mongoose detects change
+            if (student.platform_verification && student.platform_verification[platform]) {
+              student.platform_verification[platform].verified = false;
+              student.platform_verification[platform].verification_code = null;
+              student.platform_verification[platform].verified_at = null;
+            }
+            
+            // Reset ratings/stats if removed
+            if (!newValue) {
+               if (student.ratings) student.ratings[platform] = 0;
+               if (student.problems_solved) student.problems_solved[platform] = 0;
+               if (platform === 'gfg') {
+                 student.gfg_coding_score = 0;
+                 student.gfg_institute_rank = 0;
+               }
+            }
+          }
+        }
+      });
+      
+      // Explicitly mark modified to ensure updates are saved
+      student.markModified('platforms');
+      student.markModified('platform_verification');
+      student.markModified('ratings');
+      student.markModified('problems_solved');
+    }
+
+    // Recalculate score (will use 0s for unverified platforms automatically via model method)
+    student.calculateGlobalEngineerScore();
+    
+    // Save with the changes
+    const updatedStudent = await student.save();
     
     res.json({
       message: 'Profile updated successfully',
-      student
+      student: updatedStudent
     });
   } catch (error) {
     console.error('Update profile error:', error);
@@ -340,6 +386,198 @@ router.post('/sync-platforms', authenticate, authorize('student'), async (req, r
   } catch (error) {
     console.error('Sync platforms error:', error);
     res.status(500).json({ error: 'Failed to sync platform data' });
+  }
+});
+
+// Generate verification code for a platform
+router.post('/verify/generate', authenticate, authorize('student'), async (req, res) => {
+  try {
+    const { platform } = req.body;
+    console.log('Generate verification code request:', { userId: req.userId, platform });
+    
+    const validPlatforms = ['leetcode', 'codeforces', 'codechef', 'gfg'];
+    
+    if (!validPlatforms.includes(platform)) {
+      return res.status(400).json({ error: 'Invalid platform' });
+    }
+    
+    const student = await User.findById(req.userId);
+    
+    if (!student) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Check if username is provided
+    if (!req.body.username && !student.platforms[platform]) {
+       return res.status(400).json({ error: 'Please provide username' });
+    }
+
+    const username = req.body.username || student.platforms[platform];
+    
+    // Generate verification code (letters only for GFG, alphanumeric for others)
+    let verificationCode;
+    if (platform === 'gfg') {
+      // GFG only allows letters and spaces in name field
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      let code = 'TT ';
+      for (let i = 0; i < 6; i++) {
+        code += letters.charAt(Math.floor(Math.random() * letters.length));
+      }
+      verificationCode = code;
+    } else {
+      // Other platforms allow alphanumeric
+      verificationCode = 'TT-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+    }
+    console.log('Generated code for', platform, ':', verificationCode);
+    
+    // Initialize platform_verification if it doesn't exist
+    if (!student.platform_verification) {
+      student.platform_verification = {
+        leetcode: {},
+        codeforces: {},
+        codechef: {},
+        gfg: {}
+      };
+    }
+    if (!student.platform_verification[platform]) {
+      student.platform_verification[platform] = {};
+    }
+    
+    student.platform_verification[platform].verification_code = verificationCode;
+    student.platform_verification[platform].verified = false;
+    
+    await student.save();
+    console.log('Verification code saved successfully');
+    
+    res.json({ 
+      verification_code: verificationCode,
+      platform,
+      username: username
+    });
+  } catch (error) {
+    console.error('Generate verification code error:', error);
+    res.status(500).json({ error: 'Failed to generate verification code' });
+  }
+});
+
+// Verify a platform profile
+router.post('/verify/check', authenticate, authorize('student'), async (req, res) => {
+  try {
+    const { platform, username } = req.body;
+    const validPlatforms = ['leetcode', 'codeforces', 'codechef', 'gfg'];
+    
+    if (!validPlatforms.includes(platform)) {
+      return res.status(400).json({ error: 'Invalid platform' });
+    }
+    
+    if (!username) {
+        return res.status(400).json({ error: 'Username is required' });
+    }
+
+    const student = await User.findById(req.userId);
+    
+    if (!student.platform_verification[platform]?.verification_code) {
+      return res.status(400).json({ error: 'Please generate a verification code first' });
+    }
+    
+    const verificationCode = student.platform_verification[platform].verification_code;
+    
+    // Check the platform for the verification code
+    let verified = false;
+    
+    try {
+      if (platform === 'leetcode') {
+        verified = await platformService.verifyLeetCodeProfile(username, verificationCode);
+      } else if (platform === 'codeforces') {
+        verified = await platformService.verifyCodeforcesProfile(username, verificationCode);
+      } else if (platform === 'codechef') {
+        verified = await platformService.verifyCodeChefProfile(username, verificationCode);
+      } else if (platform === 'gfg') {
+        verified = await platformService.verifyGFGProfile(username, verificationCode);
+      }
+    } catch (error) {
+      console.error(`Error fetching ${platform} data for verification:`, error);
+      return res.status(400).json({ 
+        error: `Could not fetch ${platform} profile. Please make sure the code is added and try again.` 
+      });
+    }
+    
+    if (verified) {
+      // Save the confirmed username and verified status
+      student.platforms[platform] = username;
+      student.platform_verification[platform].verified = true;
+      student.platform_verification[platform].verified_at = new Date();
+      
+      // Calculate score immediately
+      student.calculateGlobalEngineerScore();
+
+      await student.save();
+      
+      res.json({ 
+        success: true, 
+        message: `${platform} profile verified successfully!`,
+        verified: true 
+      });
+    } else {
+      res.status(400).json({ 
+        success: false,
+        error: `Verification code not found in your ${platform} profile. Please make sure you added it correctly.`,
+        verified: false
+      });
+    }
+  } catch (error) {
+    console.error('Verify platform error:', error);
+    res.status(500).json({ error: 'Failed to verify platform' });
+  }
+});
+
+// Delete a platform username
+router.delete('/platform/:platform', authenticate, authorize('student'), async (req, res) => {
+  try {
+    const { platform } = req.params;
+    const validPlatforms = ['leetcode', 'codeforces', 'codechef', 'gfg'];
+    
+    if (!validPlatforms.includes(platform)) {
+      return res.status(400).json({ error: 'Invalid platform' });
+    }
+
+    const student = await User.findById(req.userId);
+    if (!student) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Clear platform data
+    if (student.platforms) {
+      student.platforms[platform] = null;
+    }
+
+    // Clear verification status
+    if (student.platform_verification && student.platform_verification[platform]) {
+      student.platform_verification[platform].verified = false;
+      student.platform_verification[platform].verification_code = null;
+      student.platform_verification[platform].verified_at = null;
+    }
+
+    // Reset ratings/stats
+    if (student.ratings) student.ratings[platform] = 0;
+    if (student.problems_solved) student.problems_solved[platform] = 0;
+    if (platform === 'gfg') {
+      student.gfg_coding_score = 0;
+      student.gfg_institute_rank = 0;
+    }
+
+    // Recalculate score
+    student.calculateGlobalEngineerScore();
+    const updatedStudent = await student.save();
+
+    res.json({
+      message: `${platform} username removed successfully`,
+      student: updatedStudent
+    });
+
+  } catch (error) {
+    console.error('Delete platform error:', error);
+    res.status(500).json({ error: 'Failed to delete platform username' });
   }
 });
 

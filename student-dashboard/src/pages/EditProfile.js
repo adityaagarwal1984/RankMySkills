@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import VerificationModal from '../components/VerificationModal';
 
 const EditProfile = () => {
   const { user, updateProfile, fetchProfile } = useAuth();
@@ -24,6 +25,13 @@ const EditProfile = () => {
   const [uploading, setUploading] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isModified, setIsModified] = useState(false);
+  const [verificationModal, setVerificationModal] = useState({ show: false, platform: null, username: null });
+  const [verificationStatus, setVerificationStatus] = useState({
+    leetcode: user?.platform_verification?.leetcode?.verified || false,
+    codeforces: user?.platform_verification?.codeforces?.verified || false,
+    codechef: user?.platform_verification?.codechef?.verified || false,
+    gfg: user?.platform_verification?.gfg?.verified || false
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -102,7 +110,11 @@ const EditProfile = () => {
     setLoading(true);
 
     try {
-      await updateProfile(formData);
+      // Exclude platforms from general profile update
+      // Platforms are handled separately via verify/delete actions
+      const { platforms, ...profileData } = formData;
+      
+      await updateProfile(profileData);
       await fetchProfile();
       setSuccess('Profile updated successfully!');
       setIsSaved(true);
@@ -111,6 +123,58 @@ const EditProfile = () => {
       setError(err.response?.data?.error || 'Failed to update profile');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const openVerificationModal = (platform) => {
+    if (!formData.platforms[platform]) {
+      setError(`Please add your ${platform} username first`);
+      return;
+    }
+    
+    // Check if there are unsaved changes
+    // Removed check to allow verification without saving first, as verification is now independent
+    /* if (isModified) {
+      setError(`Please save your profile changes before verifying ${platform}`);
+      return;
+    } */
+    
+    setError('');
+    setVerificationModal({ show: true, platform, username: formData.platforms[platform] });
+  };
+
+  const handleVerified = async (platform) => {
+    setVerificationStatus({ ...verificationStatus, [platform]: true });
+    await fetchProfile();
+    setSuccess(`${platform} profile verified successfully!`);
+  };
+
+  const handleDeletePlatform = async (platform) => {
+    if (window.confirm(`Are you sure you want to remove your ${platform} username? This will remove your verification status.`)) {
+      try {
+        const token = localStorage.getItem('token');
+        await axios.delete(`http://localhost:5000/api/student/platform/${platform}`, {
+           headers: { Authorization: `Bearer ${token}` }
+        });
+
+        setFormData(prev => ({
+          ...prev,
+          platforms: {
+            ...prev.platforms,
+            [platform]: ''
+          }
+        }));
+        setVerificationStatus(prev => ({
+          ...prev,
+          [platform]: false
+        }));
+        setIsModified(true); // Maybe not needed if we fetch profile, but good for UI state
+        setSuccess(`${platform} username removed.`);
+        await fetchProfile();
+      } catch (err) {
+        console.error(err);
+        setError('Failed to remove platform');
+      }
     }
   };
 
@@ -242,19 +306,49 @@ const EditProfile = () => {
               <label className="block text-gray-700 font-medium mb-2 flex items-center space-x-2">
                 <i className='bx bx-code-alt text-lg text-yellow-600'></i>
                 <span>LeetCode Username</span>
+                {verificationStatus.leetcode && (
+                  <div className="ml-auto flex items-center space-x-2">
+                    <span className="flex items-center text-green-600 text-sm">
+                      <i className="bx bx-badge-check text-xl animate-pulse"></i>
+                      <span className="ml-1">Verified</span>
+                    </span>
+                    <button 
+                      type="button"
+                      onClick={() => handleDeletePlatform('leetcode')}
+                      className="text-red-500 hover:text-red-700 transition-colors"
+                      title="Remove username and verification"
+                    >
+                      <i className='bx bx-trash text-lg'></i>
+                    </button>
+                  </div>
+                )}
               </label>
-              <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
-                <span className="px-4 py-2 bg-gray-50 text-gray-600 text-sm border-r border-gray-300">
-                  https://leetcode.com/u/
-                </span>
-                <input
-                  type="text"
-                  name="platform_leetcode"
-                  value={formData.platforms.leetcode}
-                  onChange={handleChange}
-                  placeholder="username"
-                  className="flex-1 px-4 py-2 focus:outline-none rounded-r-lg"
-                />
+              <div className="flex items-center gap-2">
+                <div className="flex-1 flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+                  <span className="px-4 py-2 bg-gray-50 text-gray-600 text-sm border-r border-gray-300">
+                    https://leetcode.com/u/
+                  </span>
+                  <input
+                    type="text"
+                    name="platform_leetcode"
+                    value={formData.platforms.leetcode}
+                    onChange={handleChange}
+                    placeholder="username"
+                    className="flex-1 px-4 py-2 focus:outline-none rounded-r-lg"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => openVerificationModal('leetcode')}
+                  disabled={!formData.platforms.leetcode || verificationStatus.leetcode}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    verificationStatus.leetcode
+                      ? 'bg-green-100 text-green-700 cursor-not-allowed'
+                      : 'bg-blue-500 text-white hover:bg-blue-600'
+                  } disabled:opacity-50`}
+                >
+                  {verificationStatus.leetcode ? 'Verified' : 'Verify'}
+                </button>
               </div>
             </div>
 
@@ -262,19 +356,49 @@ const EditProfile = () => {
               <label className="block text-gray-700 font-medium mb-2 flex items-center space-x-2">
                 <i className='bx bx-trophy text-lg text-blue-600'></i>
                 <span>Codeforces Handle</span>
+                {verificationStatus.codeforces && (
+                  <div className="ml-auto flex items-center space-x-2">
+                    <span className="flex items-center text-green-600 text-sm">
+                      <i className="bx bx-badge-check text-xl animate-pulse"></i>
+                      <span className="ml-1">Verified</span>
+                    </span>
+                    <button 
+                      type="button"
+                      onClick={() => handleDeletePlatform('codeforces')}
+                      className="text-red-500 hover:text-red-700 transition-colors"
+                      title="Remove username and verification"
+                    >
+                      <i className='bx bx-trash text-lg'></i>
+                    </button>
+                  </div>
+                )}
               </label>
-              <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
-                <span className="px-4 py-2 bg-gray-50 text-gray-600 text-sm border-r border-gray-300">
-                  https://codeforces.com/profile/
-                </span>
-                <input
-                  type="text"
-                  name="platform_codeforces"
-                  value={formData.platforms.codeforces}
-                  onChange={handleChange}
-                  placeholder="handle"
-                  className="flex-1 px-4 py-2 focus:outline-none rounded-r-lg"
-                />
+              <div className="flex items-center gap-2">
+                <div className="flex-1 flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+                  <span className="px-4 py-2 bg-gray-50 text-gray-600 text-sm border-r border-gray-300">
+                    https://codeforces.com/profile/
+                  </span>
+                  <input
+                    type="text"
+                    name="platform_codeforces"
+                    value={formData.platforms.codeforces}
+                    onChange={handleChange}
+                    placeholder="handle"
+                    className="flex-1 px-4 py-2 focus:outline-none rounded-r-lg"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => openVerificationModal('codeforces')}
+                  disabled={!formData.platforms.codeforces || verificationStatus.codeforces}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    verificationStatus.codeforces
+                      ? 'bg-green-100 text-green-700 cursor-not-allowed'
+                      : 'bg-blue-500 text-white hover:bg-blue-600'
+                  } disabled:opacity-50`}
+                >
+                  {verificationStatus.codeforces ? 'Verified' : 'Verify'}
+                </button>
               </div>
             </div>
 
@@ -282,19 +406,49 @@ const EditProfile = () => {
               <label className="block text-gray-700 font-medium mb-2 flex items-center space-x-2">
                 <i className='bx bx-dish text-lg text-amber-700'></i>
                 <span>CodeChef Username</span>
+                {verificationStatus.codechef && (
+                  <div className="ml-auto flex items-center space-x-2">
+                    <span className="flex items-center text-green-600 text-sm">
+                      <i className="bx bx-badge-check text-xl animate-pulse"></i>
+                      <span className="ml-1">Verified</span>
+                    </span>
+                    <button 
+                      type="button"
+                      onClick={() => handleDeletePlatform('codechef')}
+                      className="text-red-500 hover:text-red-700 transition-colors"
+                      title="Remove username and verification"
+                    >
+                      <i className='bx bx-trash text-lg'></i>
+                    </button>
+                  </div>
+                )}
               </label>
-              <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
-                <span className="px-4 py-2 bg-gray-50 text-gray-600 text-sm border-r border-gray-300">
-                  https://www.codechef.com/users/
-                </span>
-                <input
-                  type="text"
-                  name="platform_codechef"
-                  value={formData.platforms.codechef}
-                  onChange={handleChange}
-                  placeholder="username"
-                  className="flex-1 px-4 py-2 focus:outline-none rounded-r-lg"
-                />
+              <div className="flex items-center gap-2">
+                <div className="flex-1 flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+                  <span className="px-4 py-2 bg-gray-50 text-gray-600 text-sm border-r border-gray-300">
+                    https://www.codechef.com/users/
+                  </span>
+                  <input
+                    type="text"
+                    name="platform_codechef"
+                    value={formData.platforms.codechef}
+                    onChange={handleChange}
+                    placeholder="username"
+                    className="flex-1 px-4 py-2 focus:outline-none rounded-r-lg"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => openVerificationModal('codechef')}
+                  disabled={!formData.platforms.codechef || verificationStatus.codechef}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    verificationStatus.codechef
+                      ? 'bg-green-100 text-green-700 cursor-not-allowed'
+                      : 'bg-blue-500 text-white hover:bg-blue-600'
+                  } disabled:opacity-50`}
+                >
+                  {verificationStatus.codechef ? 'Verified' : 'Verify'}
+                </button>
               </div>
             </div>
 
@@ -302,19 +456,49 @@ const EditProfile = () => {
               <label className="block text-gray-700 font-medium mb-2 flex items-center space-x-2">
                 <i className='bx bx-book-open text-lg text-green-600'></i>
                 <span>GeeksForGeeks Username</span>
+                {verificationStatus.gfg && (
+                  <div className="ml-auto flex items-center space-x-2">
+                    <span className="flex items-center text-green-600 text-sm">
+                      <i className="bx bx-badge-check text-xl animate-pulse"></i>
+                      <span className="ml-1">Verified</span>
+                    </span>
+                    <button 
+                      type="button"
+                      onClick={() => handleDeletePlatform('gfg')}
+                      className="text-red-500 hover:text-red-700 transition-colors"
+                      title="Remove username and verification"
+                    >
+                      <i className='bx bx-trash text-lg'></i>
+                    </button>
+                  </div>
+                )}
               </label>
-              <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
-                <span className="px-4 py-2 bg-gray-50 text-gray-600 text-sm border-r border-gray-300">
-                  https://www.geeksforgeeks.org/user/
-                </span>
-                <input
-                  type="text"
-                  name="platform_gfg"
-                  value={formData.platforms.gfg}
-                  onChange={handleChange}
-                  placeholder="username"
-                  className="flex-1 px-4 py-2 focus:outline-none rounded-r-lg"
-                />
+              <div className="flex items-center gap-2">
+                <div className="flex-1 flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+                  <span className="px-4 py-2 bg-gray-50 text-gray-600 text-sm border-r border-gray-300">
+                    https://www.geeksforgeeks.org/user/
+                  </span>
+                  <input
+                    type="text"
+                    name="platform_gfg"
+                    value={formData.platforms.gfg}
+                    onChange={handleChange}
+                    placeholder="username"
+                    className="flex-1 px-4 py-2 focus:outline-none rounded-r-lg"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => openVerificationModal('gfg')}
+                  disabled={!formData.platforms.gfg || verificationStatus.gfg}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    verificationStatus.gfg
+                      ? 'bg-green-100 text-green-700 cursor-not-allowed'
+                      : 'bg-blue-500 text-white hover:bg-blue-600'
+                  } disabled:opacity-50`}
+                >
+                  {verificationStatus.gfg ? 'Verified' : 'Verify'}
+                </button>
               </div>
             </div>
           </div>
@@ -374,6 +558,16 @@ const EditProfile = () => {
           </button>
         </div>
       </form>
+
+      {/* Verification Modal */}
+      {verificationModal.show && (
+        <VerificationModal
+          platform={verificationModal.platform}
+          username={verificationModal.username}
+          onClose={() => setVerificationModal({ show: false, platform: null, username: null })}
+          onVerified={handleVerified}
+        />
+      )}
     </div>
   );
 };

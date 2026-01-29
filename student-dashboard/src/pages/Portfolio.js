@@ -34,19 +34,23 @@ const Portfolio = () => {
   const platforms = [
     {
       name: 'LeetCode',
+      key: 'leetcode',
       logo: 'https://leetcode.com/static/images/LeetCode_logo_rvs.png',
       color: 'yellow',
       username: user?.platforms?.leetcode,
+      verified: user?.platform_verification?.leetcode?.verified || false,
       rating: user?.ratings?.leetcode,
       maxRating: user?.max_ratings?.leetcode,
       problems: user?.problems_solved?.leetcode,
-      url: user?.platforms?.leetcode ? `https://leetcode.com/${user.platforms.leetcode}` : null
+      url: user?.platforms?.leetcode ? `https://leetcode.com/u/${user.platforms.leetcode}` : null
     },
     {
       name: 'Codeforces',
+      key: 'codeforces',
       logo: 'https://sta.codeforces.com/s/0/favicon-32x32.png',
       color: 'blue',
       username: user?.platforms?.codeforces,
+      verified: user?.platform_verification?.codeforces?.verified || false,
       rating: user?.ratings?.codeforces,
       maxRating: user?.max_ratings?.codeforces,
       problems: user?.problems_solved?.codeforces,
@@ -54,9 +58,11 @@ const Portfolio = () => {
     },
     {
       name: 'CodeChef',
+      key: 'codechef',
       logo: 'https://cdn.codechef.com/images/cc-logo.svg',
       color: 'brown',
       username: user?.platforms?.codechef,
+      verified: user?.platform_verification?.codechef?.verified || false,
       rating: user?.ratings?.codechef,
       maxRating: user?.max_ratings?.codechef,
       problems: user?.problems_solved?.codechef,
@@ -64,9 +70,11 @@ const Portfolio = () => {
     },
     {
       name: 'GeeksForGeeks',
+      key: 'gfg',
       logo: 'https://media.geeksforgeeks.org/wp-content/cdn-uploads/gfg_200x200-min.png',
       color: 'green',
       username: user?.platforms?.gfg,
+      verified: user?.platform_verification?.gfg?.verified || false,
       rating: null,
       maxRating: null,
       problems: user?.problems_solved?.gfg,
@@ -76,6 +84,9 @@ const Portfolio = () => {
       url: user?.platforms?.gfg ? `https://auth.geeksforgeeks.org/user/${user.platforms.gfg}` : null
     }
   ];
+
+  // Filter to only show verified platforms
+  const verifiedPlatforms = platforms.filter(p => p.username && p.verified);
 
   const getColorClasses = (color) => {
     const colors = {
@@ -176,53 +187,76 @@ const Portfolio = () => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {platforms.map((platform) => (
-          <div
-            key={platform.name}
-            className={`rounded-xl shadow-sm border-2 p-6 hover:shadow-md transition-all ${getColorClasses(platform.color)}`}
+      {verifiedPlatforms.length === 0 ? (
+        <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-8 text-center">
+          <i className="bx bx-shield-x text-6xl text-yellow-600 mb-4"></i>
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">No Verified Platforms</h3>
+          <p className="text-gray-700 mb-4">
+            You need to verify your coding platform profiles before they can be displayed here.
+          </p>
+          <div className="space-y-2 text-left max-w-md mx-auto mb-6">
+            <p className="text-sm text-gray-600">
+              <strong>How to verify:</strong>
+            </p>
+            <ol className="list-decimal list-inside space-y-1 text-sm text-gray-600">
+              <li>Go to Edit Profile</li>
+              <li>Add your platform usernames</li>
+              <li>Click the "Verify" button next to each platform</li>
+              <li>Follow the verification instructions</li>
+            </ol>
+          </div>
+          <a
+            href="/edit-profile"
+            className="inline-block px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors"
           >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-14 h-14 bg-white rounded-lg shadow-sm flex items-center justify-center p-2">
-                  <img 
-                    src={platform.logo} 
-                    alt={`${platform.name} logo`}
-                    className="w-full h-full object-contain"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'block';
-                    }}
-                  />
-                  <i className={`bx bx-code-alt text-3xl ${getIconColor(platform.color)} hidden`}></i>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900">{platform.name}</h3>
-                  {platform.username ? (
-                    platform.url ? (
-                      <a
-                        href={platform.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:text-blue-800 hover:underline flex items-center space-x-1"
-                      >
-                        <span>@{platform.username}</span>
-                        <i className='bx bx-link-external text-xs'></i>
-                      </a>
-                    ) : (
-                      <p className="text-sm text-gray-600">@{platform.username}</p>
-                    )
-                  ) : (
-                    <p className="text-sm text-gray-500 italic flex items-center space-x-1">
-                      <i className='bx bx-info-circle'></i>
-                      <span>Not connected</span>
-                    </p>
-                  )}
+            Go to Edit Profile
+          </a>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {verifiedPlatforms.map((platform) => (
+            <div
+              key={platform.name}
+              className={`rounded-xl shadow-sm border-2 p-6 hover:shadow-md transition-all ${getColorClasses(platform.color)}`}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-14 h-14 bg-white rounded-lg shadow-sm flex items-center justify-center p-2">
+                    <img 
+                      src={platform.logo} 
+                      alt={`${platform.name} logo`}
+                      className="w-full h-full object-contain"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'block';
+                      }}
+                    />
+                    <i className={`bx bx-code-alt text-3xl ${getIconColor(platform.color)} hidden`}></i>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900 flex items-center space-x-2">
+                      <span>{platform.name}</span>
+                      <i className="bx bx-badge-check text-green-600 text-lg" title="Verified"></i>
+                    </h3>
+                    {platform.username ? (
+                      platform.url ? (
+                        <a
+                          href={platform.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-600 hover:text-blue-800 hover:underline flex items-center space-x-1"
+                        >
+                          <span>@{platform.username}</span>
+                          <i className='bx bx-link-external text-xs'></i>
+                        </a>
+                      ) : (
+                        <p className="text-sm text-gray-600">@{platform.username}</p>
+                      )
+                    ) : null}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {platform.username ? (
               <div className="space-y-3">
                 {platform.rating !== null && platform.rating !== undefined && (
                   <>
@@ -257,20 +291,10 @@ const Portfolio = () => {
                   </div>
                 )}
               </div>
-            ) : (
-              <div className="text-center py-4">
-                <p className="text-gray-500 mb-3">Connect your {platform.name} account</p>
-                <a
-                  href="/edit-profile"
-                  className="inline-block px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                >
-                  Add Username
-                </a>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">💡 How It Works</h3>
