@@ -243,14 +243,19 @@ const EditProfile = () => {
                 <i className='bx bx-code-alt text-lg text-yellow-600'></i>
                 <span>LeetCode Username</span>
               </label>
-              <input
-                type="text"
-                name="platform_leetcode"
-                value={formData.platforms.leetcode}
-                onChange={handleChange}
-                placeholder="your-leetcode-username"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+              <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+                <span className="px-4 py-2 bg-gray-50 text-gray-600 text-sm border-r border-gray-300">
+                  https://leetcode.com/u/
+                </span>
+                <input
+                  type="text"
+                  name="platform_leetcode"
+                  value={formData.platforms.leetcode}
+                  onChange={handleChange}
+                  placeholder="username"
+                  className="flex-1 px-4 py-2 focus:outline-none rounded-r-lg"
+                />
+              </div>
             </div>
 
             <div>
@@ -258,14 +263,19 @@ const EditProfile = () => {
                 <i className='bx bx-trophy text-lg text-blue-600'></i>
                 <span>Codeforces Handle</span>
               </label>
-              <input
-                type="text"
-                name="platform_codeforces"
-                value={formData.platforms.codeforces}
-                onChange={handleChange}
-                placeholder="your-codeforces-handle"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+              <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+                <span className="px-4 py-2 bg-gray-50 text-gray-600 text-sm border-r border-gray-300">
+                  https://codeforces.com/profile/
+                </span>
+                <input
+                  type="text"
+                  name="platform_codeforces"
+                  value={formData.platforms.codeforces}
+                  onChange={handleChange}
+                  placeholder="handle"
+                  className="flex-1 px-4 py-2 focus:outline-none rounded-r-lg"
+                />
+              </div>
             </div>
 
             <div>
@@ -273,14 +283,19 @@ const EditProfile = () => {
                 <i className='bx bx-dish text-lg text-amber-700'></i>
                 <span>CodeChef Username</span>
               </label>
-              <input
-                type="text"
-                name="platform_codechef"
-                value={formData.platforms.codechef}
-                onChange={handleChange}
-                placeholder="your-codechef-username"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+              <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+                <span className="px-4 py-2 bg-gray-50 text-gray-600 text-sm border-r border-gray-300">
+                  https://www.codechef.com/users/
+                </span>
+                <input
+                  type="text"
+                  name="platform_codechef"
+                  value={formData.platforms.codechef}
+                  onChange={handleChange}
+                  placeholder="username"
+                  className="flex-1 px-4 py-2 focus:outline-none rounded-r-lg"
+                />
+              </div>
             </div>
 
             <div>
@@ -288,14 +303,19 @@ const EditProfile = () => {
                 <i className='bx bx-book-open text-lg text-green-600'></i>
                 <span>GeeksForGeeks Username</span>
               </label>
-              <input
-                type="text"
-                name="platform_gfg"
-                value={formData.platforms.gfg}
-                onChange={handleChange}
-                placeholder="your-gfg-username"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+              <div className="flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+                <span className="px-4 py-2 bg-gray-50 text-gray-600 text-sm border-r border-gray-300">
+                  https://www.geeksforgeeks.org/user/
+                </span>
+                <input
+                  type="text"
+                  name="platform_gfg"
+                  value={formData.platforms.gfg}
+                  onChange={handleChange}
+                  placeholder="username"
+                  className="flex-1 px-4 py-2 focus:outline-none rounded-r-lg"
+                />
+              </div>
             </div>
           </div>
         </div>
