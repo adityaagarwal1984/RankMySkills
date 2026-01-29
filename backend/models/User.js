@@ -150,13 +150,15 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 userSchema.methods.calculateGlobalEngineerScore = function() {
   // Use actual ratings with proper defaults
   const cf = this.ratings.codeforces || 0;
-  const lc = this.ratings.leetcode || 1500;
+  const lc = this.ratings.leetcode || 0;
   const cc = this.ratings.codechef || 0;
   
   // Calculate total problems solved across all platforms
+  // GFG coding score/4 is used as proxy for problems solved (backend only)
   const totalSolved = (this.problems_solved.leetcode || 0) + 
                       (this.problems_solved.codeforces || 0) + 
-                      (this.problems_solved.codechef || 0);
+                      (this.problems_solved.codechef || 0) +
+                      ((this.gfg_coding_score || 0) / 4);
   
   // Clamp and normalize each component
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
