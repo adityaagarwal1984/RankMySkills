@@ -1,6 +1,8 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const User = require('../models/User');
 const College = require('../models/College');
 const { authenticate, authorize } = require('../middleware/auth');
@@ -8,14 +10,20 @@ const platformService = require('../services/platformService');
 
 const router = express.Router();
 
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/profile-photos/');
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'profile-' + uniqueSuffix + path.extname(file.originalname));
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// Configure multer for file uploads (using Cloudinary)
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'talenttrack/profile-photos',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'gif'],
+    transformation: [{ width: 500, height: 500, crop: 'limit' }]
   }
 });
 
@@ -24,6 +32,8 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|gif/;
+    // For Cloudinary storage, checking mimetype is usually sufficient, 
+    // but we can keep the extension check if desired, though filaname is handled by Cloudinary
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
     
@@ -79,7 +89,8 @@ router.post('/upload-photo', authenticate, authorize('student'), upload.single('
       return res.status(400).json({ error: 'No file uploaded' });
     }
     
-    const photoUrl = `/uploads/profile-photos/${req.file.filename}`;
+    // Cloudinary returns the absolute URL in req.file.path
+    const photoUrl = req.file.path;
     
     // Update user's profile photo
     await User.findByIdAndUpdate(req.userId, {
