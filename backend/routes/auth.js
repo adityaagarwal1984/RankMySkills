@@ -210,7 +210,11 @@ router.post('/forgot-password', async (req, res) => {
     await user.save();
     
     // Create reset URL
-    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password/${resetToken}`;
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    console.log('Reset Password requested for:', email);
+    console.log('Using Frontend URL:', frontendUrl);
+    
+    const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
     
     // Configure email transporter
     const transporter = nodemailer.createTransport({
@@ -220,6 +224,15 @@ router.post('/forgot-password', async (req, res) => {
         pass: process.env.EMAIL_PASSWORD
       }
     });
+
+    // Verify transporter connection
+    try {
+      await transporter.verify();
+      console.log('SMTP connection verified');
+    } catch (verifyError) {
+      console.error('SMTP Connection Error:', verifyError);
+      // We continue to try sending, or could fail here
+    }
     
     // Email content
     const mailOptions = {
@@ -241,7 +254,9 @@ router.post('/forgot-password', async (req, res) => {
     };
     
     // Send email
+    console.log('Sending reset email...');
     await transporter.sendMail(mailOptions);
+    console.log('Reset email sent successfully');
     
     res.json({ message: 'If the email exists, a password reset link has been sent' });
   } catch (error) {
