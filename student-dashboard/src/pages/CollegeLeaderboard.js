@@ -177,7 +177,7 @@ const CollegeLeaderboard = () => {
                         <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mr-3 overflow-hidden">
                           {student.profile_photo ? (
                             <img 
-                              src={student.profile_photo.startsWith('http') ? student.profile_photo : `http://localhost:5000${student.profile_photo}`} 
+                              src={student.profile_photo.startsWith('http') ? student.profile_photo : `${process.env.REACT_APP_IMG_URL || 'http://localhost:5000'}${student.profile_photo}`} 
                               alt="Profile" 
                               className="w-10 h-10 rounded-full object-cover" 
                             />

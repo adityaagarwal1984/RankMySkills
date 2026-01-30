@@ -82,7 +82,7 @@ const EditProfile = () => {
       
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:5000/api/student/upload-photo',
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/student/upload-photo`,
         formDataUpload,
         {
           headers: {
@@ -93,7 +93,7 @@ const EditProfile = () => {
       );
       
       setFormData({ ...formData, profile_photo: response.data.photoUrl });
-      setPhotoPreview(`http://localhost:5000${response.data.photoUrl}`);
+      setPhotoPreview(`${process.env.REACT_APP_IMG_URL || 'http://localhost:5000'}${response.data.photoUrl}`);
       setSuccess('Photo uploaded successfully!');
       setSelectedFile(null);
     } catch (err) {
@@ -153,7 +153,7 @@ const EditProfile = () => {
     if (window.confirm(`Are you sure you want to remove your ${platform} username? This will remove your verification status.`)) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete(`http://localhost:5000/api/student/platform/${platform}`, {
+        await axios.delete(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/student/platform/${platform}`, {
            headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -258,7 +258,7 @@ const EditProfile = () => {
               {photoPreview && (
                 <div className="mb-4 flex justify-center">
                   <img 
-                    src={photoPreview.startsWith('http') || photoPreview.startsWith('blob:') ? photoPreview : `http://localhost:5000${photoPreview}`} 
+                    src={photoPreview.startsWith('http') || photoPreview.startsWith('blob:') ? photoPreview : `${process.env.REACT_APP_IMG_URL || 'http://localhost:5000'}${photoPreview}`} 
                     alt="Profile Preview" 
                     className="w-32 h-32 rounded-full object-cover border-4 border-blue-200"
                     onError={(e) => {

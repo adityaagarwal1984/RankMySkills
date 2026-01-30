@@ -53,7 +53,7 @@ const DashboardLayout = () => {
             <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
               {user?.profile_photo ? (
                 <img 
-                  src={user.profile_photo.startsWith('http') ? user.profile_photo : `http://localhost:5000${user.profile_photo}`} 
+                  src={user.profile_photo.startsWith('http') ? user.profile_photo : `${process.env.REACT_APP_IMG_URL || 'http://localhost:5000'}${user.profile_photo}`} 
                   alt="Profile" 
                   className="w-10 h-10 rounded-full object-cover"
                   onError={(e) => {

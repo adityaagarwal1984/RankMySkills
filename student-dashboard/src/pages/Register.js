@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import api from '../api/api';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -23,7 +23,7 @@ const Register = () => {
     // Fetch colleges list
     const fetchColleges = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/auth/colleges');
+        const response = await api.get('/auth/colleges');
         setColleges(response.data.colleges || []);
       } catch (err) {
         console.error('Failed to fetch colleges:', err);

@@ -40,7 +40,7 @@ const Home = () => {
             <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-md ring-4 ring-blue-100">
               {user?.profile_photo ? (
                 <img 
-                  src={user.profile_photo.startsWith('http') ? user.profile_photo : `http://localhost:5000${user.profile_photo}`} 
+                  src={user.profile_photo.startsWith('http') ? user.profile_photo : `${process.env.REACT_APP_IMG_URL || 'http://localhost:5000'}${user.profile_photo}`} 
                   alt="Profile" 
                   className="w-24 h-24 rounded-full object-cover"
                   onError={(e) => {

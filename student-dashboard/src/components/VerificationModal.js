@@ -87,7 +87,7 @@ const VerificationModal = ({ platform, username, onClose, onVerified }) => {
       console.log('Generating verification code for platform:', platform);
       
       const response = await axios.post(
-        'http://localhost:5000/api/student/verify/generate',
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/student/verify/generate`,
         { platform, username },
         {
           headers: { Authorization: `Bearer ${token}` }
@@ -114,7 +114,7 @@ const VerificationModal = ({ platform, username, onClose, onVerified }) => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:5000/api/student/verify/check',
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/student/verify/check`,
         { platform, username },
         {
           headers: { Authorization: `Bearer ${token}` }
