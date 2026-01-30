@@ -11,6 +11,7 @@ import Portfolio from './pages/Portfolio';
 import GlobalLeaderboard from './pages/GlobalLeaderboard';
 import CollegeLeaderboard from './pages/CollegeLeaderboard';
 import EditProfile from './pages/EditProfile';
+import LandingPage from './pages/LandingPage';
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -31,12 +32,13 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           
-          <Route path="/" element={
+          <Route path="/dashboard" element={
             <PrivateRoute>
               <DashboardLayout />
             </PrivateRoute>

@@ -50,7 +50,7 @@ const Register = () => {
 
     try {
       await register(formData);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'Registration failed');
     } finally {
@@ -59,7 +59,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 py-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black to-black py-8">
       <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
         <h1 className="text-3xl font-bold text-center mb-2 text-gray-800">RankMySkills</h1>
         <p className="text-center text-gray-600 mb-6">Student Registration</p>

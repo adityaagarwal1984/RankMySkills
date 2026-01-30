@@ -17,7 +17,7 @@ const Login = () => {
 
     try {
       await login(email, password);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed');
     } finally {
@@ -26,7 +26,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black to-black">
       <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
         <h1 className="text-3xl font-bold text-center mb-2 text-gray-800">RankMySkills</h1>
         <p className="text-center text-gray-600 mb-6">Student Login</p>

@@ -1,16 +1,22 @@
 import React from 'react';
-import { Outlet, NavLink } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const DashboardLayout = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   const navItems = [
-    { path: '/', label: 'Home', icon: 'bx-home' },
-    { path: '/portfolio', label: 'Portfolio', icon: 'bx-folder' },
-    { path: '/global-leaderboard', label: 'Global Leaderboard', icon: 'bx-world' },
-    { path: '/college-leaderboard', label: 'College Leaderboard', icon: 'bx-buildings' },
-    { path: '/edit-profile', label: 'Edit Profile', icon: 'bx-edit-alt' },
+    { path: '/dashboard', label: 'Home', icon: 'bx-home' },
+    { path: '/dashboard/portfolio', label: 'Portfolio', icon: 'bx-folder' },
+    { path: '/dashboard/global-leaderboard', label: 'Global Leaderboard', icon: 'bx-world' },
+    { path: '/dashboard/college-leaderboard', label: 'College Leaderboard', icon: 'bx-buildings' },
+    { path: '/dashboard/edit-profile', label: 'Edit Profile', icon: 'bx-edit-alt' },
   ];
 
   return (
@@ -27,7 +33,7 @@ const DashboardLayout = () => {
             <NavLink
               key={item.path}
               to={item.path}
-              end={item.path === '/'}
+              end={item.path === '/dashboard'}
               className={({ isActive }) =>
                 `flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 transition-all ${
                   isActive
@@ -64,7 +70,7 @@ const DashboardLayout = () => {
             </div>
           </div>
           <button
-            onClick={logout}
+            onClick={handleLogout}
             className="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
           >
             Logout
