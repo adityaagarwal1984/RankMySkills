@@ -282,7 +282,7 @@ const Portfolio = () => {
                 )}
 
                 {/* GeeksForGeeks specific - Coding Score only */}
-                {platform.name === 'GeeksForGeeks' && platform.codingScore && (
+                {platform.name === 'GeeksForGeeks' && (platform.codingScore !== null && platform.codingScore !== undefined) && (
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-700 font-medium">Coding Score:</span>

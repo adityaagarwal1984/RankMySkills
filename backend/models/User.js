@@ -77,14 +77,14 @@ const userSchema = new mongoose.Schema({
   
   // Platform ratings (current ratings, updated by system)
   ratings: {
-    leetcode: { type: Number, default: 1500 },
+    leetcode: { type: Number, default: 0 },
     codeforces: { type: Number, default: 0 },
     codechef: { type: Number, default: 0 }
   },
   
   // Platform max ratings (highest ratings achieved)
   max_ratings: {
-    leetcode: { type: Number, default: 1500 },
+    leetcode: { type: Number, default: 0 },
     codeforces: { type: Number, default: 0 },
     codechef: { type: Number, default: 0 }
   },

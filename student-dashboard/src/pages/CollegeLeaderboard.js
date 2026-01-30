@@ -6,8 +6,10 @@ const CollegeLeaderboard = () => {
   const { user } = useAuth();
   const [leaderboard, setLeaderboard] = useState([]);
   const [years, setYears] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [filters, setFilters] = useState({
     year: 'all',
+    course: 'all',
     sort: 'engineer_score',
     page: 1
   });
@@ -15,7 +17,7 @@ const CollegeLeaderboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchYears();
+    fetchFilters();
   }, []);
 
   useEffect(() => {
@@ -24,12 +26,15 @@ const CollegeLeaderboard = () => {
     }
   }, [filters, user]);
 
-  const fetchYears = async () => {
+  const fetchFilters = async () => {
     try {
-      const response = await api.get('/leaderboard/years');
-      setYears(response.data.years);
+      const yearRes = await api.get('/leaderboard/years');
+      setYears(yearRes.data.years);
+      
+      const courseRes = await api.get('/leaderboard/courses');
+      setCourses(courseRes.data.courses);
     } catch (error) {
-      console.error('Failed to fetch years:', error);
+      console.error('Failed to fetch filters:', error);
     }
   };
 
@@ -41,6 +46,7 @@ const CollegeLeaderboard = () => {
           type: 'college',
           college_id: user.college.college_id,
           year: filters.year,
+          course: filters.course,
           sort: filters.sort,
           page: filters.page,
           limit: 50
@@ -86,15 +92,15 @@ const CollegeLeaderboard = () => {
           <i className='bx bx-filter text-lg text-gray-700'></i>
           <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Filters</h3>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="w-40">
+            <label className="block text-xs font-medium text-gray-700 mb-1">
               Graduation Year
             </label>
             <select
               value={filters.year}
               onChange={(e) => handleFilterChange('year', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Years</option>
               {years.map((year) => (
@@ -105,14 +111,32 @@ const CollegeLeaderboard = () => {
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="w-40">
+            <label className="block text-xs font-medium text-gray-700 mb-1">
+              Course
+            </label>
+            <select
+              value={filters.course}
+              onChange={(e) => handleFilterChange('course', e.target.value)}
+              className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="all">All Courses</option>
+              {courses.map((course) => (
+                <option key={course} value={course}>
+                  {course}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="w-48">
+            <label className="block text-xs font-medium text-gray-700 mb-1">
               Sort By
             </label>
             <select
               value={filters.sort}
               onChange={(e) => handleFilterChange('sort', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               {sortOptions.map((option) => (
                 <option key={option.value} value={option.value}>

@@ -8,7 +8,7 @@ const router = express.Router();
 // Get leaderboard
 router.get('/', authenticate, async (req, res) => {
   try {
-    const { type, year, sort, college_id, limit = 100, page = 1 } = req.query;
+    const { type, year, course, sort, college_id, limit = 100, page = 1 } = req.query;
     
     // Build filter
     const filter = { role: 'student' };
@@ -25,6 +25,11 @@ router.get('/', authenticate, async (req, res) => {
     // Filter by graduation year
     if (year && year !== 'all') {
       filter.graduation_year = parseInt(year);
+    }
+
+    // Filter by course
+    if (course && course !== 'all') {
+      filter.course = course;
     }
     
     // Determine sort field
@@ -91,6 +96,7 @@ router.get('/', authenticate, async (req, res) => {
       meta: {
         type,
         year: year || 'all',
+        course: course || 'all',
         sort,
         page: parseInt(page),
         limit: parseInt(limit),
@@ -112,6 +118,17 @@ router.get('/years', authenticate, async (req, res) => {
   } catch (error) {
     console.error('Get years error:', error);
     res.status(500).json({ error: 'Failed to fetch years' });
+  }
+});
+
+// Get available courses
+router.get('/courses', authenticate, async (req, res) => {
+  try {
+    const courses = await User.distinct('course', { role: 'student' });
+    res.json({ courses: courses.sort() });
+  } catch (error) {
+    console.error('Get courses error:', error);
+    res.status(500).json({ error: 'Failed to fetch courses' });
   }
 });
 
