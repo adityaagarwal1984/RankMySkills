@@ -198,7 +198,7 @@ const Home = () => {
                 <div className="p-3 bg-orange-100 rounded-lg">
                   <i className='bx bx-badge-check text-2xl text-orange-600'></i>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-800">College Rank ({user?.college_engineer_score !== null ? rankings?.college_year?.year : 'N/A'})</h3>
+                <h3 className="text-lg font-semibold text-gray-800">College Rank ({rankings?.global_year?.year})</h3>
               </div>
               <div className="text-4xl font-bold text-orange-600 mb-2">
                 {user?.college_engineer_score !== null ? `#${rankings?.college_year?.rank || '-'}` : 'N/A'}

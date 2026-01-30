@@ -135,7 +135,7 @@ const Register = () => {
                   name="college_name"
                   value={formData.college_name}
                   onChange={handleChange}
-                  placeholder="e.g., GL BAJAJ INSTITUTE OF TECHNOLOGY AND MANAGEMENT, GREATER NOIDA"
+                  placeholder="enter full name in capital"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-red-500"
                   required
                 />

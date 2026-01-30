@@ -5,9 +5,11 @@ const GlobalLeaderboard = () => {
   const [leaderboard, setLeaderboard] = useState([]);
   const [years, setYears] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [colleges, setColleges] = useState([]);
   const [filters, setFilters] = useState({
     year: 'all',
     course: 'all',
+    college: 'all',
     sort: 'engineer_score',
     page: 1
   });
@@ -29,6 +31,9 @@ const GlobalLeaderboard = () => {
       
       const courseRes = await api.get('/leaderboard/courses');
       setCourses(courseRes.data.courses);
+
+      const collegeRes = await api.get('/auth/colleges');
+      setColleges(collegeRes.data.colleges || []);
     } catch (error) {
       console.error('Failed to fetch filters:', error);
     }
@@ -42,6 +47,7 @@ const GlobalLeaderboard = () => {
           type: 'global',
           year: filters.year,
           course: filters.course,
+          college_id: filters.college,
           sort: filters.sort,
           page: filters.page,
           limit: 50
@@ -115,6 +121,24 @@ const GlobalLeaderboard = () => {
               {courses.map((course) => (
                 <option key={course} value={course}>
                   {course}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="w-48">
+            <label className="block text-xs font-medium text-gray-700 mb-1">
+              College
+            </label>
+            <select
+              value={filters.college}
+              onChange={(e) => handleFilterChange('college', e.target.value)}
+              className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="all">All Colleges</option>
+              {colleges.map((college) => (
+                <option key={college.college_id} value={college.college_id}>
+                  {college.name_display}
                 </option>
               ))}
             </select>

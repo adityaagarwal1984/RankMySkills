@@ -20,6 +20,9 @@ router.get('/', authenticate, async (req, res) => {
         return res.status(400).json({ error: 'College ID required' });
       }
       filter.college_id = cid;
+    } else if (college_id && college_id !== 'all') {
+      // Filter by specific college in global leaderboard
+      filter.college_id = college_id;
     }
     
     // Filter by graduation year
