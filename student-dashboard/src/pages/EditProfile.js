@@ -220,15 +220,21 @@ const EditProfile = () => {
 
             <div>
               <label className="block text-gray-700 font-medium mb-2">Course</label>
-              <input
-                type="text"
+              <select
                 name="course"
                 value={formData.course}
                 onChange={handleChange}
-                placeholder="e.g., Computer Science"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
-              />
+              >
+                <option value="">-- Select Course --</option>
+                <option value="BTECH">BTECH</option>
+                <option value="BCA">BCA</option>
+                <option value="BE">BE</option>
+                <option value="MTECH">MTECH</option>
+                <option value="MCA">MCA</option>
+                <option value="ME">ME</option>
+              </select>
             </div>
 
             <div>
