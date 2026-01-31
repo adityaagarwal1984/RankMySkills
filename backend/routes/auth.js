@@ -217,23 +217,26 @@ router.post('/forgot-password', async (req, res) => {
     const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
     
     // Configure email transporter
-    // Switch to Port 465 (SSL) and Force IPv4 to resolve timeout issues
+    // Attempting Port 587 with extended timeouts. If this fails, Render is blocking SMTP ports.
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
-      port: 465,              // Try 465 (SSL) instead of 587
-      secure: true,           // true for 465, false for other ports
+      port: 587,
+      secure: false, // upgrade later with STARTTLS
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD
       },
-      // Force IPv4 addresses, as some cloud environments struggle with IPv6 for Gmail
-      family: 4, 
+      // Force IPv4
+      family: 4,
       tls: {
         rejectUnauthorized: false
       },
-      connectionTimeout: 10000,
-      debug: true,
-      logger: true
+      // Increase timeouts significantly to rule out slow network vs blocked ports
+      connectionTimeout: 60000, 
+      greetingTimeout: 30000,
+      socketTimeout: 60000,
+      debug: true, 
+      logger: true 
     });
 
     // Verify transporter connection
