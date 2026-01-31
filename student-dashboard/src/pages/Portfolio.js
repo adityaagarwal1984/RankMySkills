@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/api';
 
@@ -205,12 +206,11 @@ const Portfolio = () => {
               <li>Follow the verification instructions</li>
             </ol>
           </div>
-          <a
-            href="/edit-profile"
+          <Link to="/dashboard/edit-profile"
             className="inline-block px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors"
           >
             Go to Edit Profile
-          </a>
+          </Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
