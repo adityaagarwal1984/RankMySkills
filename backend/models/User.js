@@ -27,6 +27,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+
+  // Sync status
+  last_synced: {
+    type: Date,
+    default: null
+  },
   
   // Student-specific fields
   college_id: {

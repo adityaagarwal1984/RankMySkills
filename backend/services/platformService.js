@@ -288,6 +288,74 @@ class PlatformService {
   }
 
   /**
+   * Sync all platform data for a student
+   */
+  async syncStudentData(student) {
+    console.log(`Syncing data for student: ${student.username || student.name}`);
+    const results = {
+      leetcode: { success: false },
+      codeforces: { success: false },
+      codechef: { success: false },
+      gfg: { success: false }
+    };
+
+    try {
+      if (student.platforms?.leetcode) {
+        const data = await this.fetchLeetCodeData(student.platforms.leetcode);
+        if (data.success) {
+          student.ratings.leetcode = data.rating || 0;
+          student.max_ratings.leetcode = data.maxRating || 0;
+          student.problems_solved.leetcode = data.problemsSolved || 0;
+          results.leetcode.success = true;
+        }
+      }
+
+      if (student.platforms?.codeforces) {
+        const data = await this.fetchCodeforcesData(student.platforms.codeforces);
+        if (data.success) {
+          student.ratings.codeforces = data.rating || 0;
+          student.max_ratings.codeforces = data.maxRating || 0;
+          student.problems_solved.codeforces = data.problemsSolved || 0;
+          results.codeforces.success = true;
+        }
+      }
+
+      if (student.platforms?.codechef) {
+        const data = await this.fetchCodeChefData(student.platforms.codechef);
+        if (data.success) {
+          student.ratings.codechef = data.rating || 0;
+          student.max_ratings.codechef = data.globalRank || 0; // Storing rank in max_rating for strict schema? Schema says max_rating is Number.
+          student.problems_solved.codechef = data.problemsSolved || 0;
+          results.codechef.success = true;
+        }
+      }
+
+      if (student.platforms?.gfg) {
+        const data = await this.fetchGeeksForGeeksData(student.platforms.gfg);
+        if (data.success) {
+          student.problems_solved.gfg = data.problemsSolved || 0;
+          student.gfg_coding_score = data.codingScore || 0;
+          student.gfg_institute_rank = data.instituteRank || 0;
+          results.gfg.success = true;
+        }
+      }
+      
+      // Calculate global score if method exists
+      if (typeof student.calculateGlobalEngineerScore === 'function') {
+         student.calculateGlobalEngineerScore();
+      }
+
+      student.last_synced = new Date();
+      await student.save();
+      console.log(`Synced data for ${student.name}:`, results);
+      return { success: true, results };
+    } catch (error) {
+      console.error(`Sync error for ${student.name}:`, error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
    * Fetch GeeksForGeeks user data using web scraping
    */
   async fetchGeeksForGeeksData(username) {

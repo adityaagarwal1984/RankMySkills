@@ -73,7 +73,8 @@ router.get('/profile', authenticate, authorize('student'), async (req, res) => {
         gfg_institute_rank: student.gfg_institute_rank,
         gfg_institute_name: student.gfg_institute_name,
         global_engineer_score: student.global_engineer_score,
-        college_engineer_score: student.college_engineer_score
+        college_engineer_score: student.college_engineer_score,
+        last_synced: student.last_synced
       }
     });
   } catch (error) {
@@ -122,6 +123,8 @@ router.put('/profile', authenticate, authorize('student'), async (req, res) => {
     if (graduation_year) student.graduation_year = graduation_year;
     if (profile_photo) student.profile_photo = profile_photo;
     
+    let platformChanged = false;
+
     if (platforms) {
       // Check for platform changes to reset verification
       const validPlatforms = ['leetcode', 'codeforces', 'codechef', 'gfg'];
@@ -135,6 +138,7 @@ router.put('/profile', authenticate, authorize('student'), async (req, res) => {
           // If value changed or removed
           if (newValue !== oldValue) {
             student.platforms[platform] = newValue;
+            platformChanged = true;
             
             // Reset verification if username changed/removed
             // We use direct assignment to ensure mongoose detects change
@@ -169,6 +173,14 @@ router.put('/profile', authenticate, authorize('student'), async (req, res) => {
     
     // Save with the changes
     const updatedStudent = await student.save();
+
+    // Trigger immediate sync if platforms changed
+    if (platformChanged) {
+        // Run asynchronously, don't wait for it to reply to user
+        platformService.syncStudentData(student).catch(err => 
+            console.error('Background sync failed after profile update:', err)
+        );
+    }
     
     res.json({
       message: 'Profile updated successfully',
@@ -524,6 +536,13 @@ router.post('/verify/check', authenticate, authorize('student'), async (req, res
 
       await student.save();
       
+      // Trigger sync immediately so user sees their stats
+      try {
+        await platformService.syncStudentData(student);
+      } catch (syncErr) {
+        console.error('Post-verification sync failed:', syncErr);
+      }
+
       res.json({ 
         success: true, 
         message: `${platform} profile verified successfully!`,
