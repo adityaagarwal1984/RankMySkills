@@ -133,6 +133,12 @@ const Portfolio = () => {
             <span>{syncing ? 'Syncing...' : 'Sync Data'}</span>
           </button>
         </div>
+        
+        <div className="flex justify-end mt-2 mr-2">
+            <span className="text-sm text-gray-500 italic">
+              Last synced: {user?.last_synced ? new Date(user.last_synced).toLocaleString() : 'Never'}
+            </span>
+        </div>
 
         {/* Sync Messages */}
         {syncMessage && (

@@ -18,7 +18,7 @@ const VerificationModal = ({ platform, username, onClose, onVerified }) => {
       instructions: 'Go to your LeetCode profile settings and paste the verification code in your "About Me" or "Summary" section.',
       steps: [
         'Click the button below to open your LeetCode profile edit page',
-        'Scroll to the "About Me" or "Summary" section',
+        'Scroll to the "Summary" section',
         'Paste the verification code shown below',
         'Save your changes on LeetCode',
         'Come back here and click "Verify Profile"',
@@ -66,7 +66,7 @@ const VerificationModal = ({ platform, username, onClose, onVerified }) => {
       instructions: 'Go to your GeeksforGeeks profile edit page and temporarily add the verification code to your User Name. Note: GFG only allows letters and spaces in the name field.',
       steps: [
         'Click the button below to open your GFG profile edit page',
-        'Add the verification code (letters only) to your "User Name" field',
+        'Add the verification code to your "Name" field',
         'Note: GFG name field only accepts letters and spaces',
         'Save your changes on GeeksforGeeks',
         'Come back here and click "Verify Profile"',
