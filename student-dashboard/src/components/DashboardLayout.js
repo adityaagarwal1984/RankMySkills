@@ -24,7 +24,14 @@ const DashboardLayout = () => {
       {/* Left Sidebar */}
       <aside className="w-64 bg-white shadow-lg fixed h-full">
         <div className="p-6 border-b">
-          <h1 className="text-2xl font-bold text-primary">RankMySkills</h1>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-xl">R</span>
+            </div>
+            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">
+              RankMySkills
+            </span>
+          </div>
           <p className="text-sm text-gray-600 mt-1">Student Dashboard</p>
         </div>
 

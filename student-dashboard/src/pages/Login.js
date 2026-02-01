@@ -28,7 +28,14 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black to-black">
       <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center mb-2 text-gray-800">RankMySkills</h1>
+        <div className="flex items-center justify-center mb-2 gap-3">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-xl">R</span>
+          </div>
+          <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">
+            RankMySkills
+          </span>
+        </div>
         <p className="text-center text-gray-600 mb-6">Student Login</p>
 
         {error && (
