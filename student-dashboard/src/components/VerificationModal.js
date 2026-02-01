@@ -223,6 +223,20 @@ const VerificationModal = ({ platform, username, onClose, onVerified }) => {
             </div>
           )}
 
+          {/* Messages */}
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded flex items-center">
+              <i className="bx bx-check-circle mr-2 text-xl"></i>
+              {success}
+            </div>
+          )}
+
           {/* Steps */}
           <div className="space-y-3">
             <h3 className="font-semibold text-gray-900 mb-3">Step-by-step instructions:</h3>
@@ -262,19 +276,7 @@ const VerificationModal = ({ platform, username, onClose, onVerified }) => {
             </a>
           </div>
 
-          {/* Messages */}
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
-
-          {success && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded flex items-center">
-              <i className="bx bx-check-circle mr-2 text-xl"></i>
-              {success}
-            </div>
-          )}
+          
 
           {/* Action Buttons */}
           <div className="flex justify-end space-x-4 pt-4 border-t">
