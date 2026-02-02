@@ -1,10 +1,9 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const { Resend } = require('resend');
+const axios = require('axios');
 const User = require('../models/User');
 
-const resend = new Resend(process.env.RESEND_API);
 const College = require('../models/College');
 
 const router = express.Router();
@@ -218,33 +217,41 @@ router.post('/forgot-password', async (req, res) => {
     
     const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
     
-    // Send email using Resend
-    console.log('Sending reset email via Resend...');
+    // Send email using Brevo (Sendinblue)
+    console.log('Sending reset email via Brevo...');
 
-    const { data, error } = await resend.emails.send({
-      from: 'RankMySkills <onboarding@resend.dev>',
-      to: [user.email],
-      subject: 'Password Reset - RankMySkills',
-      html: `
-        <h2>Password Reset Request</h2>
-        <p>Hi ${user.name},</p>
-        <p>You requested a password reset for your account.</p>
-        <p>Click the link below to reset your password:</p>
-        <a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; background-color: #3B82F6; color: white; text-decoration: none; border-radius: 5px; margin: 10px 0;">Reset Password</a>
-        <p>Or copy and paste this link in your browser:</p>
-        <p>${resetUrl}</p>
-        <p>This link will expire in 1 hour.</p>
-        <p>If you didn't request this, please ignore this email.</p>
-        <p>Best regards,<br>RankMySkills Team</p>
-      `
-    });
+    const emailResponse = await axios.post(
+      'https://api.brevo.com/v3/smtp/email',
+      {
+        sender: { name: 'RankMySkills', email: process.env.EMAIL_USER || 'no-reply@rankmyskills.com' },
+        to: [{ email: user.email, name: user.name }],
+        subject: 'Password Reset - RankMySkills',
+        htmlContent: `
+          <html>
+          <body>
+            <h2>Password Reset Request</h2>
+            <p>Hi ${user.name},</p>
+            <p>You requested a password reset for your account.</p>
+            <p>Click the link below to reset your password:</p>
+            <a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; background-color: #3B82F6; color: white; text-decoration: none; border-radius: 5px; margin: 10px 0;">Reset Password</a>
+            <p>Or copy and paste this link in your browser:</p>
+            <p>${resetUrl}</p>
+            <p>This link will expire in 1 hour.</p>
+            <p>If you didn't request this, please ignore this email.</p>
+            <p>Best regards,<br>RankMySkills Team</p>
+          </body>
+          </html>
+        `
+      },
+      {
+        headers: {
+          'api-key': process.env.BREVO_API,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
 
-    if (error) {
-      console.error('Resend Error:', error);
-      return res.status(500).json({ error: 'Failed to send email' });
-    }
-
-    console.log('Reset email sent successfully:', data);
+    console.log('Reset email sent successfully:', emailResponse.data);
     
     res.json({ message: 'If the email exists, a password reset link has been sent' });
   } catch (error) {
