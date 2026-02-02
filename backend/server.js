@@ -1,5 +1,7 @@
 require('dotenv').config();
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const User = require('./models/User');
@@ -32,6 +34,23 @@ app.use('/api/leaderboard', leaderboardRoutes);
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', message: 'TalentTrack API is running' });
 });
+
+// Serve React SPA (student dashboard).
+// This fixes deep-link refreshes like /dashboard/portfolio returning 404.
+const studentBuildPath = path.join(__dirname, '..', 'student-dashboard', 'build');
+const shouldServeStudentApp =
+  process.env.SERVE_STUDENT_APP !== 'false' &&
+  (process.env.NODE_ENV === 'production' || fs.existsSync(studentBuildPath));
+
+if (shouldServeStudentApp && fs.existsSync(studentBuildPath)) {
+  // Static assets (JS/CSS/images)
+  app.use(express.static(studentBuildPath));
+
+  // SPA fallback: anything that's not an API or uploads route should serve index.html
+  app.get(/^\/(?!api\/|uploads\/).*/, (req, res) => {
+    res.sendFile(path.join(studentBuildPath, 'index.html'));
+  });
+}
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
