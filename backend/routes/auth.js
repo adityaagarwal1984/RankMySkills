@@ -1,8 +1,10 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const User = require('../models/User');
+
+const resend = new Resend(process.env.RESEND_API);
 const College = require('../models/College');
 
 const router = express.Router();
@@ -216,42 +218,12 @@ router.post('/forgot-password', async (req, res) => {
     
     const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
     
-    // Configure email transporter
-    // Attempting Port 587 with extended timeouts. If this fails, Render is blocking SMTP ports.
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false, // upgrade later with STARTTLS
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
-      },
-      // Force IPv4
-      family: 4,
-      tls: {
-        rejectUnauthorized: false
-      },
-      // Increase timeouts significantly to rule out slow network vs blocked ports
-      connectionTimeout: 60000, 
-      greetingTimeout: 30000,
-      socketTimeout: 60000,
-      debug: true, 
-      logger: true 
-    });
+    // Send email using Resend
+    console.log('Sending reset email via Resend...');
 
-    // Verify transporter connection
-    try {
-      await transporter.verify();
-      console.log('SMTP connection verified');
-    } catch (verifyError) {
-      console.error('SMTP Connection Error:', verifyError);
-      // We continue to try sending, or could fail here
-    }
-    
-    // Email content
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: user.email,
+    const { data, error } = await resend.emails.send({
+      from: 'RankMySkills <onboarding@resend.dev>',
+      to: [user.email],
       subject: 'Password Reset - RankMySkills',
       html: `
         <h2>Password Reset Request</h2>
@@ -265,12 +237,14 @@ router.post('/forgot-password', async (req, res) => {
         <p>If you didn't request this, please ignore this email.</p>
         <p>Best regards,<br>RankMySkills Team</p>
       `
-    };
-    
-    // Send email
-    console.log('Sending reset email...');
-    await transporter.sendMail(mailOptions);
-    console.log('Reset email sent successfully');
+    });
+
+    if (error) {
+      console.error('Resend Error:', error);
+      return res.status(500).json({ error: 'Failed to send email' });
+    }
+
+    console.log('Reset email sent successfully:', data);
     
     res.json({ message: 'If the email exists, a password reset link has been sent' });
   } catch (error) {
