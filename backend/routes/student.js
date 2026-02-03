@@ -305,6 +305,17 @@ router.post('/sync-platforms', authenticate, authorize('student'), async (req, r
   try {
     const student = await User.findById(req.userId);
     
+    // Cooldown check (30 minutes)
+    if (student.last_synced) {
+      const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+      if (student.last_synced > thirtyMinutesAgo) {
+        const remainingMinutes = Math.ceil((student.last_synced.getTime() + 30 * 60 * 1000 - Date.now()) / (60 * 1000));
+        return res.status(429).json({ 
+          error: `Sync cooldown active. Please wait ${remainingMinutes} minute(s) before syncing again.` 
+        });
+      }
+    }
+
     if (!student.platforms || 
         (!student.platforms.leetcode && !student.platforms.codeforces && 
          !student.platforms.codechef && !student.platforms.gfg)) {
@@ -388,6 +399,7 @@ router.post('/sync-platforms', authenticate, authorize('student'), async (req, r
     if (updatedCount > 0) {
       // Recalculate global engineer score
       student.calculateGlobalEngineerScore();
+      student.last_synced = new Date();
       await student.save();
 
       res.json({
