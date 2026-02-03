@@ -62,6 +62,36 @@ const GlobalLeaderboard = () => {
     }
   };
 
+  const getBadgeStyle = (score) => {
+    if (score >= 900) return 'bg-yellow-100 text-yellow-700 border border-yellow-300';
+    if (score >= 800) return 'bg-purple-100 text-purple-700 border border-purple-300';
+    if (score >= 650) return 'bg-indigo-100 text-indigo-700 border border-indigo-300';
+    if (score >= 450) return 'bg-blue-100 text-blue-700 border border-blue-300';
+    if (score >= 300) return 'bg-green-100 text-green-700 border border-green-300';
+    if (score >= 150) return 'bg-orange-100 text-orange-700 border border-orange-300';
+    return 'bg-gray-100 text-gray-700 border border-gray-300';
+  };
+
+  const getBadgeIcon = (score) => {
+    if (score >= 900) return 'bx-crown';
+    if (score >= 800) return 'bx-medal';
+    if (score >= 650) return 'bx-trophy';
+    if (score >= 450) return 'bx-star';
+    if (score >= 300) return 'bx-trending-up';
+    if (score >= 150) return 'bx-book-open';
+    return 'bx-rocket';
+  };
+
+  const getBadgeLabel = (score) => {
+    if (score >= 900) return 'Elite';
+    if (score >= 800) return 'Expert';
+    if (score >= 650) return 'Advanced';
+    if (score >= 450) return 'Strong';
+    if (score >= 300) return 'Intermediate';
+    if (score >= 150) return 'Learner';
+    return 'Beginner';
+  };
+
   const handleFilterChange = (key, value) => {
     setFilters({ ...filters, [key]: value, page: 1 });
   };
@@ -225,12 +255,18 @@ const GlobalLeaderboard = () => {
                           )}
                         </div>
                         <div>
-                          <div className="text-sm font-medium text-gray-900">{student.name}</div>
+                          <div className="flex items-center space-x-2">
+                            <div className="text-sm font-medium text-gray-900 w-48 truncate" title={student.name}>{student.name}</div>
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold shadow-sm flex items-center ${getBadgeStyle(student.global_engineer_score || 0)}`}>
+                              <i className={`bx ${getBadgeIcon(student.global_engineer_score || 0)} mr-1`}></i>
+                              {getBadgeLabel(student.global_engineer_score || 0)}
+                            </span>
+                          </div>
                           <div className="text-sm text-gray-500">{student.course}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 pl-12">
                       <div className="text-sm text-gray-900">{student.college}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
