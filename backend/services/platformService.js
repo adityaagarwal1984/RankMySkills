@@ -303,9 +303,9 @@ class PlatformService {
       if (student.platforms?.leetcode) {
         const data = await this.fetchLeetCodeData(student.platforms.leetcode);
         if (data.success) {
-          student.ratings.leetcode = data.rating || 0;
-          student.max_ratings.leetcode = data.maxRating || 0;
-          student.problems_solved.leetcode = data.problemsSolved || 0;
+          student.ratings.leetcode = data.rating || student.ratings.leetcode;
+          student.max_ratings.leetcode = data.maxRating || student.max_ratings.leetcode;
+          student.problems_solved.leetcode = data.problemsSolved || student.problems_solved.leetcode;
           results.leetcode.success = true;
         }
       }
@@ -313,9 +313,9 @@ class PlatformService {
       if (student.platforms?.codeforces) {
         const data = await this.fetchCodeforcesData(student.platforms.codeforces);
         if (data.success) {
-          student.ratings.codeforces = data.rating || 0;
-          student.max_ratings.codeforces = data.maxRating || 0;
-          student.problems_solved.codeforces = data.problemsSolved || 0;
+          student.ratings.codeforces = data.rating || student.ratings.codeforces;
+          student.max_ratings.codeforces = data.maxRating || student.max_ratings.codeforces;
+          student.problems_solved.codeforces = data.problemsSolved || student.problems_solved.codeforces;
           results.codeforces.success = true;
         }
       }
@@ -323,9 +323,9 @@ class PlatformService {
       if (student.platforms?.codechef) {
         const data = await this.fetchCodeChefData(student.platforms.codechef);
         if (data.success) {
-          student.ratings.codechef = data.rating || 0;
-          student.max_ratings.codechef = data.globalRank || 0; // Storing rank in max_rating for strict schema? Schema says max_rating is Number.
-          student.problems_solved.codechef = data.problemsSolved || 0;
+          student.ratings.codechef = data.rating || student.ratings.codechef;
+          student.max_ratings.codechef = data.globalRank || student.max_ratings.codechef;
+          student.problems_solved.codechef = data.problemsSolved || student.problems_solved.codechef;
           results.codechef.success = true;
         }
       }
@@ -333,9 +333,9 @@ class PlatformService {
       if (student.platforms?.gfg) {
         const data = await this.fetchGeeksForGeeksData(student.platforms.gfg);
         if (data.success) {
-          student.problems_solved.gfg = data.problemsSolved || 0;
-          student.gfg_coding_score = data.codingScore || 0;
-          student.gfg_institute_rank = data.instituteRank || 0;
+          student.problems_solved.gfg = data.problemsSolved || student.problems_solved.gfg;
+          student.gfg_coding_score = data.codingScore || student.gfg_coding_score;
+          student.gfg_institute_rank = data.instituteRank || student.gfg_institute_rank;
           results.gfg.success = true;
         }
       }

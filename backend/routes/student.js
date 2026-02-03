@@ -332,14 +332,14 @@ router.post('/sync-platforms', authenticate, authorize('student'), async (req, r
 
     // Update LeetCode data
     if (platformData.leetcode?.success) {
-      student.ratings.leetcode = platformData.leetcode.rating;
-      student.max_ratings.leetcode = platformData.leetcode.maxRating;
-      student.problems_solved.leetcode = platformData.leetcode.problemsSolved;
+      student.ratings.leetcode = platformData.leetcode.rating || student.ratings.leetcode;
+      student.max_ratings.leetcode = platformData.leetcode.maxRating || student.max_ratings.leetcode;
+      student.problems_solved.leetcode = platformData.leetcode.problemsSolved || student.problems_solved.leetcode;
       results.leetcode = { 
         success: true, 
-        rating: platformData.leetcode.rating,
-        maxRating: platformData.leetcode.maxRating,
-        problems: platformData.leetcode.problemsSolved
+        rating: student.ratings.leetcode,
+        maxRating: student.max_ratings.leetcode,
+        problems: student.problems_solved.leetcode
       };
       updatedCount++;
     } else if (platformData.leetcode) {
@@ -348,14 +348,14 @@ router.post('/sync-platforms', authenticate, authorize('student'), async (req, r
 
     // Update Codeforces data
     if (platformData.codeforces?.success) {
-      student.ratings.codeforces = platformData.codeforces.rating;
-      student.max_ratings.codeforces = platformData.codeforces.maxRating;
-      student.problems_solved.codeforces = platformData.codeforces.problemsSolved;
+      student.ratings.codeforces = platformData.codeforces.rating || student.ratings.codeforces;
+      student.max_ratings.codeforces = platformData.codeforces.maxRating || student.max_ratings.codeforces;
+      student.problems_solved.codeforces = platformData.codeforces.problemsSolved || student.problems_solved.codeforces;
       results.codeforces = { 
         success: true, 
-        rating: platformData.codeforces.rating,
-        maxRating: platformData.codeforces.maxRating,
-        problems: platformData.codeforces.problemsSolved
+        rating: student.ratings.codeforces,
+        maxRating: student.max_ratings.codeforces,
+        problems: student.problems_solved.codeforces
       };
       updatedCount++;
     } else if (platformData.codeforces) {
@@ -364,14 +364,14 @@ router.post('/sync-platforms', authenticate, authorize('student'), async (req, r
 
     // Update CodeChef data
     if (platformData.codechef?.success) {
-      student.ratings.codechef = platformData.codechef.rating;
-      student.max_ratings.codechef = platformData.codechef.maxRating;
-      student.problems_solved.codechef = platformData.codechef.problemsSolved;
+      student.ratings.codechef = platformData.codechef.rating || student.ratings.codechef;
+      student.max_ratings.codechef = platformData.codechef.maxRating || student.max_ratings.codechef;
+      student.problems_solved.codechef = platformData.codechef.problemsSolved || student.problems_solved.codechef;
       results.codechef = { 
         success: true, 
-        rating: platformData.codechef.rating,
-        maxRating: platformData.codechef.maxRating,
-        problems: platformData.codechef.problemsSolved
+        rating: student.ratings.codechef,
+        maxRating: student.max_ratings.codechef,
+        problems: student.problems_solved.codechef
       };
       updatedCount++;
     } else if (platformData.codechef) {
@@ -380,16 +380,16 @@ router.post('/sync-platforms', authenticate, authorize('student'), async (req, r
 
     // Update GeeksForGeeks data
     if (platformData.gfg?.success) {
-      student.problems_solved.gfg = platformData.gfg.problemsSolved;
-      student.gfg_coding_score = platformData.gfg.codingScore;
-      student.gfg_institute_rank = platformData.gfg.instituteRank;
-      student.gfg_institute_name = platformData.gfg.instituteName;
+      student.problems_solved.gfg = platformData.gfg.problemsSolved || student.problems_solved.gfg;
+      student.gfg_coding_score = platformData.gfg.codingScore || student.gfg_coding_score;
+      student.gfg_institute_rank = platformData.gfg.instituteRank || student.gfg_institute_rank;
+      student.gfg_institute_name = platformData.gfg.instituteName || student.gfg_institute_name;
       results.gfg = { 
         success: true, 
-        problems: platformData.gfg.problemsSolved,
-        codingScore: platformData.gfg.codingScore,
-        instituteRank: platformData.gfg.instituteRank,
-        instituteName: platformData.gfg.instituteName
+        problems: student.problems_solved.gfg,
+        codingScore: student.gfg_coding_score,
+        instituteRank: student.gfg_institute_rank,
+        instituteName: student.gfg_institute_name
       };
       updatedCount++;
     } else if (platformData.gfg) {
