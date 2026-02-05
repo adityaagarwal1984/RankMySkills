@@ -200,7 +200,10 @@ router.get('/rankings', authenticate, authorize('student'), async (req, res) => 
     // Global rank (all students)
     const globalRank = await User.countDocuments({
       role: 'student',
-      global_engineer_score: { $gt: student.global_engineer_score }
+      $or: [
+        { global_engineer_score: { $gt: student.global_engineer_score } },
+        { global_engineer_score: student.global_engineer_score, _id: { $lt: student._id } }
+      ]
     }) + 1;
     const totalGlobal = await User.countDocuments({ role: 'student' });
     
@@ -208,7 +211,10 @@ router.get('/rankings', authenticate, authorize('student'), async (req, res) => 
     const globalRankYear = await User.countDocuments({
       role: 'student',
       graduation_year: student.graduation_year,
-      global_engineer_score: { $gt: student.global_engineer_score }
+      $or: [
+        { global_engineer_score: { $gt: student.global_engineer_score } },
+        { global_engineer_score: student.global_engineer_score, _id: { $lt: student._id } }
+      ]
     }) + 1;
     const totalGlobalYear = await User.countDocuments({
       role: 'student',
@@ -219,7 +225,10 @@ router.get('/rankings', authenticate, authorize('student'), async (req, res) => 
     const collegeRank = await User.countDocuments({
       role: 'student',
       college_id: student.college_id,
-      college_engineer_score: { $gt: student.college_engineer_score }
+      $or: [
+        { college_engineer_score: { $gt: student.college_engineer_score } },
+        { college_engineer_score: student.college_engineer_score, _id: { $lt: student._id } }
+      ]
     }) + 1;
     const totalCollege = await User.countDocuments({
       role: 'student',
@@ -231,7 +240,10 @@ router.get('/rankings', authenticate, authorize('student'), async (req, res) => 
       role: 'student',
       college_id: student.college_id,
       graduation_year: student.graduation_year,
-      college_engineer_score: { $gt: student.college_engineer_score }
+      $or: [
+        { college_engineer_score: { $gt: student.college_engineer_score } },
+        { college_engineer_score: student.college_engineer_score, _id: { $lt: student._id } }
+      ]
     }) + 1;
     const totalCollegeYear = await User.countDocuments({
       role: 'student',

@@ -54,13 +54,21 @@ router.get('/', authenticate, async (req, res) => {
         sortField = type === 'college' ? '-college_engineer_score' : '-global_engineer_score';
     }
     
+    // Add tie-breaker (oldest users first)
+    const sortOptions = {};
+    const primaryField = sortField.startsWith('-') ? sortField.substring(1) : sortField;
+    const direction = sortField.startsWith('-') ? -1 : 1;
+    
+    sortOptions[primaryField] = direction;
+    sortOptions['_id'] = 1; // Tie-breaker: join date (derived from _id) ascending
+
     // Pagination
     const skip = (parseInt(page) - 1) * parseInt(limit);
     
     // Fetch students
     const students = await User.find(filter)
       .select('name profile_photo college_id graduation_year course global_engineer_score college_engineer_score ratings problems_solved platforms platform_verification')
-      .sort(sortField)
+      .sort(sortOptions)
       .limit(parseInt(limit))
       .skip(skip);
     
@@ -72,6 +80,30 @@ router.get('/', authenticate, async (req, res) => {
       collegeMap[c.college_id] = c.name_display;
     });
     
+    // Calculate current user's rank in this specific view
+    let userRank = null;
+    if (req.user && req.user.role === 'student') {
+      // Check if user matches current filters
+      let matchesFilter = true;
+      if (filter.college_id && req.user.college_id !== filter.college_id) matchesFilter = false;
+      if (filter.graduation_year && req.user.graduation_year !== filter.graduation_year) matchesFilter = false;
+      if (filter.course && req.user.course !== filter.course) matchesFilter = false;
+      
+      if (matchesFilter) {
+        // Resolve value for sorting field
+        const getNestedValue = (obj, path) => path.split('.').reduce((o, i) => (o ? o[i] : 0), obj);
+        const userValue = getNestedValue(req.user, primaryField) || 0;
+        
+        const rankFilter = { ...filter };
+        rankFilter.$or = [
+          { [primaryField]: { $gt: userValue } },
+          { [primaryField]: userValue, _id: { $lt: req.user._id } }
+        ];
+        
+        userRank = await User.countDocuments(rankFilter) + 1;
+      }
+    }
+
     // Format response
     const leaderboard = students.map((student, index) => ({
       rank: skip + index + 1,
@@ -104,7 +136,8 @@ router.get('/', authenticate, async (req, res) => {
         page: parseInt(page),
         limit: parseInt(limit),
         total,
-        total_pages: Math.ceil(total / parseInt(limit))
+        total_pages: Math.ceil(total / parseInt(limit)),
+        userRank
       }
     });
   } catch (error) {

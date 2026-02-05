@@ -183,6 +183,79 @@ const CollegeLeaderboard = () => {
         <div className="text-center py-12">Loading...</div>
       ) : (
         <>
+          {/* User Rank Card */}
+          {user && (
+            <div className="mb-6 bg-purple-50 border border-purple-200 rounded-xl shadow-sm overflow-hidden p-6">
+               <div className="flex items-center justify-between flex-wrap gap-4">
+                 <div className="flex items-center space-x-6">
+                     <div className="text-center">
+                         <div className="text-xs text-purple-600 font-bold uppercase tracking-wider mb-1">Your Rank</div>
+                         <div className="text-3xl font-bold text-purple-800">{meta?.userRank ? `#${meta.userRank}` : 'N/A'}</div>
+                     </div>
+                     <div className="h-12 w-px bg-purple-200"></div>
+                     <div className="flex items-center">
+                        <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mr-4 border-2 border-purple-200 overflow-hidden shadow-sm">
+                          {user.profile_photo ? (
+                            <img 
+                              src={user.profile_photo.startsWith('http') ? user.profile_photo : `${process.env.REACT_APP_IMG_URL || 'http://localhost:5000'}${user.profile_photo}`} 
+                              alt="Profile" 
+                              className="w-14 h-14 rounded-full object-cover" 
+                            />
+                          ) : (
+                            <i className='bx bx-user text-2xl text-gray-400'></i>
+                          )}
+                        </div>
+                        <div>
+                          <div className="flex items-center space-x-2">
+                             <div className="text-lg font-bold text-gray-900">{user.name}</div>
+                             <span className={`px-2 py-0.5 rounded-full text-xs font-semibold shadow-sm flex items-center ${getBadgeStyle(user.global_engineer_score || 0)}`}>
+                               <i className={`bx ${getBadgeIcon(user.global_engineer_score || 0)} mr-1`}></i>
+                               {getBadgeLabel(user.global_engineer_score || 0)}
+                             </span>
+                          </div>
+                          <div className="text-sm text-gray-600 flex items-center mt-0.5">
+                             <i className='bx bxs-school mr-1'></i>
+                             {user.college?.name}
+                             <span className="mx-2">•</span>
+                             {user.course} '{user.graduation_year?.toString().slice(-2)}
+                          </div>
+                        </div>
+                     </div>
+                 </div>
+                 
+                 <div className="flex items-center space-x-8">
+                     <div className="flex gap-4">
+                        <div className="text-center glass-effect rounded-lg p-2 bg-purple-100 bg-opacity-50">
+                            <div className="text-xs text-purple-700 font-semibold mb-1">College Score</div>
+                            <div className="font-bold text-purple-800 text-xl">{user.college_engineer_score !== null ? user.college_engineer_score : 'N/A'}</div>
+                        </div>
+                        <div className="text-center glass-effect rounded-lg p-2">
+                            <div className="text-xs text-gray-500 font-semibold mb-1">Global Score</div>
+                            <div className="font-bold text-blue-600 text-xl">{user.global_engineer_score || 0}</div>
+                        </div>
+                     </div>
+                     
+                     <div className="h-10 w-px bg-purple-200"></div>
+
+                     <div className="flex space-x-6">
+                        <div className="text-center">
+                            <span className="text-xs text-gray-500 block font-medium mb-1">CodeForces</span>
+                            <span className="font-bold text-gray-800 text-lg">{user.ratings?.codeforces || '-'}</span>
+                        </div>
+                        <div className="text-center">
+                            <span className="text-xs text-gray-500 block font-medium mb-1">LeetCode</span>
+                            <span className="font-bold text-gray-800 text-lg">{user.ratings?.leetcode || '-'}</span>
+                        </div>
+                        <div className="text-center">
+                            <span className="text-xs text-gray-500 block font-medium mb-1">CodeChef</span>
+                            <span className="font-bold text-gray-800 text-lg">{user.ratings?.codechef || '-'}</span>
+                        </div>
+                     </div>
+                 </div>
+               </div>
+            </div>
+          )}
+
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
