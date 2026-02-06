@@ -64,30 +64,30 @@ const CollegeLeaderboard = () => {
   const getBadgeStyle = (score) => {
     if (score >= 900) return 'bg-yellow-100 text-yellow-700 border border-yellow-300';
     if (score >= 800) return 'bg-purple-100 text-purple-700 border border-purple-300';
-    if (score >= 650) return 'bg-indigo-100 text-indigo-700 border border-indigo-300';
-    if (score >= 450) return 'bg-blue-100 text-blue-700 border border-blue-300';
-    if (score >= 300) return 'bg-green-100 text-green-700 border border-green-300';
-    if (score >= 150) return 'bg-orange-100 text-orange-700 border border-orange-300';
+    if (score >= 700) return 'bg-indigo-100 text-indigo-700 border border-indigo-300';
+    if (score >= 550) return 'bg-blue-100 text-blue-700 border border-blue-300';
+    if (score >= 400) return 'bg-green-100 text-green-700 border border-green-300';
+    if (score >= 200) return 'bg-orange-100 text-orange-700 border border-orange-300';
     return 'bg-gray-100 text-gray-700 border border-gray-300';
   };
 
   const getBadgeIcon = (score) => {
     if (score >= 900) return 'bx-crown';
     if (score >= 800) return 'bx-medal';
-    if (score >= 650) return 'bx-trophy';
-    if (score >= 450) return 'bx-star';
-    if (score >= 300) return 'bx-trending-up';
-    if (score >= 150) return 'bx-book-open';
+    if (score >= 700) return 'bx-trophy';
+    if (score >= 550) return 'bx-star';
+    if (score >= 400) return 'bx-trending-up';
+    if (score >= 200) return 'bx-book-open';
     return 'bx-rocket';
   };
 
   const getBadgeLabel = (score) => {
     if (score >= 900) return 'Elite';
     if (score >= 800) return 'Expert';
-    if (score >= 650) return 'Advanced';
-    if (score >= 450) return 'Strong';
-    if (score >= 300) return 'Intermediate';
-    if (score >= 150) return 'Learner';
+    if (score >= 700) return 'Advanced';
+    if (score >= 550) return 'Strong';
+    if (score >= 400) return 'Intermediate';
+    if (score >= 200) return 'Learner';
     return 'Beginner';
   };
 

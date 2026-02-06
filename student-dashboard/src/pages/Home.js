@@ -59,27 +59,27 @@ const Home = () => {
               <span className={`px-4 py-1.5 rounded-full text-sm font-semibold shadow-sm ${
                 (user?.global_engineer_score || 0) >= 900 ? 'bg-yellow-100 text-yellow-700 border border-yellow-300' :
                 (user?.global_engineer_score || 0) >= 800 ? 'bg-purple-100 text-purple-700 border border-purple-300' :
-                (user?.global_engineer_score || 0) >= 650 ? 'bg-indigo-100 text-indigo-700 border border-indigo-300' :
-                (user?.global_engineer_score || 0) >= 450 ? 'bg-blue-100 text-blue-700 border border-blue-300' :
-                (user?.global_engineer_score || 0) >= 300 ? 'bg-green-100 text-green-700 border border-green-300' :
-                (user?.global_engineer_score || 0) >= 150 ? 'bg-orange-100 text-orange-700 border border-orange-300' :
+                (user?.global_engineer_score || 0) >= 700 ? 'bg-indigo-100 text-indigo-700 border border-indigo-300' :
+                (user?.global_engineer_score || 0) >= 550 ? 'bg-blue-100 text-blue-700 border border-blue-300' :
+                (user?.global_engineer_score || 0) >= 400 ? 'bg-green-100 text-green-700 border border-green-300' :
+                (user?.global_engineer_score || 0) >= 200 ? 'bg-orange-100 text-orange-700 border border-orange-300' :
                 'bg-gray-100 text-gray-700 border border-gray-300'
               }`}>
                 <i className={`bx ${
                   (user?.global_engineer_score || 0) >= 900 ? 'bx-crown' :
                   (user?.global_engineer_score || 0) >= 800 ? 'bx-medal' :
-                  (user?.global_engineer_score || 0) >= 650 ? 'bx-trophy' :
-                  (user?.global_engineer_score || 0) >= 450 ? 'bx-star' :
-                  (user?.global_engineer_score || 0) >= 300 ? 'bx-trending-up' :
-                  (user?.global_engineer_score || 0) >= 150 ? 'bx-book-open' :
+                  (user?.global_engineer_score || 0) >= 700 ? 'bx-trophy' :
+                  (user?.global_engineer_score || 0) >= 550 ? 'bx-star' :
+                  (user?.global_engineer_score || 0) >= 400 ? 'bx-trending-up' :
+                  (user?.global_engineer_score || 0) >= 200 ? 'bx-book-open' :
                   'bx-rocket'
                 } mr-1`}></i>
                 {(user?.global_engineer_score || 0) >= 900 ? 'Elite' :
                  (user?.global_engineer_score || 0) >= 800 ? 'Expert' :
-                 (user?.global_engineer_score || 0) >= 650 ? 'Advanced' :
-                 (user?.global_engineer_score || 0) >= 450 ? 'Strong' :
-                 (user?.global_engineer_score || 0) >= 300 ? 'Intermediate' :
-                 (user?.global_engineer_score || 0) >= 150 ? 'Learner' :
+                 (user?.global_engineer_score || 0) >= 700 ? 'Advanced' :
+                 (user?.global_engineer_score || 0) >= 550 ? 'Strong' :
+                 (user?.global_engineer_score || 0) >= 400 ? 'Intermediate' :
+                 (user?.global_engineer_score || 0) >= 200 ? 'Learner' :
                  'Beginner'}
               </span>
             </div>
@@ -225,34 +225,34 @@ const Home = () => {
             <h4 className="text-lg font-semibold text-gray-800 mb-4">Level Classification</h4>
             <div className="space-y-3">
               <div className={`flex justify-between items-center p-3 rounded-lg ${
-                (user?.global_engineer_score || 0) >= 0 && (user?.global_engineer_score || 0) < 150 ? 'bg-gray-100 border-2 border-gray-400' : 'bg-gray-50'
+                (user?.global_engineer_score || 0) >= 0 && (user?.global_engineer_score || 0) < 200 ? 'bg-gray-100 border-2 border-gray-400' : 'bg-gray-50'
               }`}>
                 <span className="font-medium text-gray-700">Beginner</span>
-                <span className="text-sm text-gray-600">0 - 150</span>
+                <span className="text-sm text-gray-600">0 - 200</span>
               </div>
               <div className={`flex justify-between items-center p-3 rounded-lg ${
-                (user?.global_engineer_score || 0) >= 150 && (user?.global_engineer_score || 0) < 300 ? 'bg-orange-100 border-2 border-orange-400' : 'bg-gray-50'
+                (user?.global_engineer_score || 0) >= 200 && (user?.global_engineer_score || 0) < 400 ? 'bg-orange-100 border-2 border-orange-400' : 'bg-gray-50'
               }`}>
                 <span className="font-medium text-gray-700">Learner</span>
-                <span className="text-sm text-gray-600">150 - 300</span>
+                <span className="text-sm text-gray-600">200 - 400</span>
               </div>
               <div className={`flex justify-between items-center p-3 rounded-lg ${
-                (user?.global_engineer_score || 0) >= 300 && (user?.global_engineer_score || 0) < 450 ? 'bg-green-100 border-2 border-green-400' : 'bg-gray-50'
+                (user?.global_engineer_score || 0) >= 400 && (user?.global_engineer_score || 0) < 550 ? 'bg-green-100 border-2 border-green-400' : 'bg-gray-50'
               }`}>
                 <span className="font-medium text-gray-700">Intermediate</span>
-                <span className="text-sm text-gray-600">300 - 450</span>
+                <span className="text-sm text-gray-600">400 - 550</span>
               </div>
               <div className={`flex justify-between items-center p-3 rounded-lg ${
-                (user?.global_engineer_score || 0) >= 450 && (user?.global_engineer_score || 0) < 650 ? 'bg-blue-100 border-2 border-blue-400' : 'bg-gray-50'
+                (user?.global_engineer_score || 0) >= 550 && (user?.global_engineer_score || 0) < 700 ? 'bg-blue-100 border-2 border-blue-400' : 'bg-gray-50'
               }`}>
                 <span className="font-medium text-gray-700">Strong</span>
-                <span className="text-sm text-gray-600">450 - 650</span>
+                <span className="text-sm text-gray-600">550 - 700</span>
               </div>
               <div className={`flex justify-between items-center p-3 rounded-lg ${
-                (user?.global_engineer_score || 0) >= 650 && (user?.global_engineer_score || 0) < 800 ? 'bg-indigo-100 border-2 border-indigo-400' : 'bg-gray-50'
+                (user?.global_engineer_score || 0) >= 700 && (user?.global_engineer_score || 0) < 800 ? 'bg-indigo-100 border-2 border-indigo-400' : 'bg-gray-50'
               }`}>
                 <span className="font-medium text-gray-700">Advanced</span>
-                <span className="text-sm text-gray-600">650 - 800</span>
+                <span className="text-sm text-gray-600">700 - 800</span>
               </div>
               <div className={`flex justify-between items-center p-3 rounded-lg ${
                 (user?.global_engineer_score || 0) >= 800 && (user?.global_engineer_score || 0) < 900 ? 'bg-purple-100 border-2 border-purple-400' : 'bg-gray-50'

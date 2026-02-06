@@ -198,9 +198,9 @@ userSchema.methods.calculateGlobalEngineerScore = function() {
   // Clamp and normalize each component
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
   
-  const cfNormalized = clamp((cf - 800) / 2700, 0, 1);
+  const cfNormalized = clamp((cf - 800) / 1400, 0, 1);
   const lcNormalized = clamp((lc - 1400) / 1100, 0, 1);
-  const ccNormalized = clamp((cc - 1200) / 1800, 0, 1);
+  const ccNormalized = clamp((cc - 1200) / 1300, 0, 1);
   const totalNormalized = clamp(totalSolved / 2000, 0, 1);
   
   // Apply square root and weighted sum
