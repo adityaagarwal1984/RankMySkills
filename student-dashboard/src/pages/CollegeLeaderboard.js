@@ -180,7 +180,7 @@ const CollegeLeaderboard = () => {
 
       {/* Leaderboard Table */}
       {loading ? (
-        <div className="text-center py-12">Loading...</div>
+        <div className="text-center py-12">this feature is coming very soon...</div>
       ) : (
         <>
           {/* User Rank Card */}
