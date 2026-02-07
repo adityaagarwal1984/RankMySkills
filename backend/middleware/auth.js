@@ -4,7 +4,8 @@ const User = require('../models/User');
 // Verify JWT token
 const authenticate = async (req, res, next) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    // Check for token in cookies first, then Authorization header
+    const token = req.cookies?.accessToken || req.header('Authorization')?.replace('Bearer ', '');
     
     if (!token) {
       return res.status(401).json({ error: 'Authentication required' });

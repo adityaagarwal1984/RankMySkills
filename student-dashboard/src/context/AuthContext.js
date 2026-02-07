@@ -8,13 +8,9 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in
-    const token = localStorage.getItem('token');
-    if (token) {
-      fetchProfile();
-    } else {
-      setLoading(false);
-    }
+    // Check if user is logged in by trying to fetch profile
+    // The api interceptor will handle token refresh if needed
+    fetchProfile();
   }, []);
 
   const fetchProfile = async () => {
@@ -22,8 +18,9 @@ export const AuthProvider = ({ children }) => {
       const response = await api.get('/student/profile');
       setUser(response.data.student);
     } catch (error) {
-      console.error('Failed to fetch profile:', error);
-      localStorage.removeItem('token');
+      // Not logged in or session expired
+      console.log('No active session');
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -31,20 +28,24 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const response = await api.post('/auth/login', { email, password });
-    localStorage.setItem('token', response.data.token);
+    // Token is now in HttpOnly cookie
     await fetchProfile();
     return response.data;
   };
 
   const register = async (userData) => {
     const response = await api.post('/auth/register/student', userData);
-    localStorage.setItem('token', response.data.token);
+    // Token is now in HttpOnly cookie
     await fetchProfile();
     return response.data;
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
+  const logout = async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
     setUser(null);
   };
 

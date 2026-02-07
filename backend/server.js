@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const User = require('./models/User');
 const platformService = require('./services/platformService');
 
@@ -16,7 +17,11 @@ const leaderboardRoutes = require('./routes/leaderboard');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: true, // Allow all origins (or specify your frontend URL)
+  credentials: true // Allow cookies
+}));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

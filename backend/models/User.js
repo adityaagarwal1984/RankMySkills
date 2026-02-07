@@ -28,6 +28,22 @@ const userSchema = new mongoose.Schema({
     default: null
   },
 
+  // Refresh Tokens for Persistent Login
+  refreshTokens: [{
+    token: { 
+      type: String, 
+      required: true 
+    },
+    createdAt: { 
+      type: Date, 
+      default: Date.now 
+    },
+    expiresAt: { 
+      type: Date, 
+      required: true 
+    }
+  }],
+
   // Sync status
   last_synced: {
     type: Date,

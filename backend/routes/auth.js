@@ -8,6 +8,50 @@ const College = require('../models/College');
 
 const router = express.Router();
 
+// --- Authentication Helper Functions ---
+
+// Generate Access and Refresh Tokens
+const generateTokens = async (user) => {
+  const accessToken = jwt.sign(
+    { userId: user._id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: '24h' }
+  );
+
+  const refreshToken = crypto.randomBytes(40).toString('hex');
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 60); // 60 days
+
+  // Add key to user's refreshTokens array
+  user.refreshTokens.push({ token: refreshToken, expiresAt });
+  
+  // Clean up expired tokens
+  user.refreshTokens = user.refreshTokens.filter(t => t.expiresAt > new Date());
+  
+  await user.save();
+
+  return { accessToken, refreshToken };
+};
+
+// Set Cookies
+const setCookies = (res, accessToken, refreshToken) => {
+  const isProduction = process.env.NODE_ENV === 'production';
+  
+  res.cookie('accessToken', accessToken, {
+    httpOnly: true,
+    secure: isProduction, // true in production
+    sameSite: isProduction ? 'none' : 'lax', // 'none' requires secure: true
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  });
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
+    maxAge: 60 * 24 * 60 * 60 * 1000 // 60 days
+  });
+};
+
 // Register Student
 router.post('/register/student', async (req, res) => {
   try {
@@ -54,16 +98,12 @@ router.post('/register/student', async (req, res) => {
     user.calculateGlobalEngineerScore();
     await user.save();
     
-    // Generate token
-    const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    // Generate tokens and set cookies
+    const { accessToken, refreshToken } = await generateTokens(user);
+    setCookies(res, accessToken, refreshToken);
     
     res.status(201).json({
       message: 'Student registered successfully',
-      token,
       user: {
         id: user._id,
         email: user.email,
@@ -119,15 +159,13 @@ router.post('/register/college', async (req, res) => {
     
     await user.save();
     
-    const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    // For pending admins, maybe we don't login immediately? 
+    // But let's follow standard flow, they just get limited access via RBAC
+    const { accessToken, refreshToken } = await generateTokens(user);
+    setCookies(res, accessToken, refreshToken);
     
     res.status(201).json({
       message: 'College admin registered. Awaiting approval.',
-      token,
       user: {
         id: user._id,
         email: user.email,
@@ -166,15 +204,12 @@ router.post('/login', async (req, res) => {
       return res.status(403).json({ error: 'Account pending approval' });
     }
     
-    const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    // Generate tokens and set cookies
+    const { accessToken, refreshToken } = await generateTokens(user);
+    setCookies(res, accessToken, refreshToken);
     
     res.json({
       message: 'Login successful',
-      token,
       user: {
         id: user._id,
         email: user.email,
@@ -186,6 +221,68 @@ router.post('/login', async (req, res) => {
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Login failed' });
+  }
+});
+
+// Refresh Token Endpoint
+router.post('/refresh-token', async (req, res) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    
+    if (!refreshToken) {
+      return res.status(401).json({ error: 'Refresh token required' });
+    }
+    
+    // Find user with this refresh token
+    const user = await User.findOne({
+      'refreshTokens.token': refreshToken,
+      'refreshTokens.expiresAt': { $gt: new Date() }
+    });
+    
+    if (!user) {
+      res.clearCookie('accessToken');
+      res.clearCookie('refreshToken');
+      return res.status(401).json({ error: 'Invalid refresh token' });
+    }
+    
+    // Remove the old refresh token (Token Rotation) 
+    // or keep it? Requirement says "Used only to issue a new access token".
+    // "Store refresh tokens in database for revocation".
+    // Secure approach: Remove used token, issue new one.
+    user.refreshTokens = user.refreshTokens.filter(t => t.token !== refreshToken);
+    
+    const { accessToken, refreshToken: newRefreshToken } = await generateTokens(user);
+    setCookies(res, accessToken, newRefreshToken);
+    
+    res.json({ message: 'Token refreshed' });
+  } catch (error) {
+    console.error('Refresh token error:', error);
+    res.status(500).json({ error: 'Token refresh failed' });
+  }
+});
+
+// Logout
+router.post('/logout', async (req, res) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    
+    if (refreshToken) {
+      // Create unique index ensures email unique, but here we update by finding token? 
+      // Better to find by token directly in array
+      await User.updateOne(
+        { 'refreshTokens.token': refreshToken },
+        { $pull: { refreshTokens: { token: refreshToken } } }
+      );
+    }
+    
+    // Clear cookies
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+    
+    res.json({ message: 'Logged out successfully' });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({ error: 'Logout failed' });
   }
 });
 
