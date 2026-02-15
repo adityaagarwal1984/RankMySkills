@@ -18,7 +18,7 @@ const VerificationModal = ({ platform, username, onClose, onVerified }) => {
       instructions: 'Go to your LeetCode profile settings and paste the verification code in your "About Me" or "Summary" section.',
       steps: [
         'Click the button below to open your LeetCode profile edit page',
-        'Scroll to the "Summary" section',
+        'Scroll to the "ReadMe" section',
         'Paste the verification code shown below',
         'Save your changes on LeetCode',
         'Come back here and click "Verify Profile"',
