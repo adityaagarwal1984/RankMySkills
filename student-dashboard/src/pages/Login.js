@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -7,8 +7,19 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, user, loading: authLoading } = useAuth();
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      setIsRedirecting(true);
+      const timer = setTimeout(() => {
+        navigate('/dashboard');
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [user, authLoading, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,6 +35,21 @@ const Login = () => {
       setLoading(false);
     }
   };
+
+  if (authLoading || isRedirecting) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="flex flex-col items-center animate-pulse gap-4">
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+            <span className="text-white font-bold text-4xl">R</span>
+          </div>
+          <span className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">
+            RankMySkills
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black to-black">
