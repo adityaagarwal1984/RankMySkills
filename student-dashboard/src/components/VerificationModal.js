@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api/api';
 
 const VerificationModal = ({ platform, username, onClose, onVerified }) => {
   const [verificationCode, setVerificationCode] = useState('');
@@ -83,16 +83,10 @@ const VerificationModal = ({ platform, username, onClose, onVerified }) => {
     setSuccess('');
 
     try {
-      const token = localStorage.getItem('token');
       console.log('Generating verification code for platform:', platform);
       
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/student/verify/generate`,
-        { platform, username },
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      // Use the api instance which handles credentials automatically
+      const response = await api.post('/student/verify/generate', { platform, username });
 
       console.log('Verification code response:', response.data);
       setVerificationCode(response.data.verification_code);
@@ -112,14 +106,7 @@ const VerificationModal = ({ platform, username, onClose, onVerified }) => {
     setSuccess('');
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/student/verify/check`,
-        { platform, username },
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      const response = await api.post('/student/verify/check', { platform, username });
 
       if (response.data.verified) {
         setSuccess(response.data.message);

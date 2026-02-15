@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import api from '../api/api';
 import VerificationModal from '../components/VerificationModal';
 
 const EditProfile = () => {
@@ -80,17 +80,11 @@ const EditProfile = () => {
       const formDataUpload = new FormData();
       formDataUpload.append('photo', selectedFile);
       
-      const token = localStorage.getItem('token');
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/student/upload-photo`,
-        formDataUpload,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-          }
+      const response = await api.post('/student/upload-photo', formDataUpload, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
         }
-      );
+      });
       
       setFormData({ ...formData, profile_photo: response.data.photoUrl });
       setPhotoPreview(`${process.env.REACT_APP_IMG_URL || 'http://localhost:5000'}${response.data.photoUrl}`);
@@ -152,10 +146,7 @@ const EditProfile = () => {
   const handleDeletePlatform = async (platform) => {
     if (window.confirm(`Are you sure you want to remove your ${platform} username? This will remove your verification status.`)) {
       try {
-        const token = localStorage.getItem('token');
-        await axios.delete(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/student/platform/${platform}`, {
-           headers: { Authorization: `Bearer ${token}` }
-        });
+        await api.delete(`/student/platform/${platform}`);
 
         setFormData(prev => ({
           ...prev,
