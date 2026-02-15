@@ -75,24 +75,24 @@ const LandingPage = () => {
               animate={{ opacity: 1, x: 0 }}
               className="flex items-center space-x-2"
             >
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shrink-0">
                 <span className="text-white font-bold text-xl">R</span>
               </div>
-              <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">
+              <span className="text-lg md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">
                 RankMySkills
               </span>
             </motion.div>
             
-            <div className="flex items-center space-x-4">
-              <Link to="/login" className="text-gray-300 hover:text-white transition-colors px-4 py-2">
+            <div className="flex items-center space-x-2 md:space-x-4">
+              <Link to="/login" className="text-gray-300 hover:text-white transition-colors px-2 py-1 md:px-4 md:py-2 text-sm md:text-base">
                 Login
               </Link>
               <Link 
                 to="/register" 
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-medium transition-all hover:scale-105 transform flex items-center group"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 md:px-6 md:py-2 rounded-full font-medium transition-all hover:scale-105 transform flex items-center group text-sm md:text-base whitespace-nowrap"
               >
                 Get Started
-                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-1 md:ml-2 w-3 h-3 md:w-4 md:h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
           </div>

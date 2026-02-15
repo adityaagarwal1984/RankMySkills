@@ -307,7 +307,7 @@ const EditProfile = () => {
                   <div className="ml-auto flex items-center space-x-2">
                     <span className="flex items-center text-green-600 text-sm">
                       <i className="bx bx-badge-check text-xl animate-pulse"></i>
-                      <span className="ml-1">Verified</span>
+                      <span className="ml-1 hidden sm:inline">Verified</span>
                     </span>
                     <button 
                       type="button"
@@ -320,9 +320,9 @@ const EditProfile = () => {
                   </div>
                 )}
               </label>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
-                  <span className="px-4 py-2 bg-gray-50 text-gray-600 text-sm border-r border-gray-300">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <div className="flex-1 flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent overflow-hidden">
+                  <span className="px-2 sm:px-4 py-2 bg-gray-50 text-gray-600 text-xs sm:text-sm border-r border-gray-300 whitespace-nowrap">
                     https://leetcode.com/u/
                   </span>
                   <input
@@ -331,14 +331,14 @@ const EditProfile = () => {
                     value={formData.platforms.leetcode}
                     onChange={handleChange}
                     placeholder="username"
-                    className="flex-1 px-4 py-2 focus:outline-none rounded-r-lg"
+                    className="flex-1 px-4 py-2 focus:outline-none min-w-0"
                   />
                 </div>
                 <button
                   type="button"
                   onClick={() => openVerificationModal('leetcode')}
                   disabled={!formData.platforms.leetcode || verificationStatus.leetcode}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
                     verificationStatus.leetcode
                       ? 'bg-green-100 text-green-700 cursor-not-allowed'
                       : 'bg-blue-500 text-white hover:bg-blue-600'
@@ -357,7 +357,7 @@ const EditProfile = () => {
                   <div className="ml-auto flex items-center space-x-2">
                     <span className="flex items-center text-green-600 text-sm">
                       <i className="bx bx-badge-check text-xl animate-pulse"></i>
-                      <span className="ml-1">Verified</span>
+                      <span className="ml-1 hidden sm:inline">Verified</span>
                     </span>
                     <button 
                       type="button"
@@ -370,9 +370,9 @@ const EditProfile = () => {
                   </div>
                 )}
               </label>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
-                  <span className="px-4 py-2 bg-gray-50 text-gray-600 text-sm border-r border-gray-300">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <div className="flex-1 flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent overflow-hidden">
+                  <span className="px-2 sm:px-4 py-2 bg-gray-50 text-gray-600 text-xs sm:text-sm border-r border-gray-300 whitespace-nowrap">
                     https://codeforces.com/profile/
                   </span>
                   <input
@@ -381,14 +381,14 @@ const EditProfile = () => {
                     value={formData.platforms.codeforces}
                     onChange={handleChange}
                     placeholder="handle"
-                    className="flex-1 px-4 py-2 focus:outline-none rounded-r-lg"
+                    className="flex-1 px-4 py-2 focus:outline-none min-w-0"
                   />
                 </div>
                 <button
                   type="button"
                   onClick={() => openVerificationModal('codeforces')}
                   disabled={!formData.platforms.codeforces || verificationStatus.codeforces}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
                     verificationStatus.codeforces
                       ? 'bg-green-100 text-green-700 cursor-not-allowed'
                       : 'bg-blue-500 text-white hover:bg-blue-600'
@@ -407,7 +407,7 @@ const EditProfile = () => {
                   <div className="ml-auto flex items-center space-x-2">
                     <span className="flex items-center text-green-600 text-sm">
                       <i className="bx bx-badge-check text-xl animate-pulse"></i>
-                      <span className="ml-1">Verified</span>
+                      <span className="ml-1 hidden sm:inline">Verified</span>
                     </span>
                     <button 
                       type="button"
@@ -420,9 +420,9 @@ const EditProfile = () => {
                   </div>
                 )}
               </label>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
-                  <span className="px-4 py-2 bg-gray-50 text-gray-600 text-sm border-r border-gray-300">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <div className="flex-1 flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent overflow-hidden">
+                  <span className="px-2 sm:px-4 py-2 bg-gray-50 text-gray-600 text-xs sm:text-sm border-r border-gray-300 whitespace-nowrap">
                     https://www.codechef.com/users/
                   </span>
                   <input
@@ -431,14 +431,14 @@ const EditProfile = () => {
                     value={formData.platforms.codechef}
                     onChange={handleChange}
                     placeholder="username"
-                    className="flex-1 px-4 py-2 focus:outline-none rounded-r-lg"
+                    className="flex-1 px-4 py-2 focus:outline-none min-w-0"
                   />
                 </div>
                 <button
                   type="button"
                   onClick={() => openVerificationModal('codechef')}
                   disabled={!formData.platforms.codechef || verificationStatus.codechef}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
                     verificationStatus.codechef
                       ? 'bg-green-100 text-green-700 cursor-not-allowed'
                       : 'bg-blue-500 text-white hover:bg-blue-600'
@@ -457,7 +457,7 @@ const EditProfile = () => {
                   <div className="ml-auto flex items-center space-x-2">
                     <span className="flex items-center text-green-600 text-sm">
                       <i className="bx bx-badge-check text-xl animate-pulse"></i>
-                      <span className="ml-1">Verified</span>
+                      <span className="ml-1 hidden sm:inline">Verified</span>
                     </span>
                     <button 
                       type="button"
@@ -470,9 +470,9 @@ const EditProfile = () => {
                   </div>
                 )}
               </label>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
-                  <span className="px-4 py-2 bg-gray-50 text-gray-600 text-sm border-r border-gray-300">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <div className="flex-1 flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent overflow-hidden">
+                  <span className="px-2 sm:px-4 py-2 bg-gray-50 text-gray-600 text-xs sm:text-sm border-r border-gray-300 whitespace-nowrap">
                     https://www.geeksforgeeks.org/user/
                   </span>
                   <input
@@ -481,14 +481,14 @@ const EditProfile = () => {
                     value={formData.platforms.gfg}
                     onChange={handleChange}
                     placeholder="username"
-                    className="flex-1 px-4 py-2 focus:outline-none rounded-r-lg"
+                    className="flex-1 px-4 py-2 focus:outline-none min-w-0"
                   />
                 </div>
                 <button
                   type="button"
                   onClick={() => openVerificationModal('gfg')}
                   disabled={!formData.platforms.gfg || verificationStatus.gfg}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
                     verificationStatus.gfg
                       ? 'bg-green-100 text-green-700 cursor-not-allowed'
                       : 'bg-blue-500 text-white hover:bg-blue-600'

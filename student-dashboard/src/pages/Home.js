@@ -35,7 +35,7 @@ const Home = () => {
 
       {/* Profile Section */}
       <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-sm border border-blue-100 p-6 mb-8">
-        <div className="flex items-start space-x-6">
+        <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-6">
           <div className="relative">
             <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-md ring-4 ring-blue-100">
               {user?.profile_photo ? (
@@ -53,8 +53,8 @@ const Home = () => {
             </div>
           </div>
           
-          <div className="flex-1">
-            <div className="flex items-center space-x-3">
+          <div className="flex-1 w-full text-center md:text-left">
+            <div className="flex flex-col md:flex-row items-center md:items-center space-y-2 md:space-y-0 md:space-x-3 justify-center md:justify-start">
               <h2 className="text-2xl font-bold text-gray-900">{user?.name}</h2>
               <span className={`px-4 py-1.5 rounded-full text-sm font-semibold shadow-sm ${
                 (user?.global_engineer_score || 0) >= 900 ? 'bg-yellow-100 text-yellow-700 border border-yellow-300' :
@@ -83,11 +83,11 @@ const Home = () => {
                  'Beginner'}
               </span>
             </div>
-            <div className="flex items-center space-x-2 text-gray-600 mt-1">
+            <div className="flex items-center justify-center md:justify-start space-x-2 text-gray-600 mt-1">
               <i className='bx bxs-school text-lg'></i>
               <p>{user?.college?.name}</p>
             </div>
-            <div className="mt-3 flex flex-wrap gap-4 text-sm">
+            <div className="mt-3 flex flex-wrap gap-4 text-sm justify-center md:justify-start">
               <div className="flex items-center space-x-2 bg-white px-3 py-1.5 rounded-lg shadow-sm">
                 <i className='bx bx-calendar text-blue-600'></i>
                 <span className="font-medium text-gray-700">Graduation:</span>
@@ -103,7 +103,7 @@ const Home = () => {
         </div>
 
         {/* Engineer Scores */}
-        <div className="mt-6 grid grid-cols-2 gap-4">
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-white p-5 rounded-xl shadow-sm border border-blue-100 hover:shadow-md transition-shadow">
             <div className="flex items-center space-x-2 mb-2">
               <i className='bx bx-trophy text-2xl text-blue-600'></i>
@@ -127,14 +127,14 @@ const Home = () => {
       </div>
 
       {/* Ranking and Level Section */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: Rankings */}
         <div>
           <div className="mb-4">
             <h2 className="text-2xl font-bold text-gray-900">Your Rankings</h2>
             <p className="text-gray-600 mt-1">Track your performance across different categories</p>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Global Rank (All students) */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
               <div className="flex items-center space-x-3 mb-4">

@@ -112,7 +112,7 @@ const Portfolio = () => {
   return (
     <div className="max-w-6xl mx-auto">
       <div className="mb-8">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center space-x-2">
               <i className='bx bx-briefcase text-blue-600'></i>
@@ -123,7 +123,7 @@ const Portfolio = () => {
           <button
             onClick={handleSyncPlatforms}
             disabled={syncing}
-            className={`flex items-center space-x-2 px-5 py-2.5 rounded-lg font-medium transition-all ${
+            className={`flex items-center space-x-2 px-5 py-2.5 rounded-lg font-medium transition-all w-full sm:w-auto justify-center ${
               syncing 
                 ? 'bg-gray-400 cursor-not-allowed' 
                 : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg'

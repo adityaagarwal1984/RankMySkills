@@ -202,62 +202,59 @@ const GlobalLeaderboard = () => {
         <>
           {/* User Rank Card */}
           {user && (
-            <div className="mb-6 bg-blue-50 border border-blue-200 rounded-xl shadow-sm overflow-hidden p-6">
-               <div className="flex items-center justify-between flex-wrap gap-4">
-                 <div className="flex items-center space-x-6">
-                     <div className="text-center">
-                         <div className="text-xs text-blue-600 font-bold uppercase tracking-wider mb-1">Your Rank</div>
-                         <div className="text-3xl font-bold text-blue-800">{meta?.userRank ? `#${meta.userRank}` : 'N/A'}</div>
+            <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg shadow-sm overflow-hidden p-3 md:p-4">
+               <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                 <div className="flex items-center space-x-3 md:space-x-6">
+                     <div className="text-center min-w-[50px]">
+                         <div className="text-[10px] text-blue-600 font-bold uppercase tracking-wider mb-0.5">Your Rank</div>
+                         <div className="text-xl md:text-2xl font-bold text-blue-800">{meta?.userRank ? `#${meta.userRank}` : 'N/A'}</div>
                      </div>
-                     <div className="h-12 w-px bg-blue-200"></div>
+                     <div className="h-8 md:h-10 w-px bg-blue-200"></div>
                      <div className="flex items-center">
-                        <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mr-4 border-2 border-blue-200 overflow-hidden shadow-sm">
+                        <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center mr-3 border-2 border-blue-200 overflow-hidden shadow-sm">
                           {user.profile_photo ? (
                             <img 
                               src={user.profile_photo.startsWith('http') ? user.profile_photo : `${process.env.REACT_APP_IMG_URL || 'http://localhost:5000'}${user.profile_photo}`} 
                               alt="Profile" 
-                              className="w-14 h-14 rounded-full object-cover" 
+                              className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover" 
                             />
                           ) : (
-                            <i className='bx bx-user text-2xl text-gray-400'></i>
+                            <i className='bx bx-user text-xl text-gray-400'></i>
                           )}
                         </div>
                         <div>
                           <div className="flex items-center space-x-2">
-                             <div className="text-lg font-bold text-gray-900">{user.name}</div>
-                             <span className={`px-2 py-0.5 rounded-full text-xs font-semibold shadow-sm flex items-center ${getBadgeStyle(user.global_engineer_score || 0)}`}>
-                               <i className={`bx ${getBadgeIcon(user.global_engineer_score || 0)} mr-1`}></i>
+                             <div className="text-sm md:text-base font-bold text-gray-900">{user.name}</div>
+                             <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-semibold shadow-sm flex items-center ${getBadgeStyle(user.global_engineer_score || 0)}`}>
+                               <i className={`bx ${getBadgeIcon(user.global_engineer_score || 0)} mr-0.5`}></i>
                                {getBadgeLabel(user.global_engineer_score || 0)}
                              </span>
                           </div>
-                          <div className="text-sm text-gray-600 flex items-center mt-0.5">
+                          <div className="text-xs text-gray-600 flex items-center mt-0.5">
                              <i className='bx bxs-school mr-1'></i>
-                             {user.college?.name}
-                             <span className="mx-2">•</span>
-                             {user.course} '{user.graduation_year?.toString().slice(-2)}
+                             <span className="truncate max-w-[150px] md:max-w-xs">{user.college?.name}</span>
                           </div>
                         </div>
                      </div>
                  </div>
                  
-                 <div className="flex items-center space-x-8">
-                     <div className="text-center glass-effect rounded-lg p-2">
-                        <div className="text-xs text-gray-500 font-semibold mb-1">Global Score</div>
-                        <div className="font-bold text-blue-600 text-2xl">{user.global_engineer_score || 0}</div>
+                 <div className="flex items-center justify-between md:justify-end space-x-2 md:space-x-6 w-full md:w-auto bg-blue-100/50 md:bg-transparent rounded-lg p-2 md:p-0">
+                     <div className="text-center px-2">
+                        <div className="text-[10px] text-gray-500 font-semibold mb-0.5">Global Score</div>
+                        <div className="font-bold text-blue-600 text-lg md:text-xl">{user.global_engineer_score || 0}</div>
                      </div>
-                     <div className="flex space-x-6">
-                        <div className="text-center">
-                            <span className="text-xs text-gray-500 block font-medium mb-1">CodeForces</span>
-                            <span className="font-bold text-gray-800 text-lg">{user.ratings?.codeforces || '-'}</span>
-                        </div>
-                        <div className="text-center">
-                            <span className="text-xs text-gray-500 block font-medium mb-1">LeetCode</span>
-                            <span className="font-bold text-gray-800 text-lg">{user.ratings?.leetcode || '-'}</span>
-                        </div>
-                        <div className="text-center">
-                            <span className="text-xs text-gray-500 block font-medium mb-1">CodeChef</span>
-                            <span className="font-bold text-gray-800 text-lg">{user.ratings?.codechef || '-'}</span>
-                        </div>
+                     <div className="h-6 w-px bg-gray-300 md:hidden"></div>
+                     <div className="text-center px-1">
+                        <span className="text-[10px] text-gray-500 block font-medium mb-0.5">CF</span>
+                        <span className="font-bold text-gray-800 text-sm md:text-base">{user.ratings?.codeforces || '-'}</span>
+                     </div>
+                     <div className="text-center px-1">
+                        <span className="text-[10px] text-gray-500 block font-medium mb-0.5">LC</span>
+                        <span className="font-bold text-gray-800 text-sm md:text-base">{user.ratings?.leetcode || '-'}</span>
+                     </div>
+                     <div className="text-center px-1">
+                        <span className="text-[10px] text-gray-500 block font-medium mb-0.5">CC</span>
+                        <span className="font-bold text-gray-800 text-sm md:text-base">{user.ratings?.codechef || '-'}</span>
                      </div>
                  </div>
                </div>
@@ -265,97 +262,99 @@ const GlobalLeaderboard = () => {
           )}
 
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Rank
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Student
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    College
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Year
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Global Score
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    CF
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    LC
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    CC
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {leaderboard.map((student) => (
-                  <tr key={student.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[600px]">
+                <thead className="bg-gray-50 border-b">
+                  <tr>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Rank
+                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Student
+                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      College
+                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Year
+                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Global Score
+                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      CF
+                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      LC
+                    </th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      CC
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {leaderboard.map((student) => (
+                    <tr key={student.id} className="hover:bg-gray-50">
+                      <td className="px-3 py-2 whitespace-nowrap">
                       <div className="flex items-center">
                         {student.rank <= 3 ? (
-                          <span className="text-2xl mr-2">
+                          <span className="text-xl mr-1">
                             {student.rank === 1 ? '🥇' : student.rank === 2 ? '🥈' : '🥉'}
                           </span>
                         ) : null}
-                        <span className="text-sm font-bold text-gray-900">#{student.rank}</span>
+                        <span className="text-xs font-bold text-gray-900">#{student.rank}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 py-2 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mr-3 overflow-hidden">
+                        <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center mr-2 overflow-hidden">
                           {student.profile_photo ? (
                             <img 
                               src={student.profile_photo.startsWith('http') ? student.profile_photo : `${process.env.REACT_APP_IMG_URL || 'http://localhost:5000'}${student.profile_photo}`} 
                               alt="Profile" 
-                              className="w-10 h-10 rounded-full object-cover" 
+                              className="w-8 h-8 rounded-full object-cover" 
                             />
                           ) : (
-                            <i className='bx bx-user text-xl text-gray-500'></i>
+                            <i className='bx bx-user text-lg text-gray-500'></i>
                           )}
                         </div>
                         <div>
-                          <div className="flex items-center space-x-2">
-                            <div className="text-sm font-medium text-gray-900 w-48 truncate" title={student.name}>{student.name}</div>
-                            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold shadow-sm flex items-center ${getBadgeStyle(student.global_engineer_score || 0)}`}>
-                              <i className={`bx ${getBadgeIcon(student.global_engineer_score || 0)} mr-1`}></i>
+                          <div className="flex items-center space-x-1">
+                            <div className="text-xs font-medium text-gray-900 w-32 truncate" title={student.name}>{student.name}</div>
+                            <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-semibold shadow-sm flex items-center ${getBadgeStyle(student.global_engineer_score || 0)}`}>
+                              <i className={`bx ${getBadgeIcon(student.global_engineer_score || 0)} mr-0.5`}></i>
                               {getBadgeLabel(student.global_engineer_score || 0)}
                             </span>
                           </div>
-                          <div className="text-sm text-gray-500">{student.course}</div>
+                          <div className="text-[10px] text-gray-500">{student.course}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 pl-12">
-                      <div className="text-sm text-gray-900">{student.college}</div>
+                    <td className="px-3 py-2 max-w-[150px]">
+                      <div className="text-xs text-gray-900 truncate" title={student.college}>{student.college}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
                       {student.graduation_year}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-bold text-blue-600">
+                    <td className="px-3 py-2 whitespace-nowrap">
+                      <span className="text-xs font-bold text-blue-600">
                         {student.global_engineer_score}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
                       {student.ratings?.codeforces || '-'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
                       {student.ratings?.leetcode || '-'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
                       {student.ratings?.codechef || '-'}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
           </div>
 
           {/* Pagination */}
