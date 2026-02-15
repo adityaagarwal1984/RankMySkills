@@ -13,6 +13,7 @@ const Register = () => {
     course: '',
   });
   const [colleges, setColleges] = useState([]);
+  const [isCollegesLoading, setIsCollegesLoading] = useState(true);
   const [showNewCollegeInput, setShowNewCollegeInput] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,6 +28,8 @@ const Register = () => {
         setColleges(response.data.colleges || []);
       } catch (err) {
         console.error('Failed to fetch colleges:', err);
+      } finally {
+        setIsCollegesLoading(false);
       }
     };
     fetchColleges();
@@ -117,7 +120,12 @@ const Register = () => {
 
           <div>
             <label className="block text-gray-700 font-medium mb-2">College Name</label>
-            {!showNewCollegeInput ? (
+            {isCollegesLoading ? (
+              <div className="flex items-center space-x-2 py-2 text-gray-500">
+                <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-500"></div>
+                <span className="text-sm">Loading colleges...</span>
+              </div>
+            ) : !showNewCollegeInput ? (
               <select
                 name="college_name"
                 value={formData.college_name}
