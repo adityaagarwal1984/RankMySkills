@@ -21,8 +21,10 @@ const CollegeLeaderboard = () => {
   }, []);
 
   useEffect(() => {
-    if (user?.college_id) {
+    if (user?.college?.college_id) {
       fetchLeaderboard();
+    } else if (user && !user.college?.college_id) {
+      setLoading(false);
     }
   }, [filters, user]);
 
@@ -44,7 +46,7 @@ const CollegeLeaderboard = () => {
       const response = await api.get('/leaderboard', {
         params: {
           type: 'college',
-          college_id: user.college.college_id,
+          college_id: user.college?.college_id,
           year: filters.year,
           course: filters.course,
           sort: filters.sort,
@@ -96,7 +98,7 @@ const CollegeLeaderboard = () => {
   };
 
   const sortOptions = [
-    { value: 'engineer_score', label: 'College Engineer Score' },
+    { value: 'engineer_score', label: 'Global Engineer Score' },
     { value: 'cf', label: 'Codeforces Rating' },
     { value: 'lc', label: 'LeetCode Rating' },
     { value: 'cc', label: 'CodeChef Rating' }
@@ -180,76 +182,64 @@ const CollegeLeaderboard = () => {
 
       {/* Leaderboard Table */}
       {loading ? (
-        <div className="text-center py-12">this feature is coming very soon...</div>
+        <div className="text-center py-12">Loading leaderboard...</div>
       ) : (
         <>
           {/* User Rank Card */}
           {user && (
-            <div className="mb-6 bg-purple-50 border border-purple-200 rounded-xl shadow-sm overflow-hidden p-6">
-               <div className="flex items-center justify-between flex-wrap gap-4">
-                 <div className="flex items-center space-x-6">
-                     <div className="text-center">
-                         <div className="text-xs text-purple-600 font-bold uppercase tracking-wider mb-1">Your Rank</div>
-                         <div className="text-3xl font-bold text-purple-800">{meta?.userRank ? `#${meta.userRank}` : 'N/A'}</div>
+            <div className="mb-4 bg-purple-50 border border-purple-200 rounded-lg shadow-sm overflow-hidden p-3 md:p-4">
+               <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                 <div className="flex items-center space-x-3 md:space-x-6">
+                     <div className="text-center min-w-[50px]">
+                         <div className="text-[10px] text-purple-600 font-bold uppercase tracking-wider mb-0.5">Your Rank</div>
+                         <div className="text-xl md:text-2xl font-bold text-purple-800">{meta?.userRank ? `#${meta.userRank}` : 'N/A'}</div>
                      </div>
-                     <div className="h-12 w-px bg-purple-200"></div>
+                     <div className="h-8 md:h-10 w-px bg-purple-200"></div>
                      <div className="flex items-center">
-                        <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mr-4 border-2 border-purple-200 overflow-hidden shadow-sm">
+                        <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center mr-3 border-2 border-purple-200 overflow-hidden shadow-sm">
                           {user.profile_photo ? (
                             <img 
                               src={user.profile_photo.startsWith('http') ? user.profile_photo : `${process.env.REACT_APP_IMG_URL || 'http://localhost:5000'}${user.profile_photo}`} 
                               alt="Profile" 
-                              className="w-14 h-14 rounded-full object-cover" 
+                              className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover" 
                             />
                           ) : (
-                            <i className='bx bx-user text-2xl text-gray-400'></i>
+                            <i className='bx bx-user text-xl text-gray-400'></i>
                           )}
                         </div>
                         <div>
                           <div className="flex items-center space-x-2">
-                             <div className="text-lg font-bold text-gray-900">{user.name}</div>
-                             <span className={`px-2 py-0.5 rounded-full text-xs font-semibold shadow-sm flex items-center ${getBadgeStyle(user.global_engineer_score || 0)}`}>
-                               <i className={`bx ${getBadgeIcon(user.global_engineer_score || 0)} mr-1`}></i>
+                             <div className="text-sm md:text-base font-bold text-gray-900">{user.name}</div>
+                             <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-semibold shadow-sm flex items-center ${getBadgeStyle(user.global_engineer_score || 0)}`}>
+                               <i className={`bx ${getBadgeIcon(user.global_engineer_score || 0)} mr-0.5`}></i>
                                {getBadgeLabel(user.global_engineer_score || 0)}
                              </span>
                           </div>
-                          <div className="text-sm text-gray-600 flex items-center mt-0.5">
+                          <div className="text-xs text-gray-600 flex items-center mt-0.5">
                              <i className='bx bxs-school mr-1'></i>
-                             {user.college?.name}
-                             <span className="mx-2">•</span>
-                             {user.course} '{user.graduation_year?.toString().slice(-2)}
+                             <span className="truncate max-w-[150px] md:max-w-xs">{user.college?.name}</span>
                           </div>
                         </div>
                      </div>
                  </div>
                  
-                 <div className="flex items-center space-x-8">
-                     <div className="flex gap-4">
-                        <div className="text-center glass-effect rounded-lg p-2 bg-purple-100 bg-opacity-50">
-                            <div className="text-xs text-purple-700 font-semibold mb-1">College Score</div>
-                            <div className="font-bold text-purple-800 text-xl">{user.college_engineer_score !== null ? user.college_engineer_score : 'N/A'}</div>
-                        </div>
-                        <div className="text-center glass-effect rounded-lg p-2">
-                            <div className="text-xs text-gray-500 font-semibold mb-1">Global Score</div>
-                            <div className="font-bold text-blue-600 text-xl">{user.global_engineer_score || 0}</div>
-                        </div>
+                 <div className="flex items-center justify-between md:justify-end space-x-2 md:space-x-6 w-full md:w-auto bg-purple-100/50 md:bg-transparent rounded-lg p-2 md:p-0">
+                     <div className="text-center px-2">
+                        <div className="text-[10px] text-gray-500 font-semibold mb-0.5">Global Score</div>
+                        <div className="font-bold text-blue-600 text-lg md:text-xl">{user.global_engineer_score || 0}</div>
                      </div>
-                     
-                     <div className="h-10 w-px bg-purple-200"></div>
-
-                     <div className="flex space-x-6">
-                        <div className="text-center">
-                            <span className="text-xs text-gray-500 block font-medium mb-1">CodeForces</span>
-                            <span className="font-bold text-gray-800 text-lg">{user.ratings?.codeforces || '-'}</span>
-                        </div>
-                        <div className="text-center">
-                            <span className="text-xs text-gray-500 block font-medium mb-1">LeetCode</span>
-                            <span className="font-bold text-gray-800 text-lg">{user.ratings?.leetcode || '-'}</span>
-                        </div>
-                        <div className="text-center">
-                            <span className="text-xs text-gray-500 block font-medium mb-1">CodeChef</span>
-                            <span className="font-bold text-gray-800 text-lg">{user.ratings?.codechef || '-'}</span>
-                        </div>
+                     <div className="h-6 w-px bg-gray-300 md:hidden"></div>
+                     <div className="text-center px-1">
+                        <span className="text-[10px] text-gray-500 block font-medium mb-0.5">CF</span>
+                        <span className="font-bold text-gray-800 text-sm md:text-base">{user.ratings?.codeforces || '-'}</span>
+                     </div>
+                     <div className="text-center px-1">
+                        <span className="text-[10px] text-gray-500 block font-medium mb-0.5">LC</span>
+                        <span className="font-bold text-gray-800 text-sm md:text-base">{user.ratings?.leetcode || '-'}</span>
+                     </div>
+                     <div className="text-center px-1">
+                        <span className="text-[10px] text-gray-500 block font-medium mb-0.5">CC</span>
+                        <span className="font-bold text-gray-800 text-sm md:text-base">{user.ratings?.codechef || '-'}</span>
                      </div>
                  </div>
                </div>
@@ -269,9 +259,6 @@ const CollegeLeaderboard = () => {
                     </th>
                     <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Year
-                    </th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      College Score
                     </th>
                     <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Global Score
@@ -327,11 +314,6 @@ const CollegeLeaderboard = () => {
                     </td>
                     <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
                       {student.graduation_year}
-                    </td>
-                    <td className="px-3 py-2 whitespace-nowrap">
-                      <span className="text-xs font-bold text-purple-600">
-                        {student.college_engineer_score !== null ? student.college_engineer_score : 'N/A'}
-                      </span>
                     </td>
                     <td className="px-3 py-2 whitespace-nowrap">
                       <span className="text-xs font-bold text-blue-600">

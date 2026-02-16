@@ -226,8 +226,8 @@ router.get('/rankings', authenticate, authorize('student'), async (req, res) => 
       role: 'student',
       college_id: student.college_id,
       $or: [
-        { college_engineer_score: { $gt: student.college_engineer_score } },
-        { college_engineer_score: student.college_engineer_score, _id: { $lt: student._id } }
+        { global_engineer_score: { $gt: student.global_engineer_score } },
+        { global_engineer_score: student.global_engineer_score, _id: { $lt: student._id } }
       ]
     }) + 1;
     const totalCollege = await User.countDocuments({
@@ -241,8 +241,8 @@ router.get('/rankings', authenticate, authorize('student'), async (req, res) => 
       college_id: student.college_id,
       graduation_year: student.graduation_year,
       $or: [
-        { college_engineer_score: { $gt: student.college_engineer_score } },
-        { college_engineer_score: student.college_engineer_score, _id: { $lt: student._id } }
+        { global_engineer_score: { $gt: student.global_engineer_score } },
+        { global_engineer_score: student.global_engineer_score, _id: { $lt: student._id } }
       ]
     }) + 1;
     const totalCollegeYear = await User.countDocuments({
@@ -267,13 +267,13 @@ router.get('/rankings', authenticate, authorize('student'), async (req, res) => 
         college: {
           rank: collegeRank,
           total: totalCollege,
-          score_type: 'College Engineer Score'
+          score_type: 'Global Engineer Score'
         },
         college_year: {
           rank: collegeRankYear,
           total: totalCollegeYear,
           year: student.graduation_year,
-          score_type: 'College Engineer Score'
+          score_type: 'Global Engineer Score'
         }
       }
     });

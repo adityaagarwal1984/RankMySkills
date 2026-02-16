@@ -39,7 +39,7 @@ router.get('/', authenticate, async (req, res) => {
     let sortField = '-global_engineer_score';
     switch (sort) {
       case 'engineer_score':
-        sortField = type === 'college' ? '-college_engineer_score' : '-global_engineer_score';
+        sortField = '-global_engineer_score';
         break;
       case 'cf':
         sortField = '-ratings.codeforces';
@@ -51,7 +51,7 @@ router.get('/', authenticate, async (req, res) => {
         sortField = '-ratings.codechef';
         break;
       default:
-        sortField = type === 'college' ? '-college_engineer_score' : '-global_engineer_score';
+        sortField = '-global_engineer_score';
     }
     
     // Add tie-breaker (oldest users first)

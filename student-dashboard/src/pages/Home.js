@@ -103,25 +103,14 @@ const Home = () => {
         </div>
 
         {/* Engineer Scores */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white p-5 rounded-xl shadow-sm border border-blue-100 hover:shadow-md transition-shadow">
+        <div className="mt-6 flex justify-start">
+          <div className="w-full max-w-md bg-white p-5 rounded-xl shadow-sm border border-blue-100 hover:shadow-md transition-shadow">
             <div className="flex items-center space-x-2 mb-2">
               <i className='bx bx-trophy text-2xl text-blue-600'></i>
               <p className="text-sm font-semibold text-gray-700">Global Engineer Score</p>
             </div>
             <p className="text-3xl font-bold text-blue-600">{user?.global_engineer_score || 0}</p>
             <p className="text-xs text-gray-500 mt-1">Platform-defined (read-only)</p>
-          </div>
-          
-          <div className="bg-white p-5 rounded-xl shadow-sm border border-purple-100 hover:shadow-md transition-shadow">
-            <div className="flex items-center space-x-2 mb-2">
-              <i className='bx bx-award text-2xl text-purple-600'></i>
-              <p className="text-sm font-semibold text-gray-700">College Engineer Score</p>
-            </div>
-            <p className="text-3xl font-bold text-purple-600">
-              {user?.college_engineer_score !== null ? user?.college_engineer_score : 'N/A'}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">College-defined (read-only)</p>
           </div>
         </div>
       </div>
@@ -182,13 +171,13 @@ const Home = () => {
                 <h3 className="text-lg font-semibold text-gray-800">College Rank</h3>
               </div>
               <div className="text-4xl font-bold text-purple-600 mb-2">
-                {user?.college_engineer_score !== null ? `#${rankings?.college?.rank || '-'}` : 'N/A'}
+                {`#${rankings?.college?.rank || '-'}`}
               </div>
               <p className="text-gray-600 text-sm">
-                Out of {user?.college_engineer_score !== null ? (rankings?.college?.total || 0) : 'N/A'} students
+                Out of {rankings?.college?.total || 0} students
               </p>
               <p className="text-xs text-gray-500 mt-2">
-                Based on {user?.college_engineer_score !== null ? rankings?.college?.score_type : 'N/A'}
+                Based on {rankings?.college?.score_type}
               </p>
             </div>
 
@@ -201,13 +190,13 @@ const Home = () => {
                 <h3 className="text-lg font-semibold text-gray-800">College Rank ({rankings?.global_year?.year})</h3>
               </div>
               <div className="text-4xl font-bold text-orange-600 mb-2">
-                {user?.college_engineer_score !== null ? `#${rankings?.college_year?.rank || '-'}` : 'N/A'}
+                {`#${rankings?.college_year?.rank || '-'}`}
               </div>
               <p className="text-gray-600 text-sm">
-                Out of {user?.college_engineer_score !== null ? (rankings?.college_year?.total || 0) : 'N/A'} students
+                Out of {rankings?.college_year?.total || 0} students
               </p>
               <p className="text-xs text-gray-500 mt-2">
-                Based on {user?.college_engineer_score !== null ? rankings?.college_year?.score_type : 'N/A'}
+                Based on {rankings?.college_year?.score_type}
               </p>
             </div>
           </div>
