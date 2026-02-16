@@ -245,15 +245,15 @@ const GlobalLeaderboard = () => {
                      </div>
                      <div className="h-6 w-px bg-gray-300 md:hidden"></div>
                      <div className="text-center px-1">
-                        <span className="text-[10px] text-gray-500 block font-medium mb-0.5">CF</span>
+                        <span className="text-[10px] text-gray-500 block font-medium mb-0.5">Codeforces</span>
                         <span className="font-bold text-gray-800 text-sm md:text-base">{user.ratings?.codeforces || '-'}</span>
                      </div>
                      <div className="text-center px-1">
-                        <span className="text-[10px] text-gray-500 block font-medium mb-0.5">LC</span>
+                        <span className="text-[10px] text-gray-500 block font-medium mb-0.5">LeetCode</span>
                         <span className="font-bold text-gray-800 text-sm md:text-base">{user.ratings?.leetcode || '-'}</span>
                      </div>
                      <div className="text-center px-1">
-                        <span className="text-[10px] text-gray-500 block font-medium mb-0.5">CC</span>
+                        <span className="text-[10px] text-gray-500 block font-medium mb-0.5">CodeChef</span>
                         <span className="font-bold text-gray-800 text-sm md:text-base">{user.ratings?.codechef || '-'}</span>
                      </div>
                  </div>
@@ -266,88 +266,88 @@ const GlobalLeaderboard = () => {
               <table className="w-full min-w-[600px]">
                 <thead className="bg-gray-50 border-b">
                   <tr>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
                       Rank
                     </th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
                       Student
                     </th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
                       College
                     </th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
                       Year
                     </th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
                       Global Score
                     </th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      CF
+                    <th className="px-3 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                      Codeforces
                     </th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      LC
+                    <th className="px-3 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                      LeetCode
                     </th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      CC
+                    <th className="px-3 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">
+                      CodeChef
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {leaderboard.map((student) => (
                     <tr key={student.id} className="hover:bg-gray-50">
-                      <td className="px-3 py-2 whitespace-nowrap">
+                      <td className="px-3 py-3 whitespace-nowrap">
                       <div className="flex items-center">
                         {student.rank <= 3 ? (
                           <span className="text-xl mr-1">
                             {student.rank === 1 ? '🥇' : student.rank === 2 ? '🥈' : '🥉'}
                           </span>
                         ) : null}
-                        <span className="text-xs font-bold text-gray-900">#{student.rank}</span>
+                        <span className="text-sm font-bold text-gray-900">#{student.rank}</span>
                       </div>
                     </td>
-                    <td className="px-3 py-2 whitespace-nowrap">
+                    <td className="px-3 py-3 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center mr-2 overflow-hidden">
+                        <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mr-3 overflow-hidden">
                           {student.profile_photo ? (
                             <img 
                               src={student.profile_photo.startsWith('http') ? student.profile_photo : `${process.env.REACT_APP_IMG_URL || 'http://localhost:5000'}${student.profile_photo}`} 
                               alt="Profile" 
-                              className="w-8 h-8 rounded-full object-cover" 
+                              className="w-10 h-10 rounded-full object-cover" 
                             />
                           ) : (
-                            <i className='bx bx-user text-lg text-gray-500'></i>
+                            <i className='bx bx-user text-xl text-gray-500'></i>
                           )}
                         </div>
                         <div>
-                          <div className="flex items-center space-x-1">
-                            <div className="text-xs font-medium text-gray-900 w-32 truncate" title={student.name}>{student.name}</div>
-                            <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-semibold shadow-sm flex items-center ${getBadgeStyle(student.global_engineer_score || 0)}`}>
+                          <div className="flex items-center space-x-2">
+                            <div className="text-sm font-medium text-gray-900 w-40 truncate" title={student.name}>{student.name}</div>
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold shadow-sm flex items-center ${getBadgeStyle(student.global_engineer_score || 0)}`}>
                               <i className={`bx ${getBadgeIcon(student.global_engineer_score || 0)} mr-0.5`}></i>
                               {getBadgeLabel(student.global_engineer_score || 0)}
                             </span>
                           </div>
-                          <div className="text-[10px] text-gray-500">{student.course}</div>
+                          <div className="text-xs text-gray-500">{student.course}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-3 py-2 max-w-[150px]">
-                      <div className="text-xs text-gray-900 truncate" title={student.college}>{student.college}</div>
+                    <td className="px-3 py-3 max-w-[200px]">
+                      <div className="text-sm text-gray-900 truncate" title={student.college}>{student.college}</div>
                     </td>
-                    <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
+                    <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
                       {student.graduation_year}
                     </td>
-                    <td className="px-3 py-2 whitespace-nowrap">
-                      <span className="text-xs font-bold text-blue-600">
+                    <td className="px-3 py-3 whitespace-nowrap">
+                      <span className="text-sm font-bold text-blue-600">
                         {student.global_engineer_score}
                       </span>
                     </td>
-                    <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
+                    <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
                       {student.ratings?.codeforces || '-'}
                     </td>
-                    <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
+                    <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
                       {student.ratings?.leetcode || '-'}
                     </td>
-                    <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-900">
+                    <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-900">
                       {student.ratings?.codechef || '-'}
                     </td>
                   </tr>

@@ -79,7 +79,7 @@ const DashboardLayout = () => {
               end={item.path === '/dashboard'}
               onClick={() => setIsSidebarOpen(false)}
               className={({ isActive }) =>
-                `flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 transition-all ${
+                `flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 transition-all text-sm ${
                   isActive
                     ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
                     : 'text-gray-700 hover:bg-gray-100 hover:shadow-sm'
