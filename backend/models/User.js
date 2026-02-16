@@ -205,11 +205,13 @@ userSchema.methods.calculateGlobalEngineerScore = function() {
   const cc = ccVerified ? (this.ratings.codechef || 0) : 0;
   
   // Calculate total problems solved across all verified platforms
-  // GFG coding score/4 is used as proxy for problems solved (backend only)
+  // Use actual GFG detailed problem count if available, otherwise fallback to coding score proxy
+  const gfgSolved = gfgVerified ? (this.problems_solved.gfg || ((this.gfg_coding_score || 0) / 4)) : 0;
+  
   const totalSolved = (lcVerified ? (this.problems_solved.leetcode || 0) : 0) + 
                       (cfVerified ? (this.problems_solved.codeforces || 0) : 0) + 
                       (ccVerified ? (this.problems_solved.codechef || 0) : 0) +
-                      (gfgVerified ? ((this.gfg_coding_score || 0) / 4) : 0);
+                      gfgSolved;
   
   // Clamp and normalize each component
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));

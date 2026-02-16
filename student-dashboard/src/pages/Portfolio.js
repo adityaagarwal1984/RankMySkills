@@ -283,13 +283,25 @@ const Portfolio = () => {
                   </div>
                 )}
 
-                {/* GeeksForGeeks specific - Coding Score only */}
+                {/* GeeksForGeeks specific - Coding Score, Institute Rank, then Problems */}
                 {platform.name === 'GeeksForGeeks' && (
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-700 font-medium">Coding Score:</span>
                       <span className="text-xl font-bold text-green-600">{platform.codingScore || 0}</span>
                     </div>
+                    {platform.instituteRank !== null && platform.instituteRank !== undefined && platform.instituteRank > 0 && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-700 font-medium">Institute Rank:</span>
+                        <span className="text-lg font-bold text-blue-600">#{platform.instituteRank}</span>
+                      </div>
+                    )}
+                    {platform.problems !== null && platform.problems !== undefined && platform.problems > 0 && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-700 font-medium">Problems Solved:</span>
+                        <span className="text-xl font-bold text-gray-800">{platform.problems}</span>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

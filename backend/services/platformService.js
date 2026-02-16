@@ -370,6 +370,7 @@ class PlatformService {
 
       // Try the main profile page
       const urls = [
+        `https://www.geeksforgeeks.org/user/${username}`,
         `https://auth.geeksforgeeks.org/user/${username}`,
         `https://auth.geeksforgeeks.org/user/${username}/practice/`
       ];
@@ -388,6 +389,78 @@ class PlatformService {
 
           const html = response.data;
           
+          // Pattern provided by user based on exact class names
+          // <div class="ScoreContainer_text-box__MF3bg"><p class="ScoreContainer_label__aVpLE">Problems Solved</p><p class="ScoreContainer_value__7yy7h">130</p></div>
+          
+          // Problems Solved
+          if (!problemsSolved) {
+            // Expanded patterns for problems solved - wider net like Coding Score
+            const patterns = [
+               // Specific structure provided by user with flexibility
+               /Problems?\s+Solved\s*<\/p>\s*<p[^>]*>(\d+)\s*<\/p>/i,
+               // Label then Value in separate tags
+               /Problems?\s+Solved[^\d]{0,50}<[^>]+>(\d+)</i,
+               // Value then Label
+               />(\d+)<[^>]+>[^<]{0,50}Problems?\s+Solved/i,
+               // Plain text proximity
+               /Problems?\s+Solved\s*[:\-]?\s*(\d+)/i,
+               // Number of problems solved
+               /(\d+)\s*problems?\s*solved/i
+            ];
+
+            for (const pattern of patterns) {
+               const match = html.match(pattern);
+               if (match) {
+                  problemsSolved = parseInt(match[1]);
+                  console.log(`GFG: Found problems solved via pattern ${pattern}: ${problemsSolved}`);
+                  break;
+               }
+            }
+          }
+
+          // Coding Score
+          if (!codingScore) {
+            const scoreMatch = html.match(/Coding\s+Score\s*<\/p>\s*<p[^>]*>(\d+)\s*<\/p>/i);
+            
+            if (scoreMatch) {
+               codingScore = parseInt(scoreMatch[1]);
+               console.log(`GFG: Found coding score via exact structure: ${codingScore}`);
+            } else {
+               const oldScorePattern = /Coding\s+Score(?:<\/p>|<\/span>|[^<]*)(?:<[^>]*>)*?(\d+)/i;
+               const match = html.match(oldScorePattern);
+               if (match) {
+                 codingScore = parseInt(match[1]);
+               }
+            }
+          }
+
+          // Institute Rank
+          if (!instituteRank) {
+             // Expanded patterns for Institute Rank - wider net
+             const patterns = [
+                // Specific structure with anchor tag
+                /Institute\s+Rank\s*<\/p>\s*<p[^>]*>(?:<a[^>]*>)?\s*(\d+)\s*(?:<\/a>)?\s*<\/p>/i,
+                // Label then Value (with or without anchor)
+                /Institute\s+Rank[^\d]{0,50}<(?:a|p|span|div)[^>]*>(\d+)/i,
+                // Value then Label
+                />(\d+)<[^>]+>[^<]{0,50}Institute\s+Rank/i,
+                // Specific anchor tag containment
+                /Institute\s+Rank.*?<a[^>]*>(\d+)<\/a>/i,
+                // Plain text proximity
+                /Institute\s+Rank\s*[:\-]?\s*(\d+)/i
+             ];
+
+             for (const pattern of patterns) {
+                const match = html.match(pattern);
+                if (match) {
+                   instituteRank = parseInt(match[1]);
+                   console.log(`GFG: Found institute rank via pattern ${pattern}: ${instituteRank}`);
+                   break;
+                }
+             }
+          }
+          
+          // Fallback to previous patterns if specific ones fail
           // Look for data in very specific patterns to avoid mixing up values
           // Problems Solved - must have "problem" or "question" AND "solved" nearby
           if (!problemsSolved) {
