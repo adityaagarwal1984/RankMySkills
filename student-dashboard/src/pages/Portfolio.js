@@ -160,10 +160,6 @@ const Portfolio = () => {
                             <span className="text-green-700">
                               ✓ Coding Score: {result.codingScore || 'N/A'}
                             </span>
-                          ) : platform === 'codechef' ? (
-                            <span className="text-green-700">
-                              ✓ Rating: {result.rating} (Max: {result.maxRating})
-                            </span>
                           ) : (
                             <span className="text-green-700">
                               ✓ Rating: {result.rating} (Max: {result.maxRating}), Problems: {result.problems}
@@ -279,8 +275,8 @@ const Portfolio = () => {
                   </>
                 )}
                 
-                {/* Only show problems for LeetCode and Codeforces */}
-                {(platform.name === 'LeetCode' || platform.name === 'Codeforces') && (
+                {/* Show problems for LeetCode, Codeforces and CodeChef */}
+                {(platform.name === 'LeetCode' || platform.name === 'Codeforces' || platform.name === 'CodeChef') && (
                   <div className="flex justify-between items-center">
                     <span className="text-gray-700 font-medium">Problems Solved:</span>
                     <span className="text-2xl font-bold text-gray-800">{platform.problems || 0}</span>
