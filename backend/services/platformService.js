@@ -222,13 +222,16 @@ class PlatformService {
        // console.log(`CodeChef: Found via "Total Problems Solved" h3 pattern: ${problemsSolved}`);
       }
 
-      // Pattern 1: Look for "Fully Solved (123)" common in header of problems section
-      const uniqueProblemPattern = /Fully\s*Solved\s*[^\d(]*\(?(\d+)\)?/i;
-      const uniqueMatch = html.match(uniqueProblemPattern);
-      
-      if (uniqueMatch) {
-        problemsSolved = parseInt(uniqueMatch[1]);
-       // console.log(`CodeChef: Found via "Fully Solved (N)" pattern: ${problemsSolved}`);
+      // Only check other patterns if problemsSolved is not found yet
+      if (!problemsSolved) {
+        // Pattern 1: Look for "Fully Solved (123)" common in header of problems section
+        const uniqueProblemPattern = /Fully\s*Solved\s*[^\d(]*\(?(\d+)\)?/i;
+        const uniqueMatch = html.match(uniqueProblemPattern);
+        
+        if (uniqueMatch) {
+          problemsSolved = parseInt(uniqueMatch[1]);
+         // console.log(`CodeChef: Found via "Fully Solved (N)" pattern: ${problemsSolved}`);
+        }
       }
       
       if (!problemsSolved) {
@@ -334,9 +337,9 @@ class PlatformService {
       if (student.platforms?.gfg) {
         const data = await this.fetchGeeksForGeeksData(student.platforms.gfg);
         if (data.success) {
-          student.problems_solved.gfg = data.problemsSolved || student.problems_solved.gfg;
-          student.gfg_coding_score = data.codingScore || student.gfg_coding_score;
-          student.gfg_institute_rank = data.instituteRank || student.gfg_institute_rank;
+          student.problems_solved.gfg = data.problemsSolved ?? student.problems_solved.gfg;
+          student.gfg_coding_score = data.codingScore ?? student.gfg_coding_score;
+          student.gfg_institute_rank = data.instituteRank ?? student.gfg_institute_rank;
           results.gfg.success = true;
         }
       }
@@ -547,6 +550,12 @@ class PlatformService {
         } catch (urlError) {
           console.log(`GFG: URL failed: ${urlError.message}`);
         }
+      }
+      
+      // If profile exists (problems found) but no coding score found, default to 0
+      // This prevents sticking to old scores if they disappear
+      if (problemsSolved >= 0 && codingScore === null) {
+          codingScore = 0;
       }
 
       const result = {

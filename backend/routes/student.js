@@ -319,9 +319,9 @@ router.post('/sync-platforms', authenticate, authorize('student'), async (req, r
     
     // Cooldown check (30 minutes)
     if (student.last_synced) {
-      const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+      const thirtyMinutesAgo = new Date(Date.now() - 30* 60 * 1000);
       if (student.last_synced > thirtyMinutesAgo) {
-        const remainingMinutes = Math.ceil((student.last_synced.getTime() + 30 * 60 * 1000 - Date.now()) / (60 * 1000));
+        const remainingMinutes = Math.ceil((student.last_synced.getTime() + 30* 60 * 1000 - Date.now()) / (60 * 1000));
         return res.status(429).json({ 
           error: `Sync cooldown active. Please wait ${remainingMinutes} minute(s) before syncing again.` 
         });
@@ -392,9 +392,10 @@ router.post('/sync-platforms', authenticate, authorize('student'), async (req, r
 
     // Update GeeksForGeeks data
     if (platformData.gfg?.success) {
-      student.problems_solved.gfg = platformData.gfg.problemsSolved || student.problems_solved.gfg;
-      student.gfg_coding_score = platformData.gfg.codingScore || student.gfg_coding_score;
-      student.gfg_institute_rank = platformData.gfg.instituteRank || student.gfg_institute_rank;
+      // Use nullish coalescing to allow 0 values
+      student.problems_solved.gfg = platformData.gfg.problemsSolved ?? student.problems_solved.gfg;
+      student.gfg_coding_score = platformData.gfg.codingScore ?? student.gfg_coding_score;
+      student.gfg_institute_rank = platformData.gfg.instituteRank ?? student.gfg_institute_rank;
       student.gfg_institute_name = platformData.gfg.instituteName || student.gfg_institute_name;
       results.gfg = { 
         success: true, 
