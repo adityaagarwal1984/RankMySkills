@@ -185,7 +185,7 @@ class PlatformService {
       });
 
       const html = response.data;
-      let rating = 0, maxRating = 0, problemsSolved = 0;
+      let rating = null, maxRating = null, problemsSolved = null;
 
       // Extract rating
       const ratingMatch = html.match(/<div[^>]*class="rating-number[^"]*"[^>]*>(\d+)</i) ||
@@ -203,82 +203,25 @@ class PlatformService {
       }
       if (maxMatch) {
         const max = parseInt(maxMatch[1]);
-        if (max >= rating && max <= 5000) {
+        if (max >= (rating || 0) && max <= 5000) {
           maxRating = max;
           //console.log(`CodeChef: Max rating: ${maxRating}`);
         }
       }
-      if (!maxRating) maxRating = rating;
+      if (!maxRating && rating !== null) maxRating = rating;
 
       // Extract problems solved - Updated patterns
       //console.log('CodeChef: Looking for problems solved...');
       
-      // Pattern 0: Exact match as found by user inspection
-      // <h3>Total Problems Solved: 86</h3>
-      const specificH3Pattern = /<h3[^>]*>Total\s*Problems\s*Solved:\s*(\d+)<\/h3>/i;
+      // Extract problems solved - STRICT "Total Problems Solved" pattern only
+      // Matches <h3>Total Problems Solved: 0</h3> or similar
+      const specificH3Pattern = /Total\s+Problems\s+Solved\s*:\s*(\d+)/i;
       const h3ExactMatch = html.match(specificH3Pattern);
+      
       if (h3ExactMatch) {
-        problemsSolved = parseInt(h3ExactMatch[1]);
-       // console.log(`CodeChef: Found via "Total Problems Solved" h3 pattern: ${problemsSolved}`);
+         problemsSolved = parseInt(h3ExactMatch[1]);
       }
 
-      // Only check other patterns if problemsSolved is not found yet
-      if (!problemsSolved) {
-        // Pattern 1: Look for "Fully Solved (123)" common in header of problems section
-        const uniqueProblemPattern = /Fully\s*Solved\s*[^\d(]*\(?(\d+)\)?/i;
-        const uniqueMatch = html.match(uniqueProblemPattern);
-        
-        if (uniqueMatch) {
-          problemsSolved = parseInt(uniqueMatch[1]);
-         // console.log(`CodeChef: Found via "Fully Solved (N)" pattern: ${problemsSolved}`);
-        }
-      }
-      
-      if (!problemsSolved) {
-         // Pattern 2: Look for specific class or structure "content"> <h5>Fully Solved (123)</h5>
-         const h5Pattern = /<h5[^>]*>Fully\s*Solved\s*[^\d(]*\(?(\d+)\)?<\/h5>/i;
-         const h5Match = html.match(h5Pattern);
-         if (h5Match) {
-           problemsSolved = parseInt(h5Match[1]);
-          // console.log(`CodeChef: Found via h5 pattern: ${problemsSolved}`);
-         }
-      }
-
-      if (!problemsSolved) {
-        // Pattern 3: Look for the number in h3/h5 inside the problems section
-        // Often appears as <h3>Total Problems Solved: 123</h3> or similar variations
-        const patterns = [
-           /Total\s+Problems\s+Solved[^\d]*(\d+)/i,
-           /Problems\s+Solved[^\d]*(\d+)/i
-        ];
-        
-        for (const pattern of patterns) {
-          const match = html.match(pattern);
-          if (match) {
-            problemsSolved = parseInt(match[1]) || 0;
-           // console.log(`CodeChef: Found via generic pattern: ${problemsSolved}`);
-            break;
-          }
-        }
-      }
-      
-      // Pattern 4: Count the number of links in the problems solved section if simpler patterns fail
-      // This is more intensive but reliable if they change the header text
-      if (!problemsSolved) {
-         // Find the section starting with "Fully Solved"
-         const sectionStartRegex = /Fully\s+Solved/i;
-         const match = sectionStartRegex.exec(html);
-         if (match) {
-            const sectionStartIndex = match.index;
-            // Grab a chunk after this text - say 5000 chars should cover the list
-            const sectionChunk = html.substring(sectionStartIndex, sectionStartIndex + 10000);
-            // Count occurances of /status/ or /problems/ links which usually indicate a problem
-            // CodeChef problem links often look like /status/PROBLEM or similar in user profile
-            // Actually, in user profile, unsolved/solved lists are usually anchor tags.
-            // But counting regex matches for <a href="/status/..." might be simpler
-            // Better yet, look for the format `(123)` directly after "Fully Solved" again with wider spacing
-         }
-      }
 
       const result = { rating, maxRating, problemsSolved, success: true };
      // console.log('CodeChef: Final result:', result);
@@ -326,10 +269,10 @@ class PlatformService {
       if (student.platforms?.codechef) {
         const data = await this.fetchCodeChefData(student.platforms.codechef);
         if (data.success) {
-          student.ratings.codechef = data.rating || student.ratings.codechef;
+          student.ratings.codechef = data.rating ?? student.ratings.codechef ?? 0;
           // Use maxRating from fetch result, not globalRank
-          student.max_ratings.codechef = data.maxRating || student.max_ratings.codechef;
-          student.problems_solved.codechef = data.problemsSolved || student.problems_solved.codechef;
+          student.max_ratings.codechef = data.maxRating ?? student.max_ratings.codechef ?? 0;
+          student.problems_solved.codechef = data.problemsSolved ?? student.problems_solved.codechef ?? 0;
           results.codechef.success = true;
         }
       }
@@ -337,9 +280,9 @@ class PlatformService {
       if (student.platforms?.gfg) {
         const data = await this.fetchGeeksForGeeksData(student.platforms.gfg);
         if (data.success) {
-          student.problems_solved.gfg = data.problemsSolved ?? student.problems_solved.gfg;
-          student.gfg_coding_score = data.codingScore ?? student.gfg_coding_score;
-          student.gfg_institute_rank = data.instituteRank ?? student.gfg_institute_rank;
+          student.problems_solved.gfg = data.problemsSolved ?? student.problems_solved.gfg ?? 0;
+          student.gfg_coding_score = data.codingScore ?? student.gfg_coding_score ?? 0;
+          student.gfg_institute_rank = data.instituteRank ?? student.gfg_institute_rank ?? 0;
           results.gfg.success = true;
         }
       }
@@ -366,7 +309,7 @@ class PlatformService {
     try {
       console.log(`GFG: Fetching data for ${username}`);
       
-      let problemsSolved = 0;
+      let problemsSolved = null;
       let codingScore = null;
       let instituteRank = null;
       let instituteName = null;
@@ -396,7 +339,7 @@ class PlatformService {
           // <div class="ScoreContainer_text-box__MF3bg"><p class="ScoreContainer_label__aVpLE">Problems Solved</p><p class="ScoreContainer_value__7yy7h">130</p></div>
           
           // Problems Solved
-          if (!problemsSolved) {
+          if (problemsSolved === null) {
             // Expanded patterns for problems solved - wider net like Coding Score
             const patterns = [
                // Specific structure provided by user with flexibility
@@ -422,23 +365,65 @@ class PlatformService {
           }
 
           // Coding Score
-          if (!codingScore) {
-            const scoreMatch = html.match(/Coding\s+Score\s*<\/p>\s*<p[^>]*>(\d+)\s*<\/p>/i);
+          if (codingScore === null) {
+            // Priority 0: Exact structure provided by user usage of ScoreContainer classes
+            // <div class="ScoreContainer_text-box__MF3bg"><p class="ScoreContainer_label__aVpLE">Coding Score</p><p class="ScoreContainer_value__7yy7h">455</p></div>
+            const specificContainerPattern = /ScoreContainer_label__[^>]*>Coding\s+Score<\/p>\s*<p[^>]*class="ScoreContainer_value__[^>]*>(\d+)<\/p>/i;
+            const containerMatch = html.match(specificContainerPattern);
             
-            if (scoreMatch) {
-               codingScore = parseInt(scoreMatch[1]);
-               console.log(`GFG: Found coding score via exact structure: ${codingScore}`);
-            } else {
-               const oldScorePattern = /Coding\s+Score(?:<\/p>|<\/span>|[^<]*)(?:<[^>]*>)*?(\d+)/i;
-               const match = html.match(oldScorePattern);
-               if (match) {
-                 codingScore = parseInt(match[1]);
+            if (containerMatch) {
+               codingScore = parseInt(containerMatch[1]);
+               console.log(`GFG: Found coding score via ScoreContainer pattern: ${codingScore}`);
+            }
+
+            // Priority 1: Exact new design match
+            // <span class="score_card_value">520</span> ... <span class="score_card_label">Coding Score</span>
+            if (codingScore === null) {
+                const scoreCardPattern = /class="score_card_value"[^>]*>(\d+)<[^>]*>[\s\S]{0,100}Coding\s+Score/i;
+                const scoreCardMatch = html.match(scoreCardPattern);
+                if (scoreCardMatch) {
+                  codingScore = parseInt(scoreCardMatch[1]);
+                  console.log(`GFG: Found coding score via score_card_value: ${codingScore}`);
+                }
+            }
+
+            // Priority 2: Old/Standard Patterns
+            if (codingScore === null) {
+               const patterns = [
+                  /Coding\s+Score\s*<\/p>\s*<p[^>]*>(\d+)\s*<\/p>/i,
+                  /Coding\s+Score(?:<\/p>|<\/span>|[^<]*)(?:<[^>]*>)*?(\d+)/i,
+                   // JSON patterns often embedded in script tags
+                  /"codingScore"\s*:\s*(\d+)/i,
+                  /"score"\s*:\s*(\d+)/i
+               ];
+
+               for (const pattern of patterns) {
+                  const match = html.match(pattern);
+                  if (match) {
+                     codingScore = parseInt(match[1]);
+                     console.log(`GFG: Found coding score via pattern ${pattern}: ${codingScore}`);
+                     break;
+                  }
+               }
+            }
+            
+            // Priority 3: Nav bar or Sidebar score (often simple number)
+            // Look for "Score: 135" or similar
+            if (codingScore === null) {
+               const navPattern = /Score\s*:\s*(\d+)/i;
+               const navMatch = html.match(navPattern);
+               if (navMatch) {
+                 const num = parseInt(navMatch[1]);
+                 if (num > 10) { // Avoid trivial numbers
+                    codingScore = num;
+                 }
                }
             }
           }
 
+
           // Institute Rank
-          if (!instituteRank) {
+          if (instituteRank === null) {
              // Expanded patterns for Institute Rank - wider net
              const patterns = [
                 // Specific structure with anchor tag
@@ -466,7 +451,7 @@ class PlatformService {
           // Fallback to previous patterns if specific ones fail
           // Look for data in very specific patterns to avoid mixing up values
           // Problems Solved - must have "problem" or "question" AND "solved" nearby
-          if (!problemsSolved) {
+          if (problemsSolved === null) {
             const patterns = [
               // Pattern: "Total Problems Solved" or "Problems Solved" with number
               /Total\s+Problems?\s+Solved[:\s]*<[^>]*>(\d+)<\/[^>]*>/i,
@@ -492,7 +477,7 @@ class PlatformService {
           }
 
           // Coding Score - look for "Score" or "Coding Score" with a 3+ digit number
-          if (!codingScore) {
+          if (codingScore === null) {
             const patterns = [
               // Look for "Coding Score" or "Overall Coding Score"
               /(?:Overall\s+)?Coding\s+Score[^\d]*(\d{3,})/i,
@@ -519,7 +504,7 @@ class PlatformService {
           }
 
           // Institute Rank - must have "institute" or "college" AND "rank" nearby
-          if (!instituteRank) {
+          if (instituteRank === null) {
             const patterns = [
               // Pattern: Number directly before/after "Institute Rank" text
               /Institute\s+Rank[^\d]*(\d+)/i,
@@ -544,7 +529,7 @@ class PlatformService {
             }
           }
 
-          if (problemsSolved || codingScore) {
+          if (problemsSolved !== null || codingScore !== null) {
             break; // Found some data, stop trying URLs
           }
         } catch (urlError) {
@@ -552,12 +537,6 @@ class PlatformService {
         }
       }
       
-      // If profile exists (problems found) but no coding score found, default to 0
-      // This prevents sticking to old scores if they disappear
-      if (problemsSolved >= 0 && codingScore === null) {
-          codingScore = 0;
-      }
-
       const result = {
         problemsSolved,
         codingScore,
