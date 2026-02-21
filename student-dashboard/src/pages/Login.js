@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -53,6 +54,11 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black to-black">
+      {/* <Helmet>
+        <title>Secure Student Login - Access Your Dashboard | RankMySkills</title>
+        <meta name="description" content="Log in to your RankMySkills student dashboard to update your profile, view leaderboards, and track your skill progression." />
+        <link rel="canonical" href="https://rankmyskills.in/login" />
+      </Helmet> */}
       <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
         <div className="flex items-center justify-center mb-2 gap-3">
           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">

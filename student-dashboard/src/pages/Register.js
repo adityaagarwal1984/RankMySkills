@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/api';
@@ -63,6 +64,11 @@ const Register = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black to-black py-8">
+      {/* <Helmet>
+        <title>Create Free Student Account - Start Your Tech Career | RankMySkills</title>
+        <meta name="description" content="Sign up for a free RankMySkills account to build your programming portfolio, earn verified skill badges, and get discovered by top tech companies." />
+        <link rel="canonical" href="https://rankmyskills.in/register" />
+      </Helmet> */}
       <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
         <div className="flex items-center justify-center mb-2 gap-3">
           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">

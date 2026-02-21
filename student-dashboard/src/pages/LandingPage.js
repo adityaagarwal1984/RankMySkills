@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
@@ -66,6 +67,59 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-black text-white selection:bg-blue-500 selection:text-white overflow-hidden">
+      <Helmet>
+        <title>RankMySkills - #1 Student Skill Tracking & Assessment Platform</title>
+        <meta name="description" content="Join thousands of students tracking their skills, competing on leaderboards, and landing dream jobs. Start your free journey today!" />
+        <meta name="keywords" content="student tracking, skill assessment, leaderboard, college ranking, programming portfolio, tech career" />
+        <link rel="canonical" href="https://rankmyskills.in/" />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://rankmyskills.in/" />
+        <meta property="og:title" content="RankMySkills - Transform Your Academic Journey" />
+        <meta property="og:description" content="The ultimate platform for students to track skills, build portfolios, and get recognized by top employers." />
+        <meta property="og:image" content="https://rankmyskills.in/og-image.jpg" />
+
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://rankmyskills.in/" />
+        <meta property="twitter:title" content="RankMySkills - Student Success Platform" />
+        <meta property="twitter:description" content="Track progress. Compete with peers. Get hired. Join RankMySkills now." />
+        <meta property="twitter:image" content="https://rankmyskills.in/twitter-image.jpg" />
+
+        {/* JSON-LD for Sitelinks Search Box and Organization */}
+        <script type="application/ld+json">
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "RankMySkills",
+              "url": "https://rankmyskills.in",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://rankmyskills.in/search?q={search_term_string}",
+                "query-input": "required name=search_term_string"
+              }
+            }
+          `}
+        </script>
+        <script type="application/ld+json">
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "RankMySkills",
+              "url": "https://rankmyskills.in",
+              "logo": "https://rankmyskills.in/logo.svg",
+              "sameAs": [
+                "https://www.facebook.com/rankmyskills",
+                "https://twitter.com/rankmyskills",
+                "https://www.linkedin.com/company/rankmyskills"
+              ]
+            }
+          `}
+        </script>
+      </Helmet>
       {/* Navbar */}
       <nav className="fixed w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

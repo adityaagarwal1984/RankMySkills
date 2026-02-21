@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /edit-profile
+Disallow: /portfolio
+
+Sitemap: https://rankmyskills.in/sitemap.xml

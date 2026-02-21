@@ -1,6 +1,7 @@
 {
   "short_name": "RankMySkills",
-  "name": "RankMySkills",
+  "name": "RankMySkills - Student Dashboard",
+  "description": "Track your skills, compete with peers, and improve fast with RankMySkills.",
   "icons": [
     {
       "src": "logo.svg",
@@ -11,5 +12,6 @@
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#000000",
-  "background_color": "#000000"
+  "background_color": "#000000",
+  "scope": "/"
 }
