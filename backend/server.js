@@ -96,9 +96,6 @@ mongoose.connect(process.env.MONGODB_URI)
   // Run auto-sync every 24 hours
   setInterval(runAutoSync, 24 * 60 * 60 * 1000);
   
-  // Also run once shortly after startup
-  setTimeout(runAutoSync, 60 * 1000); 
-  
   // Start server
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
