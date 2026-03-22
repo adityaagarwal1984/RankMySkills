@@ -2,6 +2,40 @@ const axios = require('axios');
 
 class PlatformService {
   /**
+   * GFG scraping is unreliable, so only overwrite stored values when the
+   * current scrape returns a concrete value. Null means "keep last good data".
+   */
+  hasUsableGFGData(data) {
+    return Boolean(
+      data &&
+      (
+        data.problemsSolved !== null &&
+        data.problemsSolved !== undefined ||
+        data.codingScore !== null &&
+        data.codingScore !== undefined ||
+        data.instituteRank !== null &&
+        data.instituteRank !== undefined ||
+        data.instituteName !== null &&
+        data.instituteName !== undefined &&
+        data.instituteName !== ''
+      )
+    );
+  }
+
+  applyGFGData(student, data) {
+    if (!this.hasUsableGFGData(data)) {
+      return false;
+    }
+
+    student.problems_solved.gfg = data.problemsSolved ?? student.problems_solved.gfg ?? 0;
+    student.gfg_coding_score = data.codingScore ?? student.gfg_coding_score ?? 0;
+    student.gfg_institute_rank = data.instituteRank ?? student.gfg_institute_rank ?? 0;
+    student.gfg_institute_name = data.instituteName ?? student.gfg_institute_name ?? null;
+
+    return true;
+  }
+
+  /**
    * Fetch LeetCode user data using public GraphQL API
    */
   async fetchLeetCodeData(username) {
@@ -279,11 +313,13 @@ class PlatformService {
 
       if (student.platforms?.gfg) {
         const data = await this.fetchGeeksForGeeksData(student.platforms.gfg);
-        if (data.success) {
-          student.problems_solved.gfg = data.problemsSolved ?? student.problems_solved.gfg ?? 0;
-          student.gfg_coding_score = data.codingScore ?? student.gfg_coding_score ?? 0;
-          student.gfg_institute_rank = data.instituteRank ?? student.gfg_institute_rank ?? 0;
+        if (data.success && this.applyGFGData(student, data)) {
           results.gfg.success = true;
+        } else if (data.success) {
+          results.gfg = {
+            success: false,
+            error: 'No usable GFG data returned; keeping last saved values'
+          };
         }
       }
       

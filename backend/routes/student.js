@@ -391,12 +391,7 @@ router.post('/sync-platforms', authenticate, authorize('student'), async (req, r
     }
 
     // Update GeeksForGeeks data
-    if (platformData.gfg?.success) {
-      // Use nullish coalescing to allow 0 values
-      student.problems_solved.gfg = platformData.gfg.problemsSolved ?? student.problems_solved.gfg;
-      student.gfg_coding_score = platformData.gfg.codingScore ?? student.gfg_coding_score;
-      student.gfg_institute_rank = platformData.gfg.instituteRank ?? student.gfg_institute_rank;
-      student.gfg_institute_name = platformData.gfg.instituteName || student.gfg_institute_name;
+    if (platformData.gfg?.success && platformService.applyGFGData(student, platformData.gfg)) {
       results.gfg = { 
         success: true, 
         problems: student.problems_solved.gfg,
@@ -405,6 +400,11 @@ router.post('/sync-platforms', authenticate, authorize('student'), async (req, r
         instituteName: student.gfg_institute_name
       };
       updatedCount++;
+    } else if (platformData.gfg?.success) {
+      results.gfg = {
+        success: false,
+        error: 'No usable GFG data returned; keeping last saved values'
+      };
     } else if (platformData.gfg) {
       results.gfg = { success: false, error: platformData.gfg.error };
     }
