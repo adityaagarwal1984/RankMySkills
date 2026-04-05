@@ -15,6 +15,7 @@ const adminRoutes = require('./routes/admin');
 const leaderboardRoutes = require('./routes/leaderboard');
 
 const app = express();
+const AUTO_SYNC_INTERVAL_MS = 24 * 60 * 60 * 1000;
 
 // Middleware
 app.use(cors({
@@ -67,7 +68,7 @@ mongoose.connect(process.env.MONGODB_URI)
     console.log('🔄 Starting daily platform auto-sync...');
     try {
       // Find students who haven't synced in 24h or never synced
-      const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const twentyFourHoursAgo = new Date(Date.now() - AUTO_SYNC_INTERVAL_MS);
       
       const students = await User.find({ 
         role: 'student',
@@ -93,8 +94,13 @@ mongoose.connect(process.env.MONGODB_URI)
     }
   };
 
+  // Run once on startup so stale records are caught immediately after deploy/restart
+  runAutoSync().catch((error) => {
+    console.error('Initial auto-sync error:', error);
+  });
+
   // Run auto-sync every 24 hours
-  setInterval(runAutoSync, 24 * 60 * 60 * 1000);
+  setInterval(runAutoSync, AUTO_SYNC_INTERVAL_MS);
   
   // Start server
   const PORT = process.env.PORT || 5000;

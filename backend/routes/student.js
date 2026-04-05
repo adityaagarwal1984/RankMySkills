@@ -9,6 +9,26 @@ const { authenticate, authorize } = require('../middleware/auth');
 const platformService = require('../services/platformService');
 
 const router = express.Router();
+const AUTO_SYNC_INTERVAL_MS = 24 * 60 * 60 * 1000;
+
+function hasConfiguredPlatforms(student) {
+  return Boolean(
+    student?.platforms &&
+    Object.values(student.platforms).some(Boolean)
+  );
+}
+
+function needsAutoSync(student) {
+  if (!hasConfiguredPlatforms(student)) {
+    return false;
+  }
+
+  if (!student.last_synced) {
+    return true;
+  }
+
+  return Date.now() - student.last_synced.getTime() >= AUTO_SYNC_INTERVAL_MS;
+}
 
 // Configure Cloudinary
 cloudinary.config({
@@ -50,6 +70,12 @@ router.get('/profile', authenticate, authorize('student'), async (req, res) => {
   try {
     const student = await User.findById(req.userId).select('-password');
     const college = await College.findOne({ college_id: student.college_id });
+
+    if (needsAutoSync(student)) {
+      platformService.syncStudentData(student).catch(error => {
+        console.error(`Background auto-sync failed for ${student._id}:`, error);
+      });
+    }
     
     res.json({
       student: {

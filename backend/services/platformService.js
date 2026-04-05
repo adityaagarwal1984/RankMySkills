@@ -1,6 +1,10 @@
 const axios = require('axios');
 
 class PlatformService {
+  constructor() {
+    this.syncInProgress = new Set();
+  }
+
   /**
    * GFG scraping is unreliable, so only overwrite stored values when the
    * current scrape returns a concrete value. Null means "keep last good data".
@@ -271,6 +275,17 @@ class PlatformService {
    * Sync all platform data for a student
    */
   async syncStudentData(student) {
+    const studentId = student?._id?.toString?.() || student?.id?.toString?.();
+
+    if (studentId && this.syncInProgress.has(studentId)) {
+      console.log(`Sync already in progress for ${student.name}`);
+      return { success: false, skipped: true, reason: 'sync_in_progress' };
+    }
+
+    if (studentId) {
+      this.syncInProgress.add(studentId);
+    }
+
     console.log(`Syncing data for student: ${student.username || student.name}`);
     const results = {
       leetcode: { success: false },
@@ -335,6 +350,10 @@ class PlatformService {
     } catch (error) {
       console.error(`Sync error for ${student.name}:`, error);
       return { success: false, error: error.message };
+    } finally {
+      if (studentId) {
+        this.syncInProgress.delete(studentId);
+      }
     }
   }
 
