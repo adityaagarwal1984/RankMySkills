@@ -1,3 +1,36 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    background: #050505;
+  }
+
+  body {
+    margin: 0;
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background:
+      radial-gradient(circle at top left, rgba(245, 158, 11, 0.16), transparent 26%),
+      radial-gradient(circle at top right, rgba(250, 204, 21, 0.09), transparent 28%),
+      linear-gradient(180deg, #050505 0%, #0f0d08 52%, #17130b 100%);
+    min-height: 100vh;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+@layer components {
+  .bg-admin-app {
+    background:
+      radial-gradient(circle at top left, rgba(245, 158, 11, 0.13), transparent 22%),
+      radial-gradient(circle at bottom right, rgba(250, 204, 21, 0.08), transparent 24%),
+      linear-gradient(180deg, #050505 0%, #0d0d0d 48%, #17130b 100%);
+  }
+
+  .admin-action-link {
+    @apply inline-flex items-center justify-between rounded-2xl border border-amber-200/10 bg-black/50 px-4 py-3 text-sm font-medium text-white transition hover:border-amber-400/35 hover:bg-black/70;
+  }
+}

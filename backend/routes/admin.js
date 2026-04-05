@@ -5,6 +5,64 @@ const { authenticate, authorize } = require('../middleware/auth');
 
 const router = express.Router();
 
+async function buildCollegeAdminSummary(collegeIds) {
+  const collegeAdmins = await User.find({
+    role: 'college_admin',
+    managed_college_id: { $in: collegeIds }
+  }).select('managed_college_id approved name email');
+
+  const summaryMap = {};
+
+  collegeAdmins.forEach((admin) => {
+    const collegeId = admin.managed_college_id;
+
+    if (!summaryMap[collegeId]) {
+      summaryMap[collegeId] = {
+        total_admins: 0,
+        approved_admins: 0,
+        pending_admins: 0,
+        latest_admin: null,
+        latest_approved_admin: null,
+        has_approved_admin: false
+      };
+    }
+
+    summaryMap[collegeId].total_admins += 1;
+    summaryMap[collegeId].latest_admin = {
+      id: admin._id,
+      name: admin.name,
+      email: admin.email,
+      approved: admin.approved
+    };
+
+    if (admin.approved) {
+      summaryMap[collegeId].approved_admins += 1;
+      summaryMap[collegeId].has_approved_admin = true;
+      summaryMap[collegeId].latest_approved_admin = {
+        id: admin._id,
+        name: admin.name,
+        email: admin.email,
+        approved: admin.approved
+      };
+    } else {
+      summaryMap[collegeId].pending_admins += 1;
+    }
+  });
+
+  return summaryMap;
+}
+
+function getDefaultAdminSummary() {
+  return {
+    total_admins: 0,
+    approved_admins: 0,
+    pending_admins: 0,
+    latest_admin: null,
+    latest_approved_admin: null,
+    has_approved_admin: false
+  };
+}
+
 // Get all pending college admins
 router.get('/pending-admins', authenticate, authorize('super_admin'), async (req, res) => {
   try {
@@ -41,17 +99,29 @@ router.post('/approve-admin/:id', authenticate, authorize('super_admin'), async 
     if (!admin || admin.role !== 'college_admin') {
       return res.status(404).json({ error: 'College admin not found' });
     }
+
+    const college = await College.findOne({ college_id: admin.managed_college_id });
+    if (!college) {
+      return res.status(404).json({ error: 'College not found for this admin' });
+    }
     
     admin.approved = true;
-    await admin.save();
+    college.verified = true;
+
+    await Promise.all([admin.save(), college.save()]);
     
     res.json({
-      message: 'College admin approved',
+      message: 'College admin approved and college marked as verified',
       admin: {
         id: admin._id,
         name: admin.name,
         email: admin.email,
         approved: admin.approved
+      },
+      college: {
+        college_id: college.college_id,
+        name_display: college.name_display,
+        verified: college.verified
       }
     });
   } catch (error) {
@@ -64,10 +134,51 @@ router.post('/approve-admin/:id', authenticate, authorize('super_admin'), async 
 router.get('/colleges', authenticate, authorize('super_admin'), async (req, res) => {
   try {
     const colleges = await College.find().sort('name_display');
-    res.json({ colleges });
+    const collegeIds = colleges.map((college) => college.college_id);
+    const adminSummaryMap = await buildCollegeAdminSummary(collegeIds);
+
+    const enrichedColleges = colleges.map((college) => ({
+      ...college.toObject(),
+      verified: Boolean((adminSummaryMap[college.college_id] || getDefaultAdminSummary()).has_approved_admin),
+      admin_summary: adminSummaryMap[college.college_id] || getDefaultAdminSummary()
+    }));
+
+    res.json({ colleges: enrichedColleges });
   } catch (error) {
     console.error('Get colleges error:', error);
     res.status(500).json({ error: 'Failed to fetch colleges' });
+  }
+});
+
+// Revoke college admin access for a college
+router.post('/deny-college-access/:id', authenticate, authorize('super_admin'), async (req, res) => {
+  try {
+    const college = await College.findOne({ college_id: req.params.id });
+
+    if (!college) {
+      return res.status(404).json({ error: 'College not found' });
+    }
+
+    const updateResult = await User.updateMany(
+      { role: 'college_admin', managed_college_id: req.params.id, approved: true },
+      { $set: { approved: false } }
+    );
+
+    college.verified = false;
+    await college.save();
+
+    res.json({
+      message: 'College admin access denied and college marked as unverified',
+      college: {
+        college_id: college.college_id,
+        name_display: college.name_display,
+        verified: college.verified
+      },
+      admins_revoked: updateResult.modifiedCount || 0
+    });
+  } catch (error) {
+    console.error('Deny college access error:', error);
+    res.status(500).json({ error: 'Failed to deny college access' });
   }
 });
 
@@ -127,9 +238,13 @@ router.get('/stats', authenticate, authorize('super_admin'), async (req, res) =>
   try {
     const totalStudents = await User.countDocuments({ role: 'student' });
     const totalColleges = await College.countDocuments();
-    const verifiedColleges = await College.countDocuments({ verified: true });
     const totalCollegeAdmins = await User.countDocuments({ role: 'college_admin' });
     const pendingAdmins = await User.countDocuments({ role: 'college_admin', approved: false });
+    const verifiedCollegeIds = await User.distinct('managed_college_id', {
+      role: 'college_admin',
+      approved: true
+    });
+    const verifiedColleges = verifiedCollegeIds.length;
     
     res.json({
       stats: {
