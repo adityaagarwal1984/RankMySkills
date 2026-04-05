@@ -121,10 +121,10 @@ router.post('/register/student', async (req, res) => {
 // Register College Admin
 router.post('/register/college', async (req, res) => {
   try {
-    const { email, password, name, college_name, city, state } = req.body;
+    const { email, password, name, college_id, college_name, city, state } = req.body;
     
-    if (!email || !password || !name || !college_name) {
-      return res.status(400).json({ error: 'All fields are required' });
+    if (!email || !password || !name || (!college_id && !college_name)) {
+      return res.status(400).json({ error: 'Name, email, password, and college are required' });
     }
     
     const existingUser = await User.findOne({ email });
@@ -132,18 +132,45 @@ router.post('/register/college', async (req, res) => {
       return res.status(400).json({ error: 'Email already registered' });
     }
     
-    // Normalize and find/create college
-    const normalizedName = College.normalizeCollegeName(college_name);
-    let college = await College.findOne({ name_key: normalizedName });
-    
-    if (!college) {
-      college = new College({
-        name_display: college_name,
-        name_key: normalizedName,
-        admin_email: email,
-        verified: false,
-        location: { city, state }
-      });
+    let college = null;
+
+    // Preferred flow for dropdown-based registration: submit selected college_id
+    if (college_id) {
+      college = await College.findOne({ college_id });
+
+      if (!college) {
+        return res.status(404).json({ error: 'Selected college not found' });
+      }
+    } else {
+      // Backward-compatible fallback for older forms that still send college_name
+      const normalizedName = College.normalizeCollegeName(college_name);
+      college = await College.findOne({ name_key: normalizedName });
+      
+      if (!college) {
+        college = new College({
+          name_display: college_name,
+          name_key: normalizedName,
+          admin_email: email,
+          verified: false,
+          location: { city, state }
+        });
+        await college.save();
+      }
+    }
+
+    if (!college.admin_email || college.admin_email === 'pending@example.com') {
+      college.admin_email = email;
+    }
+
+    if ((!college.location?.city && city) || (!college.location?.state && state)) {
+      college.location = {
+        city: college.location?.city || city,
+        state: college.location?.state || state,
+        country: college.location?.country || 'India'
+      };
+    }
+
+    if (college.isModified()) {
       await college.save();
     }
     
