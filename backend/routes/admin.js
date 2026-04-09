@@ -7,16 +7,19 @@ const { authenticate, authorize } = require('../middleware/auth');
 
 const router = express.Router();
 
-const sendEmail = async ({ toEmail, toName, subject, htmlContent }) => {
+const sendEmail = async ({ toEmail, toName, subject, htmlContent, replyTo }) => {
   if (!process.env.BREVO_API || !process.env.EMAIL_USER) {
     console.warn('Email not configured. Skipping send:', subject);
     return;
   }
 
+  const replyToBlock = replyTo ? { replyTo: { email: replyTo.email, name: replyTo.name || replyTo.email } } : {};
+
   await axios.post(
     'https://api.brevo.com/v3/smtp/email',
     {
       sender: { name: 'RankMySkills', email: process.env.EMAIL_USER },
+      ...replyToBlock,
       to: [{ email: toEmail, name: toName }],
       subject,
       htmlContent
@@ -276,11 +279,13 @@ router.post('/college-admin-requests/:id/approve', authenticate, authorize('supe
 
     const registerUrl = process.env.COLLEGE_DASHBOARD_URL || 'https://college.rankmyskills.in/register';
 
-    await sendEmail({
-      toEmail: request.email,
-      toName: request.name,
-      subject: 'RankMySkills College Admin Access Approved',
-      htmlContent: `
+    try {
+      await sendEmail({
+        toEmail: request.email,
+        toName: request.name,
+        subject: 'RankMySkills College Admin Access Approved',
+        replyTo: { email: process.env.SUPER_ADMIN_EMAIL || process.env.EMAIL_USER, name: 'Super Admin' },
+        htmlContent: `
         <html>
         <body>
           <h2>Your college admin request is approved</h2>
@@ -294,8 +299,11 @@ router.post('/college-admin-requests/:id/approve', authenticate, authorize('supe
           <p>Best regards,<br>RankMySkills Team</p>
         </body>
         </html>
-      `
-    });
+        `
+      });
+    } catch (emailError) {
+      console.error('Approve request email failed:', emailError?.response?.data || emailError.message);
+    }
 
     res.json({ message: 'Invite email sent to requester.' });
   } catch (error) {
@@ -317,10 +325,12 @@ router.post('/college-admin-requests/:id/deny', authenticate, authorize('super_a
     request.denied_at = new Date();
     await request.save();
 
-    await sendEmail({
+    try {
+      await sendEmail({
       toEmail: request.email,
       toName: request.name,
-      subject: 'RankMySkills College Admin Request अपडेट',
+      subject: 'RankMySkills College Admin Request Update',
+      replyTo: { email: process.env.SUPER_ADMIN_EMAIL || process.env.EMAIL_USER, name: 'Super Admin' },
       htmlContent: `
         <html>
         <body>
@@ -332,7 +342,10 @@ router.post('/college-admin-requests/:id/deny', authenticate, authorize('super_a
         </body>
         </html>
       `
-    });
+      });
+    } catch (emailError) {
+      console.error('Deny request email failed:', emailError?.response?.data || emailError.message);
+    }
 
     res.json({ message: 'Denial email sent to requester.' });
   } catch (error) {
@@ -347,10 +360,18 @@ router.get('/colleges', authenticate, authorize('super_admin'), async (req, res)
     const colleges = await College.find().sort('name_display');
     const collegeIds = colleges.map((college) => college.college_id);
     const adminSummaryMap = await buildCollegeAdminSummary(collegeIds);
+    const approvedRequests = await CollegeAdminRequest.find({
+      college_id: { $in: collegeIds },
+      status: 'approved'
+    }).select('college_id');
+    const approvedRequestSet = new Set(approvedRequests.map((reqItem) => reqItem.college_id));
 
     const enrichedColleges = colleges.map((college) => ({
       ...college.toObject(),
-      verified: Boolean((adminSummaryMap[college.college_id] || getDefaultAdminSummary()).has_approved_admin),
+      verified: Boolean(
+        (adminSummaryMap[college.college_id] || getDefaultAdminSummary()).has_approved_admin ||
+        approvedRequestSet.has(college.college_id)
+      ),
       admin_summary: adminSummaryMap[college.college_id] || getDefaultAdminSummary()
     }));
 
@@ -373,6 +394,11 @@ router.post('/deny-college-access/:id', authenticate, authorize('super_admin'), 
     const updateResult = await User.updateMany(
       { role: 'college_admin', managed_college_id: req.params.id, approved: true },
       { $set: { approved: false } }
+    );
+
+    await CollegeAdminRequest.updateMany(
+      { college_id: req.params.id, status: { $in: ['pending', 'approved'] } },
+      { $set: { status: 'denied', denied_at: new Date() } }
     );
 
     college.verified = false;

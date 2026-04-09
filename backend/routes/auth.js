@@ -9,16 +9,19 @@ const CollegeAdminRequest = require('../models/CollegeAdminRequest');
 
 const router = express.Router();
 
-const sendEmail = async ({ toEmail, toName, subject, htmlContent }) => {
+const sendEmail = async ({ toEmail, toName, subject, htmlContent, replyTo }) => {
   if (!process.env.BREVO_API || !process.env.EMAIL_USER) {
     console.warn('Email not configured. Skipping send:', subject);
     return;
   }
 
+  const replyToBlock = replyTo ? { replyTo: { email: replyTo.email, name: replyTo.name || replyTo.email } } : {};
+
   await axios.post(
     'https://api.brevo.com/v3/smtp/email',
     {
       sender: { name: 'RankMySkills', email: process.env.EMAIL_USER },
+      ...replyToBlock,
       to: [{ email: toEmail, name: toName }],
       subject,
       htmlContent
@@ -307,26 +310,31 @@ router.post('/request-college-admin', async (req, res) => {
     const superAdminEmail = process.env.SUPER_ADMIN_EMAIL || process.env.EMAIL_USER;
 
     if (superAdminEmail) {
-      await sendEmail({
-        toEmail: superAdminEmail,
-        toName: 'Super Admin',
-        subject: 'New College Admin Access Request',
-        htmlContent: `
-          <html>
-          <body>
-            <h2>New College Admin Request</h2>
-            <p><strong>Name:</strong> ${request.name}</p>
-            <p><strong>Email:</strong> ${request.email}</p>
-            <p><strong>College:</strong> ${request.college_name}</p>
-            <p><strong>Designation:</strong> ${request.designation}</p>
-            <p><strong>Phone:</strong> ${request.phone}</p>
-            <p><strong>Message:</strong> ${request.message || 'NA'}</p>
-            <p><strong>Invite Code:</strong> ${request.invite_code}</p>
-            <p>Review this request in the admin dashboard to approve or deny.</p>
-          </body>
-          </html>
-        `
-      });
+      try {
+        await sendEmail({
+          toEmail: superAdminEmail,
+          toName: 'Super Admin',
+          subject: 'New College Admin Access Request',
+          replyTo: { email: request.email, name: request.name },
+          htmlContent: `
+            <html>
+            <body>
+              <h2>New College Admin Request</h2>
+              <p><strong>Name:</strong> ${request.name}</p>
+              <p><strong>Email:</strong> ${request.email}</p>
+              <p><strong>College:</strong> ${request.college_name}</p>
+              <p><strong>Designation:</strong> ${request.designation}</p>
+              <p><strong>Phone:</strong> ${request.phone}</p>
+              <p><strong>Message:</strong> ${request.message || 'NA'}</p>
+              <p><strong>Invite Code:</strong> ${request.invite_code}</p>
+              <p>Review this request in the admin dashboard to approve or deny.</p>
+            </body>
+            </html>
+          `
+        });
+      } catch (emailError) {
+        console.error('Request college admin email failed:', emailError?.response?.data || emailError.message);
+      }
     }
 
     res.status(201).json({
