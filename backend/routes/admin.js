@@ -1,15 +1,40 @@
 const express = require('express');
+const axios = require('axios');
 const User = require('../models/User');
 const College = require('../models/College');
+const CollegeAdminRequest = require('../models/CollegeAdminRequest');
 const { authenticate, authorize } = require('../middleware/auth');
 
 const router = express.Router();
+
+const sendEmail = async ({ toEmail, toName, subject, htmlContent }) => {
+  if (!process.env.BREVO_API || !process.env.EMAIL_USER) {
+    console.warn('Email not configured. Skipping send:', subject);
+    return;
+  }
+
+  await axios.post(
+    'https://api.brevo.com/v3/smtp/email',
+    {
+      sender: { name: 'RankMySkills', email: process.env.EMAIL_USER },
+      to: [{ email: toEmail, name: toName }],
+      subject,
+      htmlContent
+    },
+    {
+      headers: {
+        'api-key': process.env.BREVO_API,
+        'Content-Type': 'application/json'
+      }
+    }
+  );
+};
 
 async function buildCollegeAdminSummary(collegeIds) {
   const collegeAdmins = await User.find({
     role: 'college_admin',
     managed_college_id: { $in: collegeIds }
-  }).select('managed_college_id approved name email');
+  }).select('managed_college_id approved name email designation phone');
 
   const summaryMap = {};
 
@@ -32,6 +57,8 @@ async function buildCollegeAdminSummary(collegeIds) {
       id: admin._id,
       name: admin.name,
       email: admin.email,
+      designation: admin.designation || null,
+      phone: admin.phone || null,
       approved: admin.approved
     };
 
@@ -42,6 +69,8 @@ async function buildCollegeAdminSummary(collegeIds) {
         id: admin._id,
         name: admin.name,
         email: admin.email,
+        designation: admin.designation || null,
+        phone: admin.phone || null,
         approved: admin.approved
       };
     } else {
@@ -127,6 +156,188 @@ router.post('/approve-admin/:id', authenticate, authorize('super_admin'), async 
   } catch (error) {
     console.error('Approve admin error:', error);
     res.status(500).json({ error: 'Failed to approve admin' });
+  }
+});
+
+// Get college admin access requests
+router.get('/college-admin-requests', authenticate, authorize('super_admin'), async (req, res) => {
+  try {
+    const { status = 'pending' } = req.query;
+
+    const requests = await CollegeAdminRequest.find({ status })
+      .sort('-created_at')
+      .lean();
+
+    const collegeIds = requests.map((reqItem) => reqItem.college_id);
+    const colleges = await College.find({ college_id: { $in: collegeIds } }).lean();
+    const collegeMap = {};
+    colleges.forEach((college) => {
+      collegeMap[college.college_id] = college;
+    });
+
+    const enriched = requests.map((reqItem) => {
+      const college = collegeMap[reqItem.college_id];
+      const location = college?.location
+        ? [college.location.city, college.location.state].filter(Boolean).join(', ')
+        : '';
+
+      return {
+        ...reqItem,
+        college_name: reqItem.college_name || college?.name_display || 'Unknown college',
+        college_location: location || 'Not provided',
+        requested_at: reqItem.created_at ? new Date(reqItem.created_at).toLocaleString() : 'NA'
+      };
+    });
+
+    res.json({ requests: enriched });
+  } catch (error) {
+    console.error('Get college admin requests error:', error);
+    res.status(500).json({ error: 'Failed to fetch college admin requests' });
+  }
+});
+
+// Get verified college admins (approved + registered)
+router.get('/college-admins', authenticate, authorize('super_admin'), async (req, res) => {
+  try {
+    const admins = await User.find({ role: 'college_admin', approved: true })
+      .select('name email managed_college_id designation phone')
+      .lean();
+
+    const collegeIds = admins.map((admin) => admin.managed_college_id);
+    const colleges = await College.find({ college_id: { $in: collegeIds } }).lean();
+    const collegeMap = {};
+    colleges.forEach((college) => {
+      collegeMap[college.college_id] = college;
+    });
+
+    const requests = await CollegeAdminRequest.find({
+      status: 'used',
+      college_id: { $in: collegeIds }
+    }).lean();
+    const requestMap = {};
+    requests.forEach((reqItem) => {
+      requestMap[`${reqItem.email}-${reqItem.college_id}`] = reqItem;
+    });
+
+    const enriched = admins.map((admin) => {
+      const college = collegeMap[admin.managed_college_id];
+      const requestKey = `${admin.email}-${admin.managed_college_id}`;
+      const request = requestMap[requestKey];
+      const location = college?.location
+        ? [college.location.city, college.location.state].filter(Boolean).join(', ')
+        : '';
+
+      return {
+        id: admin._id,
+        name: admin.name,
+        email: admin.email,
+        designation: admin.designation || request?.designation || 'NA',
+        phone: admin.phone || request?.phone || 'NA',
+        college_id: admin.managed_college_id,
+        college_name: college?.name_display || request?.college_name || 'Unknown college',
+        college_location: location || 'Not provided'
+      };
+    });
+
+    res.json({ admins: enriched });
+  } catch (error) {
+    console.error('Get college admins error:', error);
+    res.status(500).json({ error: 'Failed to fetch college admins' });
+  }
+});
+
+// Approve college admin request (sends invite code)
+router.post('/college-admin-requests/:id/approve', authenticate, authorize('super_admin'), async (req, res) => {
+  try {
+    const request = await CollegeAdminRequest.findById(req.params.id);
+
+    if (!request || request.status !== 'pending') {
+      return res.status(404).json({ error: 'Request not found or already processed' });
+    }
+
+    const college = await College.findOne({ college_id: request.college_id });
+    if (!college) {
+      return res.status(404).json({ error: 'College not found' });
+    }
+
+    const existingApprovedAdmin = await User.findOne({
+      role: 'college_admin',
+      managed_college_id: request.college_id,
+      approved: true
+    });
+
+    if (existingApprovedAdmin) {
+      return res.status(409).json({ error: 'College admin access already granted for this college' });
+    }
+
+    request.status = 'approved';
+    request.approved_at = new Date();
+    await request.save();
+
+    const registerUrl = process.env.COLLEGE_DASHBOARD_URL || 'https://college.rankmyskills.in/register';
+
+    await sendEmail({
+      toEmail: request.email,
+      toName: request.name,
+      subject: 'RankMySkills College Admin Access Approved',
+      htmlContent: `
+        <html>
+        <body>
+          <h2>Your college admin request is approved</h2>
+          <p>Hi ${request.name},</p>
+          <p>You can now register as a college admin using the invite code below.</p>
+          <p><strong>Invite Code:</strong> ${request.invite_code}</p>
+          <p>Use the link below to register:</p>
+          <a href="${registerUrl}" style="display: inline-block; padding: 10px 20px; background-color: #0f766e; color: white; text-decoration: none; border-radius: 6px;">Register as College Admin</a>
+          <p>If the button does not work, open this URL:</p>
+          <p>${registerUrl}</p>
+          <p>Best regards,<br>RankMySkills Team</p>
+        </body>
+        </html>
+      `
+    });
+
+    res.json({ message: 'Invite email sent to requester.' });
+  } catch (error) {
+    console.error('Approve college admin request error:', error);
+    res.status(500).json({ error: 'Failed to approve request' });
+  }
+});
+
+// Deny college admin request (sends denial email)
+router.post('/college-admin-requests/:id/deny', authenticate, authorize('super_admin'), async (req, res) => {
+  try {
+    const request = await CollegeAdminRequest.findById(req.params.id);
+
+    if (!request || request.status !== 'pending') {
+      return res.status(404).json({ error: 'Request not found or already processed' });
+    }
+
+    request.status = 'denied';
+    request.denied_at = new Date();
+    await request.save();
+
+    await sendEmail({
+      toEmail: request.email,
+      toName: request.name,
+      subject: 'RankMySkills College Admin Request अपडेट',
+      htmlContent: `
+        <html>
+        <body>
+          <h2>College admin request update</h2>
+          <p>Hi ${request.name},</p>
+          <p>Thank you for your request. At this time, we are unable to approve college admin access.</p>
+          <p>If this is unexpected, you may reply with additional details.</p>
+          <p>Best regards,<br>RankMySkills Team</p>
+        </body>
+        </html>
+      `
+    });
+
+    res.json({ message: 'Denial email sent to requester.' });
+  } catch (error) {
+    console.error('Deny college admin request error:', error);
+    res.status(500).json({ error: 'Failed to deny request' });
   }
 });
 

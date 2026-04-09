@@ -149,6 +149,14 @@ const userSchema = new mongoose.Schema({
     ref: 'College',
     required: function() { return this.role === 'college_admin'; }
   },
+  designation: {
+    type: String,
+    default: null
+  },
+  phone: {
+    type: String,
+    default: null
+  },
   approved: {
     type: Boolean,
     default: function() { return this.role !== 'college_admin'; }

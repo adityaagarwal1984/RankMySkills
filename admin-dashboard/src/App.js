@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Overview from './pages/Overview';
 import Approvals from './pages/Approvals';
 import Colleges from './pages/Colleges';
+import CollegeAdmins from './pages/CollegeAdmins';
 import Students from './pages/Students';
 import Leaderboard from './pages/Leaderboard';
 
@@ -25,6 +26,7 @@ function App() {
           <Route index element={<Overview />} />
           <Route path="approvals" element={<Approvals />} />
           <Route path="colleges" element={<Colleges />} />
+          <Route path="college-admins" element={<CollegeAdmins />} />
           <Route path="students" element={<Students />} />
           <Route path="leaderboard" element={<Leaderboard />} />
         </Route>

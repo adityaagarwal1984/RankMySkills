@@ -65,7 +65,10 @@ function Colleges() {
             const summary = college.admin_summary || {};
             const hasApprovedAdmin = Boolean(summary.has_approved_admin);
             const isVerified = Boolean(college.verified && hasApprovedAdmin);
-            const activeAdminEmail = isVerified ? summary.latest_approved_admin?.email || 'NA' : 'NA';
+            const activeAdmin = isVerified ? summary.latest_approved_admin : null;
+            const activeAdminEmail = activeAdmin?.email || 'NA';
+            const activeAdminName = activeAdmin?.name || 'NA';
+            const activeAdminDesignation = activeAdmin?.designation || 'NA';
 
             return (
               <article key={college.college_id} className="rounded-[1.75rem] border border-white/10 bg-white/5 p-6 shadow-xl">
@@ -89,7 +92,9 @@ function Colleges() {
 
                 <div className="mt-6 grid gap-3 text-sm text-slate-300">
                   <InfoRow label="College ID" value={college.college_id} />
+                  <InfoRow label="Admin Name" value={activeAdminName} />
                   <InfoRow label="Admin Email" value={activeAdminEmail} />
+                  <InfoRow label="Designation" value={activeAdminDesignation} />
                   <InfoRow label="Approved Admins" value={summary.approved_admins ?? 0} />
                   <InfoRow label="Pending Admins" value={summary.pending_admins ?? 0} />
                   <InfoRow

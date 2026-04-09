@@ -6,6 +6,7 @@ const navItems = [
   { to: '/', label: 'Overview', icon: 'bx-grid-alt' },
   { to: '/approvals', label: 'Approvals', icon: 'bx-user-check' },
   { to: '/colleges', label: 'Colleges', icon: 'bx-buildings' },
+  { to: '/college-admins', label: 'College Admins', icon: 'bx-id-card' },
   { to: '/students', label: 'Students', icon: 'bx-group' },
   { to: '/leaderboard', label: 'Leaderboard', icon: 'bx-trophy' },
 ];

@@ -10,8 +10,8 @@ function Approvals() {
 
   const loadPendingAdmins = async () => {
     try {
-      const response = await api.get('/admin/pending-admins');
-      setAdmins(response.data.admins || []);
+      const response = await api.get('/admin/college-admin-requests', { params: { status: 'pending' } });
+      setAdmins(response.data.requests || []);
       setError('');
     } catch (loadError) {
       setError(loadError.response?.data?.error || 'Failed to load pending approvals.');
@@ -29,11 +29,26 @@ function Approvals() {
     setActionMessage('');
 
     try {
-      await api.post(`/admin/approve-admin/${adminId}`);
+      await api.post(`/admin/college-admin-requests/${adminId}/approve`);
       setAdmins((current) => current.filter((admin) => admin._id !== adminId));
-      setActionMessage('College admin approved and college marked as verified.');
+      setActionMessage('Approval sent with invite code to the college admin.');
     } catch (approveError) {
       setActionMessage(approveError.response?.data?.error || 'Approval failed.');
+    } finally {
+      setProcessingId('');
+    }
+  };
+
+  const denyAdmin = async (adminId) => {
+    setProcessingId(adminId);
+    setActionMessage('');
+
+    try {
+      await api.post(`/admin/college-admin-requests/${adminId}/deny`);
+      setAdmins((current) => current.filter((admin) => admin._id !== adminId));
+      setActionMessage('Denial email sent to the requester.');
+    } catch (denyError) {
+      setActionMessage(denyError.response?.data?.error || 'Deny failed.');
     } finally {
       setProcessingId('');
     }
@@ -80,41 +95,13 @@ function Approvals() {
                   </tr>
                 ) : (
                   admins.map((admin) => (
-                    <tr key={admin._id} className="border-t border-white/10 text-sm text-slate-200">
-                      <td className="px-6 py-5">
-                        <p className="font-semibold text-white">{admin.name}</p>
-                        <p className="mt-1 text-slate-400">{admin.email}</p>
-                      </td>
-                      <td className="px-6 py-5">
-                        <p>{admin.college?.name_display || 'Unknown college'}</p>
-                        <p className="mt-1 text-xs text-slate-500">{admin.managed_college_id}</p>
-                      </td>
-                      <td className="px-6 py-5 text-slate-300">
-                        {admin.college?.location?.city || admin.college?.location?.state
-                          ? `${admin.college?.location?.city || ''}${admin.college?.location?.city && admin.college?.location?.state ? ', ' : ''}${admin.college?.location?.state || ''}`
-                          : 'Not provided'}
-                      </td>
-                      <td className="px-6 py-5">
-                        <button
-                          type="button"
-                          className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-amber-300 via-yellow-300 to-amber-500 px-4 py-2.5 font-semibold text-stone-950 transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-70"
-                          disabled={processingId === admin._id}
-                          onClick={() => approveAdmin(admin._id)}
-                        >
-                          {processingId === admin._id ? (
-                            <>
-                              <i className="bx bx-loader-alt animate-spin text-lg" />
-                              Approving...
-                            </>
-                          ) : (
-                            <>
-                              <i className="bx bx-check text-lg" />
-                              Approve
-                            </>
-                          )}
-                        </button>
-                      </td>
-                    </tr>
+                    <ApprovalRow
+                      key={admin._id}
+                      admin={admin}
+                      processingId={processingId}
+                      onApprove={approveAdmin}
+                      onDeny={denyAdmin}
+                    />
                   ))
                 )}
               </tbody>
@@ -122,6 +109,88 @@ function Approvals() {
           </div>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function ApprovalRow({ admin, processingId, onApprove, onDeny }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const isProcessing = processingId === admin._id;
+
+  return (
+    <>
+      <tr className="border-t border-white/10 text-sm text-slate-200">
+        <td className="px-6 py-5">
+          <button
+            type="button"
+            className="text-left"
+            onClick={() => setIsOpen((value) => !value)}
+          >
+            <p className="font-semibold text-white">{admin.name}</p>
+            <p className="mt-1 text-slate-400">{admin.email}</p>
+            <p className="mt-2 text-xs text-amber-300">{isOpen ? 'Hide details' : 'View full details'}</p>
+          </button>
+        </td>
+        <td className="px-6 py-5">
+          <p>{admin.college_name || admin.college?.name_display || 'Unknown college'}</p>
+          <p className="mt-1 text-xs text-slate-500">{admin.college_id}</p>
+        </td>
+        <td className="px-6 py-5 text-slate-300">
+          {admin.college_location || 'Not provided'}
+        </td>
+        <td className="px-6 py-5">
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-amber-300 via-yellow-300 to-amber-500 px-4 py-2.5 font-semibold text-stone-950 transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-70"
+              disabled={isProcessing}
+              onClick={() => onApprove(admin._id)}
+            >
+              {isProcessing ? (
+                <>
+                  <i className="bx bx-loader-alt animate-spin text-lg" />
+                  Approving...
+                </>
+              ) : (
+                <>
+                  <i className="bx bx-check text-lg" />
+                  Approve
+                </>
+              )}
+            </button>
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 rounded-2xl border border-rose-300/30 bg-rose-500/10 px-4 py-2.5 font-semibold text-rose-100 transition hover:bg-rose-500/20 disabled:cursor-not-allowed disabled:opacity-70"
+              disabled={isProcessing}
+              onClick={() => onDeny(admin._id)}
+            >
+              <i className="bx bx-block text-lg" />
+              Deny
+            </button>
+          </div>
+        </td>
+      </tr>
+      {isOpen ? (
+        <tr className="border-t border-white/10 bg-black/40 text-sm text-slate-300">
+          <td colSpan="4" className="px-6 py-5">
+            <div className="grid gap-4 md:grid-cols-2">
+              <DetailItem label="Designation" value={admin.designation || 'NA'} />
+              <DetailItem label="Phone" value={admin.phone || 'NA'} />
+              <DetailItem label="Message" value={admin.message || 'NA'} />
+              <DetailItem label="Requested At" value={admin.requested_at || 'NA'} />
+            </div>
+          </td>
+        </tr>
+      ) : null}
+    </>
+  );
+}
+
+function DetailItem({ label, value }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-black/60 px-4 py-3">
+      <p className="text-xs uppercase tracking-[0.2em] text-slate-500">{label}</p>
+      <p className="mt-1 text-sm text-slate-200">{value}</p>
     </div>
   );
 }

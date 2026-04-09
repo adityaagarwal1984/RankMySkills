@@ -113,14 +113,12 @@ function Students() {
                   <th className="px-6 py-4">College</th>
                   <th className="px-6 py-4">Year</th>
                   <th className="px-6 py-4">Course</th>
-                  <th className="px-6 py-4">Global Score</th>
-                  <th className="px-6 py-4">College Score</th>
                 </tr>
               </thead>
               <tbody>
                 {students.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="px-6 py-12 text-center text-sm text-slate-400">
+                    <td colSpan="4" className="px-6 py-12 text-center text-sm text-slate-400">
                       No students found for the current filters.
                     </td>
                   </tr>
@@ -137,8 +135,6 @@ function Students() {
                         <td className="px-6 py-5 text-slate-300">{collegeName}</td>
                         <td className="px-6 py-5 text-slate-300">{student.graduation_year}</td>
                         <td className="px-6 py-5 text-slate-300">{student.course}</td>
-                        <td className="px-6 py-5 font-semibold text-amber-300">{student.global_engineer_score ?? 0}</td>
-                        <td className="px-6 py-5 font-semibold text-emerald-300">{student.college_engineer_score ?? 0}</td>
                       </tr>
                     );
                   })

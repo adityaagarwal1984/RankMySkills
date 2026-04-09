@@ -5,8 +5,36 @@ const axios = require('axios');
 const User = require('../models/User');
 
 const College = require('../models/College');
+const CollegeAdminRequest = require('../models/CollegeAdminRequest');
 
 const router = express.Router();
+
+const sendEmail = async ({ toEmail, toName, subject, htmlContent }) => {
+  if (!process.env.BREVO_API || !process.env.EMAIL_USER) {
+    console.warn('Email not configured. Skipping send:', subject);
+    return;
+  }
+
+  await axios.post(
+    'https://api.brevo.com/v3/smtp/email',
+    {
+      sender: { name: 'RankMySkills', email: process.env.EMAIL_USER },
+      to: [{ email: toEmail, name: toName }],
+      subject,
+      htmlContent
+    },
+    {
+      headers: {
+        'api-key': process.env.BREVO_API,
+        'Content-Type': 'application/json'
+      }
+    }
+  );
+};
+
+const generateInviteCode = () => {
+  return `RMS-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
+};
 
 // --- Authentication Helper Functions ---
 
@@ -121,10 +149,10 @@ router.post('/register/student', async (req, res) => {
 // Register College Admin
 router.post('/register/college', async (req, res) => {
   try {
-    const { email, password, name, college_id, college_name, city, state } = req.body;
+    const { email, password, name, college_id, college_name, city, state, invite_code } = req.body;
     
-    if (!email || !password || !name || (!college_id && !college_name)) {
-      return res.status(400).json({ error: 'Name, email, password, and college are required' });
+    if (!email || !password || !name || (!college_id && !college_name) || !invite_code) {
+      return res.status(400).json({ error: 'Name, email, password, college, and invite code are required' });
     }
     
     const existingUser = await User.findOne({ email });
@@ -158,6 +186,26 @@ router.post('/register/college', async (req, res) => {
       }
     }
 
+    const existingApprovedAdmin = await User.findOne({
+      role: 'college_admin',
+      managed_college_id: college.college_id,
+      approved: true
+    });
+    if (existingApprovedAdmin) {
+      return res.status(409).json({ error: 'College admin access already granted for this college' });
+    }
+
+    const request = await CollegeAdminRequest.findOne({
+      email: email.toLowerCase(),
+      college_id: college.college_id,
+      invite_code,
+      status: 'approved'
+    });
+
+    if (!request) {
+      return res.status(403).json({ error: 'Invalid invite code for this college or email' });
+    }
+
     if (!college.admin_email || college.admin_email === 'pending@example.com') {
       college.admin_email = email;
     }
@@ -181,18 +229,22 @@ router.post('/register/college', async (req, res) => {
       name,
       role: 'college_admin',
       managed_college_id: college.college_id,
-      approved: false
+      approved: true,
+      designation: request.designation,
+      phone: request.phone
     });
     
     await user.save();
+
+    request.status = 'used';
+    request.used_at = new Date();
+    await request.save();
     
-    // For pending admins, maybe we don't login immediately? 
-    // But let's follow standard flow, they just get limited access via RBAC
     const { accessToken, refreshToken } = await generateTokens(user);
     setCookies(res, accessToken, refreshToken);
     
     res.status(201).json({
-      message: 'College admin registered. Awaiting approval.',
+      message: 'College admin registered successfully.',
       user: {
         id: user._id,
         email: user.email,
@@ -204,6 +256,86 @@ router.post('/register/college', async (req, res) => {
   } catch (error) {
     console.error('Register error:', error);
     res.status(500).json({ error: 'Registration failed' });
+  }
+});
+
+// Request College Admin Access (public)
+router.post('/request-college-admin', async (req, res) => {
+  try {
+    const { name, email, college_id, designation, phone, message } = req.body;
+
+    if (!name || !email || !college_id || !designation || !phone) {
+      return res.status(400).json({ error: 'Name, email, college, designation, and phone are required' });
+    }
+
+    const college = await College.findOne({ college_id });
+    if (!college) {
+      return res.status(404).json({ error: 'Selected college not found' });
+    }
+
+    const existingApprovedAdmin = await User.findOne({
+      role: 'college_admin',
+      managed_college_id: college_id,
+      approved: true
+    });
+    if (existingApprovedAdmin) {
+      return res.status(409).json({ error: 'College admin access already granted for this college' });
+    }
+
+    const existingPending = await CollegeAdminRequest.findOne({
+      email: email.toLowerCase(),
+      college_id,
+      status: 'pending'
+    });
+    if (existingPending) {
+      return res.status(409).json({ error: 'You already have a pending request for this college' });
+    }
+
+    const invite_code = generateInviteCode();
+
+    const request = await CollegeAdminRequest.create({
+      name,
+      email: email.toLowerCase(),
+      college_id,
+      college_name: college.name_display,
+      designation,
+      phone,
+      message: message || '',
+      invite_code
+    });
+
+    const superAdminEmail = process.env.SUPER_ADMIN_EMAIL || process.env.EMAIL_USER;
+
+    if (superAdminEmail) {
+      await sendEmail({
+        toEmail: superAdminEmail,
+        toName: 'Super Admin',
+        subject: 'New College Admin Access Request',
+        htmlContent: `
+          <html>
+          <body>
+            <h2>New College Admin Request</h2>
+            <p><strong>Name:</strong> ${request.name}</p>
+            <p><strong>Email:</strong> ${request.email}</p>
+            <p><strong>College:</strong> ${request.college_name}</p>
+            <p><strong>Designation:</strong> ${request.designation}</p>
+            <p><strong>Phone:</strong> ${request.phone}</p>
+            <p><strong>Message:</strong> ${request.message || 'NA'}</p>
+            <p><strong>Invite Code:</strong> ${request.invite_code}</p>
+            <p>Review this request in the admin dashboard to approve or deny.</p>
+          </body>
+          </html>
+        `
+      });
+    }
+
+    res.status(201).json({
+      message: 'Request submitted successfully. You will receive an invite code after approval.',
+      request_id: request._id
+    });
+  } catch (error) {
+    console.error('Request college admin error:', error);
+    res.status(500).json({ error: 'Failed to submit request' });
   }
 });
 
@@ -428,7 +560,19 @@ router.post('/reset-password/:token', async (req, res) => {
 router.get('/colleges', async (req, res) => {
   try {
     const colleges = await College.find().sort('name_display').select('college_id name_display');
-    res.json({ colleges });
+    const approvedCollegeIds = await User.distinct('managed_college_id', {
+      role: 'college_admin',
+      approved: true
+    });
+    const approvedSet = new Set(approvedCollegeIds);
+
+    const enriched = colleges.map((college) => ({
+      college_id: college.college_id,
+      name_display: college.name_display,
+      has_approved_admin: approvedSet.has(college.college_id)
+    }));
+
+    res.json({ colleges: enriched });
   } catch (error) {
     console.error('Get colleges error:', error);
     res.status(500).json({ error: 'Failed to fetch colleges' });

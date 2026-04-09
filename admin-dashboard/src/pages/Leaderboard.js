@@ -5,6 +5,7 @@ function Leaderboard() {
   const [filters, setFilters] = useState({
     year: 'all',
     course: 'all',
+    college_id: '',
     sort: 'engineer_score',
     page: 1,
     limit: 25,
@@ -13,19 +14,22 @@ function Leaderboard() {
   const [meta, setMeta] = useState(null);
   const [years, setYears] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [colleges, setColleges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     const loadFilterOptions = async () => {
       try {
-        const [yearResponse, courseResponse] = await Promise.all([
+        const [yearResponse, courseResponse, collegeResponse] = await Promise.all([
           api.get('/leaderboard/years'),
           api.get('/leaderboard/courses'),
+          api.get('/admin/colleges'),
         ]);
 
         setYears(yearResponse.data.years || []);
         setCourses(courseResponse.data.courses || []);
+        setColleges(collegeResponse.data.colleges || []);
       } catch (loadError) {
         console.error('Leaderboard filter load failed:', loadError);
       }
@@ -40,7 +44,11 @@ function Leaderboard() {
       setError('');
 
       try {
-        const response = await api.get('/leaderboard', { params: filters });
+        const params = { ...filters };
+        if (!params.college_id) {
+          delete params.college_id;
+        }
+        const response = await api.get('/leaderboard', { params });
         setLeaderboard(response.data.leaderboard || []);
         setMeta(response.data.meta || null);
       } catch (loadError) {
@@ -69,7 +77,7 @@ function Leaderboard() {
         </p>
       </section>
 
-      <section className="grid gap-4 rounded-[2rem] border border-white/10 bg-white/5 p-5 md:grid-cols-4">
+      <section className="grid gap-4 rounded-[2rem] border border-white/10 bg-white/5 p-5 md:grid-cols-5">
         <FilterSelect name="year" label="Year" value={filters.year} onChange={handleFilterChange}>
           <option value="all">All years</option>
           {years.map((year) => (
@@ -84,6 +92,15 @@ function Leaderboard() {
           {courses.map((course) => (
             <option key={course} value={course}>
               {course}
+            </option>
+          ))}
+        </FilterSelect>
+
+        <FilterSelect name="college_id" label="College" value={filters.college_id} onChange={handleFilterChange}>
+          <option value="">All colleges</option>
+          {colleges.map((college) => (
+            <option key={college.college_id} value={college.college_id}>
+              {college.name_display}
             </option>
           ))}
         </FilterSelect>
@@ -139,12 +156,12 @@ function Leaderboard() {
                       <td className="px-6 py-5 text-slate-300">{student.college}</td>
                       <td className="px-6 py-5 text-slate-300">{student.graduation_year}</td>
                       <td className="px-6 py-5 font-semibold text-white">{student.global_engineer_score}</td>
-                      <td className="px-6 py-5">
-                        <div className="flex flex-wrap gap-2">
-                          <Badge label={`LC ${student.ratings?.leetcode || 0}`} />
-                          <Badge label={`CF ${student.ratings?.codeforces || 0}`} />
-                          <Badge label={`CC ${student.ratings?.codechef || 0}`} />
-                        </div>
+                      <td className="px-6 py-5 text-sm text-slate-300 whitespace-nowrap">
+                        <span className="font-medium text-slate-200">LC</span> {student.ratings?.leetcode || 0}
+                        <span className="mx-2 text-slate-600">|</span>
+                        <span className="font-medium text-slate-200">CF</span> {student.ratings?.codeforces || 0}
+                        <span className="mx-2 text-slate-600">|</span>
+                        <span className="font-medium text-slate-200">CC</span> {student.ratings?.codechef || 0}
                       </td>
                     </tr>
                   ))
@@ -196,10 +213,6 @@ function FilterSelect({ label, children, ...props }) {
       </select>
     </label>
   );
-}
-
-function Badge({ label }) {
-  return <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-medium text-slate-200">{label}</span>;
 }
 
 function Panel({ text, isError = false }) {
