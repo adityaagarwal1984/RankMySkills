@@ -215,14 +215,14 @@ const App = () => {
 
       <main className="relative z-10">
         {/* Hero Section */}
-        <section className="container mx-auto px-6 pb-12 pt-28 lg:pt-20 flex flex-col lg:flex-row items-center gap-8 relative min-h-[100dvh] lg:min-h-screen">
+        <section className="container mx-auto px-6 pb-12 pt-28 lg:pt-20 flex flex-col lg:flex-row items-center lg:items-start xl:items-center gap-8 lg:gap-12 relative min-h-[100dvh] lg:min-h-screen overflow-hidden lg:overflow-visible">
           
-          <div className="lg:w-1/2 flex flex-col gap-1 z-10 lg:-mt-8">
+          <div className="w-full lg:w-1/2 flex flex-col gap-1 z-10 lg:-mt-8 text-center lg:text-left items-center lg:items-start">
             <motion.div 
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, type: "spring", stiffness: 100 }}
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#3ce3a8]/30 w-fit text-[10px] font-bold bg-[#3ce3a8]/5 text-[#3ce3a8] tracking-widest mb-4"
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#3ce3a8]/30 w-fit text-[10px] font-bold bg-[#3ce3a8]/5 text-[#3ce3a8] tracking-widest mb-2 md:mb-4"
             >
               {/* <span className="text-[10px]">✦</span>
               UNIFIED ECOSYSTEM */}
@@ -232,12 +232,12 @@ const App = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.1 }}
-              className="text-4xl md:text-5xl lg:text-[3.5rem] font-bold leading-[1.05] tracking-tight text-white mb-4"
+              className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold leading-[1.1] tracking-tight text-white mb-2 md:mb-4"
             >
-              <br></br>
-              <span className="text-[#3ce3a8]">The Ultimate<br /> Ecosystem </span>
-              <span className="text-3xl md:text-4xl lg:text-[2.75rem] leading-[1.1]">for</span><br />
-              <span className="text-3xl md:text-4xl lg:text-[2.75rem] leading-[1.1] block min-h-[90px] lg:min-h-[120px] mt-6 font-medium">
+              <br className="hidden lg:block"></br>
+              <span className="text-[#3ce3a8]">The Ultimate<br className="hidden sm:block" /> Ecosystem </span>
+              <span className="text-2xl sm:text-4xl lg:text-[2.75rem] leading-[1.1]">for</span><br />
+              <span className="text-xl sm:text-3xl md:text-4xl lg:text-[2.75rem] leading-[1.2] block min-h-[70px] sm:min-h-[90px] lg:min-h-[120px] mt-4 sm:mt-6 font-medium sm:ml-4 lg:ml-12">
                 <Typewriter phrases={[
                   "Students to compete and grow faster",
                   "College Admins to track student activity",
@@ -250,18 +250,18 @@ const App = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex flex-wrap gap-4 pt-2 mt-8 lg:mt-12"
+              className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-2 mt-4 sm:mt-8 w-full sm:w-auto"
             >
               
               <a 
                 href="https://student.rankmyskills.in" 
-                className="bg-[#3ce3a8] text-[#04080c] px-6 py-3.5 rounded-lg font-bold flex items-center gap-2 transition-all hover:bg-[#20caa0] hover:-translate-y-0.5 text-sm"
+                className="bg-[#3ce3a8] text-[#04080c] px-6 py-3.5 rounded-lg font-bold flex items-center justify-center gap-2 transition-all hover:bg-[#20caa0] hover:-translate-y-0.5 text-sm w-full sm:w-auto"
               >
                 Open Student Dashboard <ArrowRight size={16} />
               </a>
               <a 
                 href="https://college.rankmyskills.in" 
-                className="bg-transparent border border-gray-600 text-white px-6 py-3.5 rounded-lg font-semibold flex items-center gap-2 transition-all hover:border-gray-400 hover:-translate-y-0.5 text-sm"
+                className="bg-transparent border border-gray-600 text-white px-6 py-3.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all hover:border-gray-400 hover:-translate-y-0.5 text-sm w-full sm:w-auto"
               >
                 College Dashboard <ArrowRight size={16} />
               </a>
@@ -272,13 +272,13 @@ const App = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.3 }}
-            className="lg:w-1/2 relative w-full h-[500px] mt-16 lg:mt-8 lg:ml-8"
+            className="w-full lg:w-1/2 relative h-[350px] sm:h-[450px] lg:h-[500px] mt-8 lg:mt-8 lg:ml-8"
           >
             {/* 3D Network Concept in Hero replacing the static dashboard */}
             <div className="absolute inset-0 rounded-2xl overflow-hidden border border-white/5 bg-[#0a1118]/40 backdrop-blur-sm shadow-[0_0_50px_rgba(16,185,129,0.15)] flex items-center justify-center pointer-events-none">
               <ErrorBoundary>
                 {/* A generic prebuilt spline that provides a nice 3d network / node vibe replacing old design */}
-                <div className="w-[150%] h-[150%] pointer-events-auto">
+                <div className="w-[150%] h-[150%] pointer-events-auto hidden sm:block">
                   <Spline scene="https://prod.spline.design/kZIGLNcdAJe-2V5i/scene.splinecode" />
                 </div>
               </ErrorBoundary>
@@ -287,20 +287,20 @@ const App = () => {
             {/* Overlaid Animated Nodes for Student, College, Admin */}
             <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
               <motion.div 
-                className="relative w-[400px] h-[400px] scale-110"
+                className="relative w-[280px] h-[280px] sm:w-[400px] sm:h-[400px] scale-90 sm:scale-100 lg:scale-110"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 75, repeat: Infinity, ease: "linear" }}
               >
-                <div className="absolute top-1/2 left-1/2 rounded-full border border-emerald-500/30 w-80 h-80 -translate-x-1/2 -translate-y-1/2 shadow-[inset_0_0_20px_rgba(16,185,129,0.1)]"></div>
-                <div className="absolute top-1/2 left-1/2 border border-emerald-500/10 rounded-full w-56 h-56 -translate-x-1/2 -translate-y-1/2"></div>
+                <div className="absolute top-1/2 left-1/2 rounded-full border border-emerald-500/30 w-56 h-56 sm:w-80 sm:h-80 -translate-x-1/2 -translate-y-1/2 shadow-[inset_0_0_20px_rgba(16,185,129,0.1)]"></div>
+                <div className="absolute top-1/2 left-1/2 border border-emerald-500/10 rounded-full w-40 h-40 sm:w-56 sm:h-56 -translate-x-1/2 -translate-y-1/2"></div>
                 
                 {/* Central "RankMySkills" Hub */}
                 <motion.div 
-                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-[#0a1118] border border-emerald-500 shadow-[0_0_40px_rgba(16,185,129,0.5)] flex items-center justify-center z-20 backdrop-blur-md"
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#0a1118] border border-emerald-500 shadow-[0_0_40px_rgba(16,185,129,0.5)] flex items-center justify-center z-20 backdrop-blur-md"
                   animate={{ rotate: -360 }}
                   transition={{ duration: 75, repeat: Infinity, ease: "linear" }}
                 >
-                  <div className="w-12 h-12 rounded bg-[#10b981] flex items-center justify-center font-black text-[#04080c] shadow-[0_0_15px_rgba(16,185,129,0.6)] text-2xl">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded bg-[#10b981] flex items-center justify-center font-black text-[#04080c] shadow-[0_0_15px_rgba(16,185,129,0.6)] text-xl sm:text-2xl">
                     R
                   </div>
                 </motion.div>
@@ -308,36 +308,36 @@ const App = () => {
                 {/* Student Node */}
                 <div className="absolute top-[10%] left-[50%] -translate-x-1/2 -translate-y-1/2 z-30">
                   <motion.div 
-                     className="w-20 h-20 rounded-2xl bg-[#162330]/90 backdrop-blur border border-blue-500/60 flex flex-col items-center justify-center p-2 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                     className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-[#162330]/90 backdrop-blur border border-blue-500/60 flex flex-col items-center justify-center p-1 sm:p-2 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
                      animate={{ rotate: -360 }}
                      transition={{ duration: 75, repeat: Infinity, ease: "linear" }}
                   >
-                    <Users size={20} className="text-blue-400 mb-1" />
-                    <span className="text-xs font-bold text-center">Students</span>
+                    <Users size={16} className="text-blue-400 mb-1 sm:w-5 sm:h-5" />
+                    <span className="text-[10px] sm:text-xs font-bold text-center">Students</span>
                   </motion.div>
                 </div>
 
                 {/* College Node */}
                 <div className="absolute top-[70%] left-[15.36%] -translate-x-1/2 -translate-y-1/2 z-30">
                   <motion.div 
-                     className="w-20 h-20 rounded-2xl bg-[#162330]/90 backdrop-blur border border-red-500/60 flex flex-col items-center justify-center p-2 shadow-[0_0_20px_rgba(20,184,166,0.3)]"
+                     className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-[#162330]/90 backdrop-blur border border-red-500/60 flex flex-col items-center justify-center p-1 sm:p-2 shadow-[0_0_20px_rgba(20,184,166,0.3)]"
                      animate={{ rotate: -360 }}
                      transition={{ duration: 75, repeat: Infinity, ease: "linear" }}
                   >
-                    <BarChart3 size={20} className="text-red-400 mb-1" />
-                    <span className="text-xs font-bold text-center">Colleges</span>
+                    <BarChart3 size={16} className="text-red-400 mb-1 sm:w-5 sm:h-5" />
+                    <span className="text-[10px] sm:text-xs font-bold text-center">Colleges</span>
                   </motion.div>
                 </div>
 
                 {/* Admin Node */}
                 <div className="absolute top-[70%] left-[84.64%] -translate-x-1/2 -translate-y-1/2 z-30">
                   <motion.div 
-                     className="w-20 h-20 rounded-2xl bg-[#162330]/90 backdrop-blur border border-yellow-300/60 flex flex-col items-center justify-center p-2 shadow-[0_0_20px_rgba(59,130,246,0.3)]"
+                     className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl bg-[#162330]/90 backdrop-blur border border-yellow-300/60 flex flex-col items-center justify-center p-1 sm:p-2 shadow-[0_0_20px_rgba(59,130,246,0.3)]"
                      animate={{ rotate: -360 }}
                      transition={{ duration: 75, repeat: Infinity, ease: "linear" }}
                   >
-                    <ShieldCheck size={20} className="text-yellow-300 mb-1" />
-                    <span className="text-xs font-bold text-center">Admins</span>
+                    <ShieldCheck size={16} className="text-yellow-300 mb-1 sm:w-5 sm:h-5" />
+                    <span className="text-[10px] sm:text-xs font-bold text-center">Admins</span>
                   </motion.div>
                 </div>
 
