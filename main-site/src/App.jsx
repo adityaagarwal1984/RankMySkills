@@ -33,11 +33,13 @@ const FlipCard = ({ title, desc, link, linkText, icon, image, step }) => {
       style={{ perspective: '1000px' }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={() => window.location.href = link}
     >
       <motion.div
-        className="w-full h-full relative transition-all duration-700"
+        className="w-full h-full relative"
         style={{ transformStyle: 'preserve-3d' }}
         animate={{ rotateY: isHovered ? 180 : 0 }}
+        transition={{ duration: 0.35, ease: "easeInOut" }}
       >
         {/* Front */}
         <div className="absolute w-full h-full rounded-xl border border-emerald-500/20 bg-[#04080c] overflow-hidden flex flex-col justify-end" style={{ backfaceVisibility: 'hidden' }}>
@@ -55,15 +57,17 @@ const FlipCard = ({ title, desc, link, linkText, icon, image, step }) => {
         {/* Back */}
         <div className="absolute w-full h-full rounded-xl border border-[#3ce3a8]/40 bg-black overflow-hidden p-6 flex flex-col items-center justify-center text-center shadow-lg" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
           <div className="absolute inset-0 bg-cover bg-center opacity-[0.1]" style={{ backgroundImage: `url(${image})` }}></div>
-          <div className="relative z-10 flex flex-col items-center w-full">
+          <div className="relative z-10 flex flex-col items-center w-full" style={{ transform: 'translateZ(30px)' }}>
             <div className="w-12 h-12 rounded-full bg-[#3ce3a8]/10 text-[#3ce3a8] border border-[#3ce3a8]/30 flex items-center justify-center mb-3">
                 {icon}
             </div>
             <h3 className="text-xl font-bold mb-2 text-white hover:text-[#3ce3a8] transition-colors">{title}</h3>
             <p className="text-[13px] text-gray-300 mb-5 leading-relaxed w-full max-w-[95%] mx-auto">{desc}</p>
-            <a href={link} className="bg-[#3ce3a8] text-black px-5 py-2.5 rounded-lg text-xs font-bold flex items-center gap-2 hover:-translate-y-0.5 transition-transform hover:bg-[#20caa0]">
+            <div 
+              className="bg-[#3ce3a8] text-black px-5 py-2.5 rounded-lg text-xs font-bold flex items-center gap-2 transition-all group-hover:-translate-y-0.5"
+            >
               {linkText} <ArrowRight size={14} />
-            </a>
+            </div>
           </div>
         </div>
       </motion.div>
@@ -123,6 +127,44 @@ const EcosystemSteps = () => {
         ))}
       </div>
     </div>
+  );
+};
+
+const Typewriter = ({ phrases }) => {
+  const [text, setText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [loopNum, setLoopNum] = useState(0);
+  const [typingSpeed, setTypingSpeed] = useState(80);
+
+  useEffect(() => {
+    let timer = setTimeout(() => {
+      const i = loopNum % phrases.length;
+      const fullText = phrases[i];
+
+      if (isDeleting) {
+        setText(fullText.substring(0, text.length - 1));
+        setTypingSpeed(30);
+      } else {
+        setText(fullText.substring(0, text.length + 1));
+        setTypingSpeed(80);
+      }
+
+      if (!isDeleting && text === fullText) {
+        setTimeout(() => setIsDeleting(true), 2500);
+      } else if (isDeleting && text === '') {
+        setIsDeleting(false);
+        setLoopNum(loopNum + 1);
+        setTypingSpeed(500);
+      }
+    }, typingSpeed);
+
+    return () => clearTimeout(timer);
+  }, [text, isDeleting, loopNum, phrases, typingSpeed]);
+
+  return (
+    <span className="border-r-4 border-[#3ce3a8] pr-1 inline-block min-h-[3rem]">
+      {text}
+    </span>
   );
 };
 
@@ -190,20 +232,27 @@ const App = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.1 }}
-              className="text-4xl md:text-5xl lg:text-[4rem] font-bold leading-[1.05] tracking-tight text-white mb-8"
+              className="text-4xl md:text-5xl lg:text-[3.5rem] font-bold leading-[1.05] tracking-tight text-white mb-4"
             >
               <br></br>
-              {/* RankMySkills:<br /> */}
-              <span className="text-[#3ce3a8]">The Ultimate<br /> Ecosystem</span><br />
-              <span className="text-3xl md:text-4xl lg:text-[2.75rem] leading-[1.1]">for Engineering<br /> Student Growth and<br /> Placement Intelligence</span>
+              <span className="text-[#3ce3a8]">The Ultimate<br /> Ecosystem </span>
+              <span className="text-3xl md:text-4xl lg:text-[2.75rem] leading-[1.1]">for</span><br />
+              <span className="text-3xl md:text-4xl lg:text-[2.75rem] leading-[1.1] block min-h-[90px] lg:min-h-[120px] mt-6 font-medium">
+                <Typewriter phrases={[
+                  "Students to compete and grow faster",
+                  "College Admins to track student activity",
+                  "Superadmins to monitor students and admins"
+                ]} />
+              </span>
             </motion.h1>
             
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex flex-wrap gap-4 pt-2"
+              className="flex flex-wrap gap-4 pt-2 mt-8 lg:mt-12"
             >
+              
               <a 
                 href="https://rankmyskills.in" 
                 className="bg-[#3ce3a8] text-[#04080c] px-6 py-3.5 rounded-lg font-bold flex items-center gap-2 transition-all hover:bg-[#20caa0] hover:-translate-y-0.5 text-sm"
@@ -211,10 +260,10 @@ const App = () => {
                 Open Student Dashboard <ArrowRight size={16} />
               </a>
               <a 
-                href="https://admin.rankmyskills.in" 
+                href="https://college.rankmyskills.in" 
                 className="bg-transparent border border-gray-600 text-white px-6 py-3.5 rounded-lg font-semibold flex items-center gap-2 transition-all hover:border-gray-400 hover:-translate-y-0.5 text-sm"
               >
-                Admin Dashboard <ArrowRight size={16} />
+                College Dashboard <ArrowRight size={16} />
               </a>
             </motion.div>
           </div>
@@ -223,7 +272,7 @@ const App = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.3 }}
-            className="lg:w-1/2 relative w-full h-[500px] mt-10 lg:mt-0"
+            className="lg:w-1/2 relative w-full h-[500px] mt-16 lg:mt-8 lg:ml-8"
           >
             {/* 3D Network Concept in Hero replacing the static dashboard */}
             <div className="absolute inset-0 rounded-2xl overflow-hidden border border-white/5 bg-[#0a1118]/40 backdrop-blur-sm shadow-[0_0_50px_rgba(16,185,129,0.15)] flex items-center justify-center pointer-events-none">
@@ -259,11 +308,11 @@ const App = () => {
                 {/* Student Node */}
                 <div className="absolute top-[10%] left-[50%] -translate-x-1/2 -translate-y-1/2 z-30">
                   <motion.div 
-                     className="w-20 h-20 rounded-2xl bg-[#162330]/90 backdrop-blur border border-emerald-500/60 flex flex-col items-center justify-center p-2 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                     className="w-20 h-20 rounded-2xl bg-[#162330]/90 backdrop-blur border border-blue-500/60 flex flex-col items-center justify-center p-2 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
                      animate={{ rotate: -360 }}
                      transition={{ duration: 75, repeat: Infinity, ease: "linear" }}
                   >
-                    <Users size={20} className="text-emerald-400 mb-1" />
+                    <Users size={20} className="text-blue-400 mb-1" />
                     <span className="text-xs font-bold text-center">Students</span>
                   </motion.div>
                 </div>
@@ -271,11 +320,11 @@ const App = () => {
                 {/* College Node */}
                 <div className="absolute top-[70%] left-[15.36%] -translate-x-1/2 -translate-y-1/2 z-30">
                   <motion.div 
-                     className="w-20 h-20 rounded-2xl bg-[#162330]/90 backdrop-blur border border-teal-500/60 flex flex-col items-center justify-center p-2 shadow-[0_0_20px_rgba(20,184,166,0.3)]"
+                     className="w-20 h-20 rounded-2xl bg-[#162330]/90 backdrop-blur border border-red-500/60 flex flex-col items-center justify-center p-2 shadow-[0_0_20px_rgba(20,184,166,0.3)]"
                      animate={{ rotate: -360 }}
                      transition={{ duration: 75, repeat: Infinity, ease: "linear" }}
                   >
-                    <BarChart3 size={20} className="text-teal-400 mb-1" />
+                    <BarChart3 size={20} className="text-red-400 mb-1" />
                     <span className="text-xs font-bold text-center">Colleges</span>
                   </motion.div>
                 </div>
@@ -283,11 +332,11 @@ const App = () => {
                 {/* Admin Node */}
                 <div className="absolute top-[70%] left-[84.64%] -translate-x-1/2 -translate-y-1/2 z-30">
                   <motion.div 
-                     className="w-20 h-20 rounded-2xl bg-[#162330]/90 backdrop-blur border border-blue-500/60 flex flex-col items-center justify-center p-2 shadow-[0_0_20px_rgba(59,130,246,0.3)]"
+                     className="w-20 h-20 rounded-2xl bg-[#162330]/90 backdrop-blur border border-yellow-300/60 flex flex-col items-center justify-center p-2 shadow-[0_0_20px_rgba(59,130,246,0.3)]"
                      animate={{ rotate: -360 }}
                      transition={{ duration: 75, repeat: Infinity, ease: "linear" }}
                   >
-                    <ShieldCheck size={20} className="text-blue-400 mb-1" />
+                    <ShieldCheck size={20} className="text-yellow-300 mb-1" />
                     <span className="text-xs font-bold text-center">Admins</span>
                   </motion.div>
                 </div>
@@ -420,13 +469,13 @@ const App = () => {
         </section>
 
         {/* Footer */}
-        <footer className="border-t border-white/10 bg-[#04080c] py-16 text-center text-gray-500 text-sm relative z-10">
+        <footer className="border-t border-white/10 bg-[#04080c] py-6 text-center text-gray-500 text-sm relative z-10">
           <div className="container mx-auto px-6 flex flex-col items-center">
-            <div className="flex items-center justify-center gap-3 mb-8 opacity-80 hover:opacity-100 transition-opacity cursor-pointer">
-              <div className="w-8 h-8 rounded bg-[#3ce3a8] flex items-center justify-center font-black text-[#060b13] text-sm shadow-[0_0_15px_rgba(60,227,168,0.5)]">
+            <div className="flex items-center justify-center gap-3 mb-4 opacity-80 hover:opacity-100 transition-opacity cursor-pointer">
+              <div className="w-6 h-6 rounded bg-[#3ce3a8] flex items-center justify-center font-black text-[#060b13] text-xs shadow-[0_0_15px_rgba(60,227,168,0.5)]">
                 R
               </div>
-              <span className="font-extrabold text-xl text-white tracking-tight">RankMy<span className="text-[#3ce3a8]">Skills</span></span>
+              <span className="font-extrabold text-lg text-white tracking-tight">RankMy<span className="text-[#3ce3a8]">Skills</span></span>
             </div>
             <p className="font-medium">© 2026 RankMySkills. All rights reserved.</p>
           </div>
