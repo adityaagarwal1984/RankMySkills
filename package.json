@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@splinetool/react-spline": "^4.1.0",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.8.0",
     "react-helmet": "^6.1.0"
