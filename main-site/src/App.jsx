@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Component } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Spline from '@splinetool/react-spline';
 import { Play, ArrowRight, ShieldCheck, BarChart3, Users } from 'lucide-react';
 
@@ -24,6 +24,108 @@ class ErrorBoundary extends Component {
   }
 }
 
+const FlipCard = ({ title, desc, link, linkText, icon, image, step }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div 
+      className="relative w-full h-[400px] cursor-pointer group"
+      style={{ perspective: '1000px' }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <motion.div
+        className="w-full h-full relative transition-all duration-700"
+        style={{ transformStyle: 'preserve-3d' }}
+        animate={{ rotateY: isHovered ? 180 : 0 }}
+      >
+        {/* Front */}
+        <div className="absolute w-full h-full rounded-xl border border-emerald-500/20 bg-[#04080c] overflow-hidden flex flex-col justify-end" style={{ backfaceVisibility: 'hidden' }}>
+          <div className="absolute inset-0 bg-cover bg-center opacity-80 transition-opacity duration-500 group-hover:opacity-100 group-hover:scale-105" style={{ backgroundImage: `url(${image})` }}></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#04080c] via-[#04080c]/60 to-transparent"></div>
+          <div className="absolute top-0 right-0 p-6 text-6xl font-black text-white/10 pointer-events-none transition-colors duration-500 group-hover:text-[#3ce3a8]/20">{step}</div>
+          <div className="p-6 relative z-10">
+             <div className="w-12 h-12 rounded-lg bg-[#3ce3a8]/10 text-[#3ce3a8] border border-[#3ce3a8]/30 flex items-center justify-center mb-4 backdrop-blur-sm">
+                {icon}
+             </div>
+             <h3 className="text-xl md:text-2xl font-bold text-white drop-shadow-md">{title}</h3>
+          </div>
+        </div>
+
+        {/* Back */}
+        <div className="absolute w-full h-full rounded-xl border border-[#3ce3a8]/40 bg-black overflow-hidden p-6 flex flex-col items-center justify-center text-center shadow-lg" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
+          <div className="absolute inset-0 bg-cover bg-center opacity-[0.1]" style={{ backgroundImage: `url(${image})` }}></div>
+          <div className="relative z-10 flex flex-col items-center w-full">
+            <div className="w-12 h-12 rounded-full bg-[#3ce3a8]/10 text-[#3ce3a8] border border-[#3ce3a8]/30 flex items-center justify-center mb-3">
+                {icon}
+            </div>
+            <h3 className="text-xl font-bold mb-2 text-white hover:text-[#3ce3a8] transition-colors">{title}</h3>
+            <p className="text-[13px] text-gray-300 mb-5 leading-relaxed w-full max-w-[95%] mx-auto">{desc}</p>
+            <a href={link} className="bg-[#3ce3a8] text-black px-5 py-2.5 rounded-lg text-xs font-bold flex items-center gap-2 hover:-translate-y-0.5 transition-transform hover:bg-[#20caa0]">
+              {linkText} <ArrowRight size={14} />
+            </a>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+const EcosystemSteps = () => {
+  const steps = [
+    { step: "1", title: "Students Join", desc: "Register & complete skills." },
+    { step: "2", title: "College Registers", desc: "Admin requests access." },
+    { step: "3", title: "Admin Approves", desc: "Platform admin reviews." },
+    { step: "4", title: "Access Granted", desc: "College gets dashboards." },
+    { step: "5", title: "Insights Visible", desc: "Data becomes visible." }
+  ];
+
+  return (
+    <div className="max-w-5xl mx-auto relative mt-16 pb-12">
+      <div className="hidden md:block absolute top-[28px] left-[10%] right-[10%] h-1.5 bg-gray-800/80 rounded-full z-0 overflow-hidden">
+        <motion.div 
+          className="h-full bg-gradient-to-r from-teal-400 via-emerald-500 to-green-400 shadow-[0_0_15px_rgba(16,185,129,0.8)]"
+          initial={{ width: "0%" }}
+          whileInView={{ width: "100%" }}
+          viewport={{ once: false, margin: "-50px" }}
+          transition={{ duration: 1.5, ease: "linear" }}
+        />
+      </div>
+      
+      <div className="grid md:grid-cols-5 gap-8">
+        {steps.map((item, idx) => (
+          <div key={idx} className="relative z-10 flex flex-col items-center text-center group">
+            <motion.div 
+              className="w-16 h-16 rounded-full bg-[#0a1118] border-4 border-gray-700 flex items-center justify-center text-2xl font-bold text-gray-500 mb-6 transition-all"
+              initial={{ borderColor: "#374151", color: "#6b7280", backgroundColor: "#0a1118", scale: 0.8 }}
+              whileInView={{ 
+                borderColor: "#10b981", 
+                backgroundColor: "#10b981", 
+                color: "#ffffff",
+                scale: 1,
+                boxShadow: "0 0 30px rgba(16,185,129,0.6)"
+              }}
+              viewport={{ once: false, margin: "-50px" }}
+              transition={{ duration: 0.4, delay: (idx * 0.3) }}
+            >
+              {item.step}
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, margin: "-50px" }}
+              transition={{ duration: 0.4, delay: (idx * 0.3) + 0.2, type: "spring", stiffness: 100 }}
+            >
+               <h4 className="font-bold text-lg mb-2 text-white drop-shadow-md">{item.title}</h4>
+               <p className="text-sm text-gray-400 leading-relaxed max-w-[150px] mx-auto">{item.desc}</p>
+            </motion.div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const App = () => {
   const [scrolled, setScrolled] = useState(false);
 
@@ -39,7 +141,7 @@ const App = () => {
     <div className="min-h-screen bg-[#0a1118] text-white relative overflow-x-hidden font-sans">
       
       {/* Interactive Spline 3D Background */}
-      <div className="fixed inset-0 z-0 h-screen w-screen pointer-events-none opacity-50 mix-blend-screen overflow-hidden">
+      <div className="fixed inset-0 z-0 h-screen w-screen pointer-events-none opacity-40 mix-blend-screen overflow-hidden">
          <ErrorBoundary>
            <Spline scene="https://prod.spline.design/6Wq1Q7YGyM-iab9I/scene.splinecode" />
          </ErrorBoundary>
@@ -52,7 +154,7 @@ const App = () => {
           animate={{ opacity: 1, x: 0 }}
           className="flex items-center gap-3 drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]"
         >
-          <div className="w-9 h-9 rounded bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center font-black text-[#04080c] shadow-lg shadow-emerald-500/50">
+          <div className="w-9 h-9 rounded bg-[#10b981] flex items-center justify-center font-black text-[#04080c] shadow-lg shadow-emerald-500/50">
             R
           </div>
           <span className="text-2xl font-extrabold tracking-tight text-white">RankMy<span className="text-emerald-400">Skills</span></span>
@@ -67,73 +169,52 @@ const App = () => {
           <a href="#process" className="hover:text-emerald-400 transition-colors drop-shadow-[0_0_8px_rgba(16,185,129,0)] hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]">How It Works</a>
           <a href="#demo" className="hover:text-emerald-400 transition-colors drop-shadow-[0_0_8px_rgba(16,185,129,0)] hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]">Demo</a>
         </motion.div>
-        {/* <motion.a 
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3 }}
-          href="https://college.rankmyskills.in"
-          className="border border-emerald-500 hover:bg-emerald-500/20 text-emerald-400 px-6 py-2.5 rounded-full text-sm font-bold transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)]"
-        >
-          College Login
-        </motion.a> */}
       </nav>
 
-      <main className="relative z-10 pt-20">
+      <main className="relative z-10 pt-8">
         {/* Hero Section */}
-        <section className="container mx-auto px-6 pb-24 flex flex-col lg:flex-row items-center gap-12 relative">
+        <section className="container mx-auto px-6 pb-12 pt-6 flex flex-col lg:flex-row items-center gap-8 relative min-h-[85vh] lg:min-h-0">
           
-          <div className="absolute top-1/4 left-1/4 w-[40vw] h-[40vw] bg-emerald-500/20 rounded-full blur-[120px] pointer-events-none -z-10 mix-blend-screen animate-pulse"></div>
-
-          <div className="lg:w-1/2 flex flex-col gap-6 z-10">
+          <div className="lg:w-1/2 flex flex-col gap-1 z-10 lg:-mt-8">
             <motion.div 
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, type: "spring", stiffness: 100 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/30 text-emerald-400 w-fit text-sm font-medium shadow-[0_0_15px_rgba(16,185,129,0.3)] backdrop-blur-sm"
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#3ce3a8]/30 w-fit text-[10px] font-bold bg-[#3ce3a8]/5 text-[#3ce3a8] tracking-widest mb-4"
             >
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              UNIFIED ECOSYSTEM
+              {/* <span className="text-[10px]">✦</span>
+              UNIFIED ECOSYSTEM */}
             </motion.div>
             
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-3xl md:text-6xl font-extrabold leading-[1.1] tracking-tight"
+              transition={{ duration: 0.7, delay: 0.1 }}
+              className="text-4xl md:text-5xl lg:text-[4rem] font-bold leading-[1.05] tracking-tight text-white mb-8"
             >
-              
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-emerald-400 to-green-300">
-                A Unified Ecosystem
-              </span> <br/>
-              for Engineering Student Growth and Placement Intelligence
+              <br></br>
+              {/* RankMySkills:<br /> */}
+              <span className="text-[#3ce3a8]">The Ultimate<br /> Ecosystem</span><br />
+              <span className="text-3xl md:text-4xl lg:text-[2.75rem] leading-[1.1]">for Engineering<br /> Student Growth and<br /> Placement Intelligence</span>
             </motion.h1>
-            
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-gray-400 text-lg md:text-xl max-w-xl leading-relaxed"
-            >
-              One ecosystem. Three dashboards. Complete visibility into student performance, college rankings, and placement outcomes.
-            </motion.p>
             
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex flex-wrap gap-4 pt-4"
+              className="flex flex-wrap gap-4 pt-2"
             >
               <a 
                 href="https://rankmyskills.in" 
-                className="bg-gradient-to-r from-emerald-500 to-teal-400 text-[#04080c] px-8 py-4 rounded-xl font-bold flex items-center gap-2 transition-all shadow-[0_0_30px_rgba(16,185,129,0.5)] hover:shadow-[0_0_40px_rgba(16,185,129,0.8)] transform hover:-translate-y-1 hover:scale-[1.02]"
+                className="bg-[#3ce3a8] text-[#04080c] px-6 py-3.5 rounded-lg font-bold flex items-center gap-2 transition-all hover:bg-[#20caa0] hover:-translate-y-0.5 text-sm"
               >
-                Open Student Dashboard <ArrowRight size={18} />
+                Open Student Dashboard <ArrowRight size={16} />
               </a>
               <a 
                 href="https://admin.rankmyskills.in" 
-                className="bg-[#0b131c]/50 backdrop-blur-md border border-emerald-500/40 text-emerald-400 px-8 py-4 rounded-xl font-semibold flex items-center gap-2 transition-all hover:bg-emerald-500/10 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:-translate-y-1"
+                className="bg-transparent border border-gray-600 text-white px-6 py-3.5 rounded-lg font-semibold flex items-center gap-2 transition-all hover:border-gray-400 hover:-translate-y-0.5 text-sm"
               >
-                Admin Dashboard <ArrowRight size={18} />
+                Admin Dashboard <ArrowRight size={16} />
               </a>
             </motion.div>
           </div>
@@ -141,165 +222,148 @@ const App = () => {
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="lg:w-1/2 relative"
+            transition={{ duration: 1, delay: 0.3 }}
+            className="lg:w-1/2 relative w-full h-[500px] mt-10 lg:mt-0"
           >
-            {/* Abstract visual representation of a dashboard in 3D-ish CSS */}
-            <div className="relative w-full max-w-lg mx-auto aspect-video rounded-xl border border-white/10 bg-[#0d1620] shadow-2xl overflow-hidden transform perspective-1000 rotate-y-[-5deg] rotate-x-[5deg]">
-              <div className="absolute top-0 w-full h-8 bg-[#121c26] border-b border-white/5 flex items-center px-4 gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
-                <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-                <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
-                <div className="ml-4 text-xs text-gray-500 font-mono">rankmyskills.in/dashboard</div>
-              </div>
-              <div className="p-6 pt-12 flex flex-col gap-4">
-                <div className="flex gap-4">
-                  <div className="w-1/3 h-24 rounded-lg bg-[#162330] border border-white/5 p-4">
-                    <div className="text-xs text-gray-500 mb-2">STUDENTS</div>
-                    <div className="text-2xl font-bold">1,248</div>
-                    <div className="text-xs text-emerald-400 mt-1">+12% this month</div>
-                  </div>
-                  <div className="w-1/3 h-24 rounded-lg bg-[#162330] border border-white/5 p-4">
-                    <div className="text-xs text-gray-500 mb-2">ASSESSMENTS</div>
-                    <div className="text-2xl font-bold">3,820</div>
-                    <div className="text-xs text-emerald-400 mt-1">+8% this month</div>
-                  </div>
-                  <div className="w-1/3 h-24 rounded-lg bg-gradient-to-br from-teal-500/20 to-emerald-500/5 p-4 border border-emerald-500/30">
-                    <div className="text-xs text-emerald-400/80 mb-2">RANKING</div>
-                    <div className="text-2xl font-bold text-emerald-400">#3</div>
-                    <div className="text-xs text-gray-400 mt-1">Nationally</div>
-                  </div>
+            {/* 3D Network Concept in Hero replacing the static dashboard */}
+            <div className="absolute inset-0 rounded-2xl overflow-hidden border border-white/5 bg-[#0a1118]/40 backdrop-blur-sm shadow-[0_0_50px_rgba(16,185,129,0.15)] flex items-center justify-center pointer-events-none">
+              <ErrorBoundary>
+                {/* A generic prebuilt spline that provides a nice 3d network / node vibe replacing old design */}
+                <div className="w-[150%] h-[150%] pointer-events-auto">
+                  <Spline scene="https://prod.spline.design/kZIGLNcdAJe-2V5i/scene.splinecode" />
                 </div>
-                <div className="w-full h-32 rounded-lg bg-[#162330] border border-white/5 p-4 flex items-end gap-2">
-                   {/* Fake chart bars */}
-                   {[40, 60, 45, 80, 55, 90, 70, 100].map((h, i) => (
-                     <div key={i} className="flex-1 bg-gradient-to-t from-emerald-500/20 to-teal-400/80 rounded-t-sm" style={{ height: `${h}%` }}></div>
-                   ))}
+              </ErrorBoundary>
+            </div>
+
+            {/* Overlaid Animated Nodes for Student, College, Admin */}
+            <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+              <motion.div 
+                className="relative w-[400px] h-[400px] scale-110"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 75, repeat: Infinity, ease: "linear" }}
+              >
+                <div className="absolute top-1/2 left-1/2 rounded-full border border-emerald-500/30 w-80 h-80 -translate-x-1/2 -translate-y-1/2 shadow-[inset_0_0_20px_rgba(16,185,129,0.1)]"></div>
+                <div className="absolute top-1/2 left-1/2 border border-emerald-500/10 rounded-full w-56 h-56 -translate-x-1/2 -translate-y-1/2"></div>
+                
+                {/* Central "RankMySkills" Hub */}
+                <motion.div 
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-[#0a1118] border border-emerald-500 shadow-[0_0_40px_rgba(16,185,129,0.5)] flex items-center justify-center z-20 backdrop-blur-md"
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 75, repeat: Infinity, ease: "linear" }}
+                >
+                  <div className="w-12 h-12 rounded bg-[#10b981] flex items-center justify-center font-black text-[#04080c] shadow-[0_0_15px_rgba(16,185,129,0.6)] text-2xl">
+                    R
+                  </div>
+                </motion.div>
+
+                {/* Student Node */}
+                <div className="absolute top-[10%] left-[50%] -translate-x-1/2 -translate-y-1/2 z-30">
+                  <motion.div 
+                     className="w-20 h-20 rounded-2xl bg-[#162330]/90 backdrop-blur border border-emerald-500/60 flex flex-col items-center justify-center p-2 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                     animate={{ rotate: -360 }}
+                     transition={{ duration: 75, repeat: Infinity, ease: "linear" }}
+                  >
+                    <Users size={20} className="text-emerald-400 mb-1" />
+                    <span className="text-xs font-bold text-center">Students</span>
+                  </motion.div>
                 </div>
-              </div>
+
+                {/* College Node */}
+                <div className="absolute top-[70%] left-[15.36%] -translate-x-1/2 -translate-y-1/2 z-30">
+                  <motion.div 
+                     className="w-20 h-20 rounded-2xl bg-[#162330]/90 backdrop-blur border border-teal-500/60 flex flex-col items-center justify-center p-2 shadow-[0_0_20px_rgba(20,184,166,0.3)]"
+                     animate={{ rotate: -360 }}
+                     transition={{ duration: 75, repeat: Infinity, ease: "linear" }}
+                  >
+                    <BarChart3 size={20} className="text-teal-400 mb-1" />
+                    <span className="text-xs font-bold text-center">Colleges</span>
+                  </motion.div>
+                </div>
+
+                {/* Admin Node */}
+                <div className="absolute top-[70%] left-[84.64%] -translate-x-1/2 -translate-y-1/2 z-30">
+                  <motion.div 
+                     className="w-20 h-20 rounded-2xl bg-[#162330]/90 backdrop-blur border border-blue-500/60 flex flex-col items-center justify-center p-2 shadow-[0_0_20px_rgba(59,130,246,0.3)]"
+                     animate={{ rotate: -360 }}
+                     transition={{ duration: 75, repeat: Infinity, ease: "linear" }}
+                  >
+                    <ShieldCheck size={20} className="text-blue-400 mb-1" />
+                    <span className="text-xs font-bold text-center">Admins</span>
+                  </motion.div>
+                </div>
+
+              </motion.div>
             </div>
             
-            {/* Floating element */}
-            <motion.div 
-              animate={{ y: [0, -15, 0] }}
-              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-              className="absolute -right-8 top-16 bg-[#162330] border border-white/10 p-3 rounded-lg shadow-xl flex items-center gap-3 backdrop-blur-md"
-            >
-              <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-                <Users size={18} />
-              </div>
-              <div>
-                <div className="text-sm font-bold">New Student Joined</div>
-                <div className="text-xs text-gray-400">Sneha Patel • 2 min ago</div>
-              </div>
-            </motion.div>
           </motion.div>
         </section>
 
-        {/* Dashboards Section */}
-        <section id="ecosystem" className="py-24 bg-[#080d13] relative border-t border-white/5">
-          <div className="container mx-auto px-6 text-center">
-            <h3 className="text-emerald-400 font-semibold tracking-widest text-sm mb-4 uppercase">THE ECOSYSTEM</h3>
-            <h2 className="text-4xl md:text-5xl font-bold mb-16">Three Dashboards. <span className="text-emerald-400">One Unified Platform.</span></h2>
+        {/* Dashboards Section with 3D Flipping Cards */}
+        <section id="ecosystem" className="py-20 bg-[#080d13] relative border-t border-white/5">
+          <div className="container mx-auto px-6 text-center relative z-10">
+            <h3 className="text-[#3ce3a8] font-bold tracking-widest text-xs mb-3 uppercase">THE ECOSYSTEM</h3>
+            <h2 className="text-3xl md:text-4xl font-bold mb-12 text-white">Three Dashboards. <span className="text-[#3ce3a8]">One Unified Platform.</span></h2>
             
             <div className="grid md:grid-cols-3 gap-8 text-left">
-              {/* Card 1 */}
-              <motion.div 
-                whileHover={{ y: -10 }}
-                className="bg-[#0f1722] border border-white/5 hover:border-emerald-500/30 p-8 rounded-2xl shadow-lg transition-all group relative overflow-hidden"
-              >
-                <div className="absolute top-0 right-0 p-8 text-8xl font-black text-white/[0.02] pointer-events-none group-hover:text-emerald-500/[0.05] transition-colors">01</div>
-                <div className="w-14 h-14 rounded-xl bg-gray-800 flex items-center justify-center mb-6 group-hover:bg-emerald-500/20 group-hover:text-emerald-400 transition-colors border border-white/5">
-                   <Users size={24} />
-                </div>
-                <h3 className="text-2xl font-bold mb-4">Student Dashboard</h3>
-                <p className="text-gray-400 mb-8 leading-relaxed">Students track assessments, view rankings, and monitor placement readiness in real time.</p>
-                <a href="https://rankmyskills.in" className="text-emerald-400 font-semibold flex items-center gap-2 hover:text-emerald-300">
-                  Open Student Dashboard <ArrowRight size={16} />
-                </a>
-              </motion.div>
-              
-              {/* Card 2 */}
-              <motion.div 
-                whileHover={{ y: -10 }}
-                className="bg-[#0f1722] border border-emerald-500/20 p-8 rounded-2xl shadow-[0_0_30px_rgba(16,185,129,0.05)] transition-all group relative overflow-hidden"
-              >
-                <div className="absolute top-0 right-0 p-8 text-8xl font-black text-white/[0.02] pointer-events-none group-hover:text-emerald-500/[0.05] transition-colors">02</div>
-                <div className="w-14 h-14 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mb-6">
-                   <BarChart3 size={24} />
-                </div>
-                <h3 className="text-2xl font-bold mb-4">College Dashboard</h3>
-                <p className="text-gray-400 mb-8 leading-relaxed">College admins view enrolled students, leaderboard positions, and performance data for their institution.</p>
-                <a href="https://college.rankmyskills.in" className="text-emerald-400 font-semibold flex items-center gap-2 hover:text-emerald-300">
-                  Open College Dashboard <ArrowRight size={16} />
-                </a>
-              </motion.div>
-              
-              {/* Card 3 */}
-              <motion.div 
-                whileHover={{ y: -10 }}
-                className="bg-[#0f1722] border border-white/5 hover:border-emerald-500/30 p-8 rounded-2xl shadow-lg transition-all group relative overflow-hidden"
-              >
-                 <div className="absolute top-0 right-0 p-8 text-8xl font-black text-white/[0.02] pointer-events-none group-hover:text-emerald-500/[0.05] transition-colors">03</div>
-                <div className="w-14 h-14 rounded-xl bg-gray-800 flex items-center justify-center mb-6 group-hover:bg-emerald-500/20 group-hover:text-emerald-400 transition-colors border border-white/5">
-                   <ShieldCheck size={24} />
-                </div>
-                <h3 className="text-2xl font-bold mb-4">Admin Dashboard</h3>
-                <p className="text-gray-400 mb-8 leading-relaxed">Platform admins manage college approvals, oversee all data, and control access across the ecosystem.</p>
-                <a href="https://admin.rankmyskills.in" className="text-emerald-400 font-semibold flex items-center gap-2 hover:text-emerald-300">
-                  Open Admin Dashboard <ArrowRight size={16} />
-                </a>
-              </motion.div>
+              <FlipCard 
+                title="Student Dashboard"
+                desc="Students track assessments, view rankings, and monitor placement readiness in real time. Build your portfolio and level up your engineering skills seamlessly."
+                link="https://rankmyskills.in"
+                linkText="Open Dashboard"
+                icon={<Users size={28} />}
+                image="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800"
+                step="01"
+              />
+              <FlipCard 
+                title="College Dashboard"
+                desc="College admins view enrolled students, leaderboard positions, and performance data for their institution. Manage batches and improve placement outputs effectively."
+                link="https://college.rankmyskills.in"
+                linkText="College Login"
+                icon={<BarChart3 size={28} />}
+                image="https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=800"
+                step="02"
+              />
+              <FlipCard 
+                title="Admin Dashboard"
+                desc="Platform admins manage college approvals, oversee all data, and control access across the ecosystem. Ensure data integrity and system health globally."
+                link="https://admin.rankmyskills.in"
+                linkText="Admin Login"
+                icon={<ShieldCheck size={28} />}
+                image="https://images.unsplash.com/photo-1542626991-cbc4e32524cc?q=80&w=800"
+                step="03"
+              />
             </div>
           </div>
         </section>
 
-        {/* Process Section */}
-        <section id="process" className="py-24 bg-[#0a1118] relative">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-16">
-              <h3 className="text-emerald-400 font-semibold tracking-widest text-sm mb-4 uppercase">PROCESS</h3>
-              <h2 className="text-4xl font-bold">How the Ecosystem Works</h2>
+        {/* Process Section with Filling Animation */}
+        <section id="process" className="py-24 bg-[#0a1118] relative overflow-hidden">
+          
+          <div className="container mx-auto px-6 relative z-10">
+            <div className="text-center mb-12">
+              <h3 className="text-[#3ce3a8] font-bold tracking-widest text-xs mb-3 uppercase">PROCESS</h3>
+              <h2 className="text-3xl md:text-4xl font-bold">How the Ecosystem Works</h2>
+              <p className="text-gray-400 mt-3 text-base">A seamless flow connecting every stakeholder.</p>
             </div>
             
-            <div className="max-w-5xl mx-auto relative mt-16">
-              {/* Connecting line */}
-              <div className="hidden md:block absolute top-[28px] left-[10%] right-[10%] h-0.5 bg-gradient-to-r from-gray-800 via-emerald-500/50 to-gray-800 z-0"></div>
-              
-              <div className="grid md:grid-cols-5 gap-8">
-                {[
-                  { step: "1", title: "Students Join", desc: "Students register and complete skill assessments." },
-                  { step: "2", title: "College Registers", desc: "College admin requests platform access." },
-                  { step: "3", title: "Admin Approves", desc: "Platform admin reviews college registration." },
-                  { step: "4", title: "Access Granted", desc: "College admin gains full dashboard access." },
-                  { step: "5", title: "Insights Visible", desc: "Rankings and placement data become visible." }
-                ].map((item, idx) => (
-                  <div key={idx} className="relative z-10 flex flex-col items-center text-center group">
-                    <div className="w-14 h-14 rounded-full bg-[#0a1118] border-2 border-emerald-500/50 flex items-center justify-center text-xl font-bold text-emerald-400 mb-6 shadow-[0_0_15px_rgba(16,185,129,0.2)] group-hover:bg-emerald-500 group-hover:text-white transition-all group-hover:scale-110">
-                      {item.step}
-                    </div>
-                    <h4 className="font-bold text-lg mb-2">{item.title}</h4>
-                    <p className="text-sm text-gray-400">{item.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <EcosystemSteps />
           </div>
         </section>
 
         {/* Demo Section */}
-        <section id="demo" className="py-24 bg-[#080d13] border-t border-white/5 relative">
-          <div className="container mx-auto px-6 text-center max-w-5xl">
-            <h3 className="text-emerald-400 font-semibold tracking-widest text-sm mb-4 uppercase">DEMO</h3>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">See RankMySkills in Action</h2>
-            <p className="text-gray-400 text-lg mb-16 max-w-2xl mx-auto">Watch how students, colleges, and admins interact across the unified platform.</p>
+        <section id="demo" className="py-20 bg-[#080d13] border-t border-white/5 relative">
+
+          <div className="container mx-auto px-6 text-center max-w-5xl relative z-10">
+            <h3 className="text-[#3ce3a8] font-bold tracking-widest text-xs mb-3 uppercase">DEMO</h3>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">See RankMySkills in Action</h2>
+            <p className="text-gray-400 text-base mb-12 max-w-xl mx-auto">Watch how students, colleges, and admins interact across the unified platform.</p>
             
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
+              viewport={{ once: false, amount: 0.2 }}
               transition={{ duration: 0.8, type: "spring" }}
-              className="relative rounded-2xl overflow-hidden border border-emerald-500 shadow-[0_0_80px_rgba(16,185,129,0.3)] group pb-[56.25%] backdrop-blur-sm bg-black/40 ring-1 ring-emerald-500/50"
+              className="relative rounded-2xl overflow-hidden border border-[#3ce3a8]/20 shadow-xl group pb-[56.25%] backdrop-blur-sm bg-black/80"
             >
               <div className="absolute top-0 w-full h-8 bg-[#121c26] border-b border-white/5 flex items-center px-4 gap-2 z-10">
                 <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
@@ -320,54 +384,51 @@ const App = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-24 bg-gradient-to-b from-[#0a1118] to-[#080d13] border-t border-white/5 text-center relative overflow-hidden">
-          <div className="absolute inset-0 z-0 opacity-30">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-500/20 blur-[100px] rounded-full"></div>
-          </div>
-          
+        <section className="py-24 bg-[#0a1118] border-t border-white/5 text-center relative overflow-hidden">
           <div className="container mx-auto px-6 relative z-10">
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-emerald-500/30 text-emerald-400 text-sm font-medium mb-8 bg-[#0a1118]/50 backdrop-blur-md">
-              ✨ GET STARTED TODAY
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#3ce3a8]/30 text-[#3ce3a8] text-xs font-bold mb-6 tracking-widest bg-[#3ce3a8]/5">
+              <span className="text-[10px]">✦</span>
+              GET STARTED TODAY
             </span>
-            <h2 className="text-4xl md:text-6xl font-bold mb-6">
-              Ready to Unlock <span className="text-emerald-400">Placement<br/>Intelligence?</span>
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight">
+              Ready to Unlock <span className="text-[#3ce3a8]">Placement<br/>Intelligence?</span>
             </h2>
-            <p className="text-gray-400 text-lg mb-10 max-w-2xl mx-auto">
+            <p className="text-gray-400 text-base md:text-lg mb-10 max-w-xl mx-auto font-normal">
               Join the RankMySkills ecosystem and unlock complete placement intelligence for your institution.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
                <a 
                 href="https://rankmyskills.in" 
-                className="bg-emerald-500 hover:bg-emerald-400 text-[#0a1118] px-8 py-4 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] transform hover:-translate-y-1"
+                className="bg-[#3ce3a8] text-[#0a1118] px-8 py-3.5 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:bg-[#20caa0] text-sm flex items-center gap-2"
               >
-                Open Student Dashboard →
+                Open Student Dashboard <ArrowRight size={18} />
               </a>
               <a 
                 href="https://admin.rankmyskills.in" 
-                className="bg-[#121c26] border border-emerald-500/30 hover:border-emerald-400 text-emerald-400 px-8 py-4 rounded-xl font-semibold transition-all hover:bg-emerald-500/5"
+                className="bg-transparent border border-gray-600 hover:border-gray-400 text-white px-6 py-3.5 rounded-lg font-semibold transition-all hover:-translate-y-0.5 flex items-center gap-2 text-sm"
               >
-                Admin Dashboard →
+                Admin Dashboard
               </a>
               <a 
                 href="https://college.rankmyskills.in" 
-                className="bg-[#121c26] border border-emerald-500/30 hover:border-emerald-400 text-emerald-400 px-8 py-4 rounded-xl font-semibold transition-all hover:bg-emerald-500/5"
+                className="bg-transparent border border-gray-600 hover:border-gray-400 text-white px-6 py-3.5 rounded-lg font-semibold transition-all hover:-translate-y-0.5 flex items-center gap-2 text-sm"
               >
-                Register as College Admin →
+                Register as College Admin
               </a>
             </div>
           </div>
         </section>
-        
+
         {/* Footer */}
-        <footer className="border-t border-white/5 bg-[#060b13] py-12 text-center text-gray-500 text-sm">
-          <div className="container mx-auto px-6">
-            <div className="flex items-center justify-center gap-2 mb-6">
-              <div className="w-6 h-6 rounded bg-emerald-500 flex items-center justify-center font-bold text-[#060b13] text-xs">
+        <footer className="border-t border-white/10 bg-[#04080c] py-16 text-center text-gray-500 text-sm relative z-10">
+          <div className="container mx-auto px-6 flex flex-col items-center">
+            <div className="flex items-center justify-center gap-3 mb-8 opacity-80 hover:opacity-100 transition-opacity cursor-pointer">
+              <div className="w-8 h-8 rounded bg-[#3ce3a8] flex items-center justify-center font-black text-[#060b13] text-sm shadow-[0_0_15px_rgba(60,227,168,0.5)]">
                 R
               </div>
-              <span className="font-bold text-gray-300">RankMySkills</span>
+              <span className="font-extrabold text-xl text-white tracking-tight">RankMy<span className="text-[#3ce3a8]">Skills</span></span>
             </div>
-            <p>© 2026 RankMySkills. All rights reserved.</p>
+            <p className="font-medium">© 2026 RankMySkills. All rights reserved.</p>
           </div>
         </footer>
       </main>
