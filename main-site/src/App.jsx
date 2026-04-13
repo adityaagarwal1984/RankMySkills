@@ -213,9 +213,9 @@ const App = () => {
         </motion.div>
       </nav>
 
-      <main className="relative z-10 pt-8">
+      <main className="relative z-10">
         {/* Hero Section */}
-        <section className="container mx-auto px-6 pb-12 pt-6 flex flex-col lg:flex-row items-center gap-8 relative min-h-[85vh] lg:min-h-0">
+        <section className="container mx-auto px-6 pb-12 pt-28 lg:pt-20 flex flex-col lg:flex-row items-center gap-8 relative min-h-[100dvh] lg:min-h-screen">
           
           <div className="lg:w-1/2 flex flex-col gap-1 z-10 lg:-mt-8">
             <motion.div 
@@ -254,7 +254,7 @@ const App = () => {
             >
               
               <a 
-                href="https://rankmyskills.in" 
+                href="https://student.rankmyskills.in" 
                 className="bg-[#3ce3a8] text-[#04080c] px-6 py-3.5 rounded-lg font-bold flex items-center gap-2 transition-all hover:bg-[#20caa0] hover:-translate-y-0.5 text-sm"
               >
                 Open Student Dashboard <ArrowRight size={16} />
@@ -357,7 +357,7 @@ const App = () => {
               <FlipCard 
                 title="Student Dashboard"
                 desc="Students track assessments, view rankings, and monitor placement readiness in real time. Build your portfolio and level up your engineering skills seamlessly."
-                link="https://rankmyskills.in"
+                link="https://student.rankmyskills.in"
                 linkText="Open Dashboard"
                 icon={<Users size={28} />}
                 image="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800"
@@ -447,7 +447,7 @@ const App = () => {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
                <a 
-                href="https://rankmyskills.in" 
+                href="https://student.rankmyskills.in" 
                 className="bg-[#3ce3a8] text-[#0a1118] px-8 py-3.5 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:bg-[#20caa0] text-sm flex items-center gap-2"
               >
                 Open Student Dashboard <ArrowRight size={18} />
