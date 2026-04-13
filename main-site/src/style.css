@@ -1,0 +1,15 @@
+@import "tailwindcss";
+:root {
+  --background: #060b13;
+  --text-primary: #e0f2fe;
+  --accent-cyan: #00df9a;
+}
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
