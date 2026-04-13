@@ -215,9 +215,9 @@ const App = () => {
 
       <main className="relative z-10">
         {/* Hero Section */}
-        <section className="container mx-auto px-6 pb-12 pt-28 lg:pt-20 flex flex-col lg:flex-row items-center lg:items-start xl:items-center gap-8 lg:gap-12 relative min-h-[100dvh] lg:min-h-screen overflow-hidden lg:overflow-visible">
+        <section className="container mx-auto px-6 pb-6 pt-24 lg:pt-20 flex flex-col lg:flex-row items-center lg:items-start xl:items-center gap-4 sm:gap-8 lg:gap-12 relative min-h-[100dvh] lg:min-h-screen justify-center overflow-hidden lg:overflow-visible">
           
-          <div className="w-full lg:w-1/2 flex flex-col gap-1 z-10 lg:-mt-8 text-center lg:text-left items-center lg:items-start">
+          <div className="w-full lg:w-1/2 flex flex-col z-10 lg:-mt-8 text-center lg:text-left items-center lg:items-start max-w-2xl mx-auto lg:mx-0">
             <motion.div 
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -232,27 +232,35 @@ const App = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.1 }}
-              className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold leading-[1.1] tracking-tight text-white mb-2 md:mb-4"
+              className="text-[2.5rem] leading-[1.1] sm:text-5xl lg:text-[4rem] font-bold tracking-tight text-white mb-4 lg:mb-6 w-full"
             >
               <br className="hidden lg:block"></br>
-              <span className="text-[#3ce3a8]">The Ultimate<br className="hidden sm:block" /> Ecosystem </span>
-              <span className="text-2xl sm:text-4xl lg:text-[2.75rem] leading-[1.1]">for</span><br />
-              <span className="text-xl sm:text-3xl md:text-4xl lg:text-[2.75rem] leading-[1.2] block min-h-[70px] sm:min-h-[90px] lg:min-h-[120px] mt-4 sm:mt-6 font-medium sm:ml-4 lg:ml-12">
+              <span className="text-[#3ce3a8]">The Ultimate<br /> Ecosystem</span>
+              <span className="text-white"> for</span><br />
+              <div className="text-xl sm:text-3xl lg:text-[2.5rem] leading-[1.2] min-h-[60px] sm:min-h-[90px] lg:min-h-[100px] mt-3 lg:mt-4 font-medium flex justify-center lg:justify-start">
                 <Typewriter phrases={[
                   "Students to compete and grow faster",
                   "College Admins to track student activity",
                   "Superadmins to monitor students and admins"
                 ]} />
-              </span>
+              </div>
             </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-gray-300 text-[13px] sm:text-sm lg:text-base font-normal leading-relaxed text-center lg:text-left mb-6 max-w-md lg:max-w-xl mx-auto lg:mx-0"
+            >
+              A unified platform connecting engineering talent with placement opportunities. Track activities, manage assessments, and accelerate career growth through one seamless ecosystem.
+            </motion.p>
             
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-2 mt-4 sm:mt-8 w-full sm:w-auto"
+              className="flex flex-col sm:flex-row w-full sm:w-auto gap-3 lg:gap-4 pb-4"
             >
-              
               <a 
                 href="https://student.rankmyskills.in" 
                 className="bg-[#3ce3a8] text-[#04080c] px-6 py-3.5 rounded-lg font-bold flex items-center justify-center gap-2 transition-all hover:bg-[#20caa0] hover:-translate-y-0.5 text-sm w-full sm:w-auto"
@@ -261,7 +269,7 @@ const App = () => {
               </a>
               <a 
                 href="https://college.rankmyskills.in" 
-                className="bg-transparent border border-gray-600 text-white px-6 py-3.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all hover:border-gray-400 hover:-translate-y-0.5 text-sm w-full sm:w-auto"
+                className="bg-transparent border border-gray-600 text-white px-6 py-3.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all hover:bg-white/5 hover:border-gray-400 hover:-translate-y-0.5 text-sm w-full sm:w-auto"
               >
                 College Dashboard <ArrowRight size={16} />
               </a>
@@ -272,7 +280,7 @@ const App = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.3 }}
-            className="w-full lg:w-1/2 relative h-[350px] sm:h-[450px] lg:h-[500px] mt-8 lg:mt-8 lg:ml-8"
+            className="w-full lg:w-1/2 relative h-[250px] sm:h-[400px] lg:h-[500px] mt-4 lg:mt-8 lg:ml-8 flex-shrink-0"
           >
             {/* 3D Network Concept in Hero replacing the static dashboard */}
             <div className="absolute inset-0 rounded-2xl overflow-hidden border border-white/5 bg-[#0a1118]/40 backdrop-blur-sm shadow-[0_0_50px_rgba(16,185,129,0.15)] flex items-center justify-center pointer-events-none">
