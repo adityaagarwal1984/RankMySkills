@@ -232,12 +232,12 @@ const App = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.1 }}
-              className="text-[2.5rem] leading-[1.1] sm:text-5xl lg:text-[4rem] font-bold tracking-tight text-white mb-4 lg:mb-6 w-full"
+              className="text-5xl leading-[1.1] sm:text-6xl lg:text-[4rem] font-bold tracking-tight text-white mb-6 lg:mb-6 w-full"
             >
               <br className="hidden lg:block"></br>
               <span className="text-[#3ce3a8]">The Ultimate<br /> Ecosystem</span>
               <span className="text-white"> for</span><br />
-              <div className="text-xl sm:text-3xl lg:text-[2.5rem] leading-[1.2] min-h-[60px] sm:min-h-[90px] lg:min-h-[100px] mt-3 lg:mt-4 font-medium flex justify-center lg:justify-start">
+              <div className="text-3xl sm:text-4xl lg:text-[2.5rem] leading-[1.3] min-h-[90px] sm:min-h-[110px] lg:min-h-[100px] mt-4 lg:mt-4 font-medium flex justify-center lg:justify-start">
                 <Typewriter phrases={[
                   "Students to compete and grow faster",
                   "College Admins to track student activity",
@@ -250,7 +250,7 @@ const App = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-gray-300 text-[13px] sm:text-sm lg:text-base font-normal leading-relaxed text-center lg:text-left mb-6 max-w-md lg:max-w-xl mx-auto lg:mx-0"
+              className="text-gray-300 text-lg sm:text-xl lg:text-base font-normal leading-relaxed text-center lg:text-left mb-10 max-w-md lg:max-w-xl mx-auto lg:mx-0"
             >
               A unified platform connecting engineering talent with placement opportunities. Track activities, manage assessments, and accelerate career growth through one seamless ecosystem.
             </motion.p>
@@ -259,19 +259,19 @@ const App = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex flex-col sm:flex-row w-full sm:w-auto gap-3 lg:gap-4 pb-4"
+              className="flex flex-col sm:flex-row w-full sm:w-auto gap-4 lg:gap-4 pb-8"
             >
               <a 
                 href="https://student.rankmyskills.in" 
-                className="bg-[#3ce3a8] text-[#04080c] px-6 py-3.5 rounded-lg font-bold flex items-center justify-center gap-2 transition-all hover:bg-[#20caa0] hover:-translate-y-0.5 text-sm w-full sm:w-auto"
+                className="bg-[#3ce3a8] text-[#04080c] px-6 py-4 rounded-lg font-bold flex items-center justify-center gap-2 transition-all hover:bg-[#20caa0] hover:-translate-y-0.5 text-base w-full sm:w-auto"
               >
-                Open Student Dashboard <ArrowRight size={16} />
+                Open Student Dashboard <ArrowRight size={18} />
               </a>
               <a 
                 href="https://college.rankmyskills.in" 
-                className="bg-transparent border border-gray-600 text-white px-6 py-3.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all hover:bg-white/5 hover:border-gray-400 hover:-translate-y-0.5 text-sm w-full sm:w-auto"
+                className="bg-transparent border border-gray-600 text-white px-6 py-4 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all hover:bg-white/5 hover:border-gray-400 hover:-translate-y-0.5 text-base w-full sm:w-auto"
               >
-                College Dashboard <ArrowRight size={16} />
+                College Dashboard <ArrowRight size={18} />
               </a>
             </motion.div>
           </div>
